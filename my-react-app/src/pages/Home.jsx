@@ -29,31 +29,54 @@ const Home = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
   }, []);
 
   useGSAP(() => {
-    // 1. INITIAL ANIMATION: Move the prompt from the Center to the Bottom Right
+    // 1. BUTTON CONTAINER ANIMATION
+    // Start perfectly centered
     gsap.set("#global-scroll-btn", {
       top: "50%",
       left: "50%",
       xPercent: -50,
       yPercent: -50,
-      scale: 1.2,
-      transformOrigin: "center center"
     });
 
+    // Move to bottom right (100% left/top pushes the top-left corner to the very edge, 
+    // -100 x/yPercent pulls it exactly inside the screen, and x/y adds the margin padding)
     gsap.to("#global-scroll-btn", {
-      top: "95%",              
-      left: "95%",             
-      xPercent: -100,          
+      top: "100%",
+      left: "100%",
+      xPercent: -100,
       yPercent: -100,
-      scale: 0.8,              
+      x: () => window.innerWidth >= 768 ? -48 : -32, // 48px margin desktop, 32px mobile
+      y: () => window.innerWidth >= 768 ? -48 : -32,
+      scale: 0.85,
       scrollTrigger: {
         trigger: "#hero",
         start: "top top",
-        end: "+=800", 
+        end: "+=800",
+        scrub: 1,
+        invalidateOnRefresh: true, // Recalculates screen width perfectly on resize
+      },
+    });
+
+    // 2. TEXT ALIGNMENT ANIMATION
+    // Text starts centered on the button
+    gsap.set("#scroll-btn-text", {
+      left: "50%",
+      xPercent: -50,
+    });
+
+    // Text slides to become perfectly flush with the right edge of the button
+    gsap.to("#scroll-btn-text", {
+      left: "100%",
+      xPercent: -100,
+      scrollTrigger: {
+        trigger: "#hero",
+        start: "top top",
+        end: "+=800",
         scrub: 1,
       },
     });
 
-    // 2. DIRECTIONAL TRACKING
+    // 3. DIRECTIONAL TRACKING
     const sections = [
       { id: "#hero", next: "#about", nextText: "Scroll to About", prev: "#hero", prevText: "Scroll to explore" },
       { id: "#about", next: "#projects", nextText: "Scroll to Projects", prev: "#hero", prevText: "Scroll to Hero" },
@@ -104,20 +127,24 @@ const Home = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
         {/* --- GLOBAL FLOATING SCROLL BUTTON --- */}
         <div 
           id="global-scroll-btn"
-          // FIX APPLIED HERE: Added w-[240px] to lock the container width
-          className="fixed z-[150] w-[240px] flex flex-col items-center gap-4 pointer-events-none"
+          // FIX APPLIED: We removed all widths/flex columns so the box wraps TIGHTLY around the circular button
+          className="fixed z-[150] pointer-events-none"
         >
           
+          {/* FIX APPLIED: Text is absolutely positioned.
+            Because it is 'absolute', it breaks out of the container's physical width flow.
+            Changing text length now has ZERO effect on the button's layout.
+          */}
           <span 
-            // FIX APPLIED HERE: Added text-center so the text aligns properly inside the fixed width
-            className="text-center text-xs md:text-sm tracking-[0.2em] uppercase font-bold text-white mix-blend-difference transition-all duration-300 whitespace-nowrap"
+            id="scroll-btn-text"
+            className="absolute bottom-[calc(100%+16px)] whitespace-nowrap text-xs md:text-sm tracking-[0.2em] uppercase font-bold text-white mix-blend-difference transition-opacity duration-300"
           >
             {navData.text}
           </span>
           
           <button
             onClick={handleScrollClick}
-            className="w-12 h-12 md:w-16 md:h-16 rounded-full border border-white/30 flex items-center justify-center bg-black/20 backdrop-blur-md hover:bg-white hover:text-black transition-all duration-500 text-white cursor-pointer pointer-events-auto group shadow-2xl"
+            className="relative w-12 h-12 md:w-16 md:h-16 rounded-full border border-white/30 flex items-center justify-center bg-black/20 backdrop-blur-md hover:bg-white hover:text-black transition-all duration-500 text-white cursor-pointer pointer-events-auto group shadow-2xl"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

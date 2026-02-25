@@ -163,7 +163,7 @@ const Hero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
 
   return (
     <div ref={containerRef} className="w-full z-0">
-      <div className="parent relative w-full h-[800vh] bg-gradient-to-b from-black via-neutral-900 to-black">
+      <div className="parent relative w-full h-[800vh] bg-linear-to-b from-black via-neutral-900 to-black">
         
         <div 
           className="sticky top-0 left-0 w-full h-screen z-0 bg-center bg-cover" 
@@ -180,7 +180,7 @@ const Hero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
           
           <h1
             id="hero-text"
-            className="text-white text-6xl md:text-8xl font-bold flex flex-wrap justify-center gap-4 md:gap-8"
+            className="text-white text-5xl md:text-8xl font-bold flex flex-wrap justify-center gap-4 md:gap-8"
             style={{ textShadow: "0px 10px 30px rgba(0,0,0,0.6)" }}
           >
             <span className="hero-word opacity-0">Build.</span>

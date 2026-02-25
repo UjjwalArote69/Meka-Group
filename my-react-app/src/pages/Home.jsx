@@ -128,7 +128,7 @@ const Home = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
         <div 
           id="global-scroll-btn"
           // FIX APPLIED: We removed all widths/flex columns so the box wraps TIGHTLY around the circular button
-          className="fixed z-[150] pointer-events-none"
+          className="fixed z-150 pointer-events-none"
         >
           
           {/* FIX APPLIED: Text is absolutely positioned.

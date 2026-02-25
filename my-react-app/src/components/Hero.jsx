@@ -1,168 +1,198 @@
-// src/pages/Home.jsx
-import React, { useState, useRef, useCallback } from 'react';
-import Hero from '../components/Hero';
-import About from '../components/About';
-import Projects from '../components/Projects';
-import MoreProjects from '../components/MoreProjects';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
+// src/components/Hero.jsx
+import React, { useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react"; 
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Home = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
+const Hero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
   const containerRef = useRef(null);
-
-  const [navData, setNavData] = useState({
-    text: "Scroll to explore", 
-    target: "#about",
-    isUp: false,
-  });
-
-  const updateNav = useCallback((text, target, isUp) => {
-    setNavData((prev) => {
-      if (prev.text !== text || prev.target !== target || prev.isUp !== isUp) {
-        return { text, target, isUp };
-      }
-      return prev;
-    });
-  }, []);
+  const canvasRef = useRef(null);
+  const imagesRef = useRef([]);
+  const frameState = useRef({ currentIndex: 0, maxIndex: 223 });
+  const [_initialShown, setInitialShown] = useState(false);
 
   useGSAP(() => {
-    // 1. BUTTON CONTAINER ANIMATION
-    // Start perfectly centered
-    gsap.set("#global-scroll-btn", {
-      top: "50%",
-      left: "50%",
-      xPercent: -50,
-      yPercent: -50,
-    });
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const context = canvas.getContext("2d", { alpha: false }); 
+    if (!context) return;
 
-    // Move to bottom right (100% left/top pushes the top-left corner to the very edge, 
-    // -100 x/yPercent pulls it exactly inside the screen, and x/y adds the margin padding)
-    gsap.to("#global-scroll-btn", {
-      top: "100%",
-      left: "100%",
-      xPercent: -100,
-      yPercent: -100,
-      x: () => window.innerWidth >= 768 ? -48 : -32, // 48px margin desktop, 32px mobile
-      y: () => window.innerWidth >= 768 ? -48 : -32,
-      scale: 0.85,
-      scrollTrigger: {
-        trigger: "#hero",
-        start: "top top",
-        end: "+=800",
-        scrub: 1,
-        invalidateOnRefresh: true, // Recalculates screen width perfectly on resize
-      },
-    });
+    let animationStarted = false;
+    const images = imagesRef.current;
 
-    // 2. TEXT ALIGNMENT ANIMATION
-    // Text starts centered on the button
-    gsap.set("#scroll-btn-text", {
-      left: "50%",
-      xPercent: -50,
-    });
+    function renderFrame(index) {
+      const img = images[index];
+      if (!img) return;
 
-    // Text slides to become perfectly flush with the right edge of the button
-    gsap.to("#scroll-btn-text", {
-      left: "100%",
-      xPercent: -100,
-      scrollTrigger: {
-        trigger: "#hero",
-        start: "top top",
-        end: "+=800",
-        scrub: 1,
-      },
-    });
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      const scale = Math.max(
+        canvas.width / img.width,
+        canvas.height / img.height
+      );
+      const newWidth = img.width * scale;
+      const newHeight = img.height * scale;
+      const offsetX = (canvas.width - newWidth) / 2;
+      const offsetY = (canvas.height - newHeight) / 2;
 
-    // 3. DIRECTIONAL TRACKING
-    const sections = [
-      { id: "#hero", next: "#about", nextText: "Scroll to About", prev: "#hero", prevText: "Scroll to explore" },
-      { id: "#about", next: "#projects", nextText: "Scroll to Projects", prev: "#hero", prevText: "Scroll to Hero" },
-      { id: "#projects", next: "#archive", nextText: "Scroll to Archive", prev: "#about", prevText: "Scroll to About" },
-      { id: "#archive", next: "#hero", nextText: "Back to Top", prev: "#projects", prevText: "Scroll to Projects" }
-    ];
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = "high"; 
+      context.drawImage(img, offsetX, offsetY, newWidth, newHeight);
+    }
 
-    sections.forEach((sec, index) => {
-      ScrollTrigger.create({
-        trigger: sec.id,
-        start: "top center",
-        end: "bottom center",
-        onUpdate: (self) => {
-          if (self.direction === 1) { 
-            if (index === sections.length - 1) {
-              updateNav(sec.nextText, sec.next, true); 
-            } else {
-              updateNav(sec.nextText, sec.next, false); 
-            }
-          } else if (self.direction === -1) { 
-            if (index === 0) {
-              updateNav(sec.prevText, sec.next, false); 
-            } else {
-              updateNav(sec.prevText, sec.prev, true); 
+    function setCanvasSize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      renderFrame(Math.floor(frameState.current.currentIndex));
+    }
+
+    setCanvasSize();
+    window.addEventListener("resize", setCanvasSize);
+
+    function startAnimation() {
+      if (animationStarted) return;
+      animationStarted = true;
+
+      gsap.to(canvas, { autoAlpha: 1, duration: 1.0, ease: "power1.out" });
+      setInitialShown(true);
+
+      gsap.to(frameState.current, {
+        currentIndex: frameState.current.maxIndex - 1,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".parent",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1, 
+        },
+        onUpdate: () => {
+          const index = Math.floor(frameState.current.currentIndex);
+          requestAnimationFrame(() => renderFrame(index));
+        },
+      });
+
+      const hasAnimated = sessionStorage.getItem("heroTextAnimated_V4");
+
+      if (hasAnimated) {
+        gsap.set(".hero-word", { opacity: 1, filter: "blur(0px)", scale: 1, x: 0, y: 0 });
+      } else {
+        gsap.fromTo(
+          ".hero-word",
+          {
+            opacity: 0,
+            filter: "blur(24px)",   
+            scale: 2.5,             
+            x: (index) => (index === 0 ? -400 : index === 2 ? 400 : 0), 
+            y: (index) => (index === 1 ? 250 : -150), 
+          },
+          {
+            opacity: 1,
+            filter: "blur(0px)",
+            scale: 1,
+            x: 0,
+            y: 0,
+            duration: 2.8,       
+            stagger: 0.6,        
+            ease: "expo.out",    
+            scrollTrigger: {
+              trigger: ".parent",
+              start: "top -2%", 
+              once: true,
+            },
+            onComplete: () => {
+              sessionStorage.setItem("heroTextAnimated_V4", "true");
             }
           }
-        }
-      });
-    });
+        );
+      }
 
-  }, { scope: containerRef });
-
-  const handleScrollClick = () => {
-    const targetEl = document.querySelector(navData.target);
-    if (targetEl) {
-      targetEl.scrollIntoView({ behavior: "smooth" });
+      onReady(); 
     }
-  };
+
+    function preloadImages() {
+      let loadedCount = 0;
+      const maxIndex = frameState.current.maxIndex;
+      
+      // 🚨 FIX: Force it to wait until ALL 223 frames are loaded
+      const minFramesToStart = maxIndex; 
+
+      const firstImg = new Image();
+      firstImg.src = `/frames/frame_0000.png`;
+      firstImg.onload = () => {
+        images[0] = firstImg;
+        renderFrame(0);
+        onLoadProgress(1);
+      };
+
+      for (let i = 0; i < maxIndex; i++) {
+        const img = new Image();
+        const src = `/frames/frame_${i.toString().padStart(4, "0")}.png`;
+        img.src = src;
+
+        img.onload = () => {
+          loadedCount++;
+          images[i] = img;
+          const percent = Math.min(100, (loadedCount / maxIndex) * 100);
+          onLoadProgress(percent);
+
+          // Now this will ONLY trigger when loadedCount reaches 223
+          if (!animationStarted && loadedCount >= minFramesToStart) {
+            startAnimation();
+          }
+        };
+
+        img.onerror = () => {
+          loadedCount++;
+          const percent = Math.min(100, (loadedCount / maxIndex) * 100);
+          onLoadProgress(percent);
+          
+          if (!animationStarted && loadedCount >= minFramesToStart)
+            startAnimation();
+        };
+      }
+    }
+
+    gsap.set(canvas, { autoAlpha: 0 });
+    preloadImages();
+
+    return () => {
+      window.removeEventListener("resize", setCanvasSize);
+    };
+  }, { scope: containerRef, dependencies: [onLoadProgress, onReady] }); 
 
   return (
-    <div ref={containerRef} className="w-full relative z-0">
+    <div ref={containerRef} className="w-full z-0">
+      <div className="parent relative w-full h-[800vh] bg-gradient-to-b from-black via-neutral-900 to-black">
         
-        <div id="hero"><Hero onLoadProgress={onLoadProgress} onReady={onReady} /></div>
-        <div id="about"><About /></div>
-        <div id="projects"><Projects/></div>
-        <div id="archive"><MoreProjects/></div>
-
-        {/* --- GLOBAL FLOATING SCROLL BUTTON --- */}
         <div 
-          id="global-scroll-btn"
-          // FIX APPLIED: We removed all widths/flex columns so the box wraps TIGHTLY around the circular button
-          className="fixed z-[150] pointer-events-none"
+          className="sticky top-0 left-0 w-full h-screen z-0 bg-center bg-cover" 
+          style={{ backgroundImage: "linear-gradient(180deg,#030303,#0a0a0a)" }}
         >
+          <canvas
+            ref={canvasRef}
+            className="w-full h-full pointer-events-none"
+            style={{ display: "block" }}
+          />
+        </div>
+
+        <div className="sticky top-0 left-0 w-full h-screen z-10 flex items-center justify-center pointer-events-none overflow-hidden">
           
-          {/* FIX APPLIED: Text is absolutely positioned.
-            Because it is 'absolute', it breaks out of the container's physical width flow.
-            Changing text length now has ZERO effect on the button's layout.
-          */}
-          <span 
-            id="scroll-btn-text"
-            className="absolute bottom-[calc(100%+16px)] whitespace-nowrap text-xs md:text-sm tracking-[0.2em] uppercase font-bold text-white mix-blend-difference transition-opacity duration-300"
+          <h1
+            id="hero-text"
+            className="text-white text-6xl md:text-8xl font-bold flex flex-wrap justify-center gap-4 md:gap-8"
+            style={{ textShadow: "0px 10px 30px rgba(0,0,0,0.6)" }}
           >
-            {navData.text}
-          </span>
-          
-          <button
-            onClick={handleScrollClick}
-            className="relative w-12 h-12 md:w-16 md:h-16 rounded-full border border-white/30 flex items-center justify-center bg-black/20 backdrop-blur-md hover:bg-white hover:text-black transition-all duration-500 text-white cursor-pointer pointer-events-auto group shadow-2xl"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className={`w-5 h-5 md:w-6 md:h-6 transform transition-all duration-500 ${
-                navData.isUp ? "rotate-180 group-hover:-translate-y-2" : "group-hover:translate-y-2"
-              }`}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
-            </svg>
-          </button>
+            <span className="hero-word opacity-0">Build.</span>
+            <span className="hero-word opacity-0">Innovate.</span>
+            <span className="hero-word opacity-0">Sustain.</span>
+          </h1>
 
         </div>
+        
+      </div>
     </div>
   );
-}
+};
 
-export default Home;
+export default Hero;

@@ -23,7 +23,21 @@ const MoreProjects = lazy(
     import("../components/MoreProjects"),
 );
 
-const Companies = lazy(() => import('../components/Companies'))
+const Companies = lazy(
+  () =>
+    import("../components/Companies"),
+);
+
+const Testimonials = lazy(
+  () =>
+    import("../components/Testimonials"),
+);
+
+const Fleet = lazy(
+  () => import("../components/Fleet"),
+);
+
+const Footer = lazy(() => import('../components/Footer'));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -227,13 +241,22 @@ const Home = ({
           <About />
         </div>
         <div id="companies">
-          <Companies/>
+          <Companies />
+        </div>
+        <div id="fleet">
+          <Fleet />
         </div>
         <div id="projects">
           <Projects />
         </div>
         <div id="archive">
           <MoreProjects />
+        </div>
+        <div id="testimonials">
+          <Testimonials />
+        </div>
+        <div id="footer">
+          <Footer/>
         </div>
       </Suspense>
 

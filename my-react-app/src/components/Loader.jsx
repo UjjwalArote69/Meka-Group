@@ -97,11 +97,11 @@ export default function Loader({ visible = true, progress = 0, brandLogo }) {
     <div
       ref={containerRef}
       aria-hidden={!visible}
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-white ${
+      className={`fixed inset-0 z-9999 flex items-center justify-center bg-white ${
         visible ? "pointer-events-auto" : "pointer-events-none"
       }`}
     >
-      <div className="flex flex-col items-center justify-center text-center px-6 w-full">
+      <div className="flex flex-col font-sans items-center justify-center text-center px-6 w-full">
         
         {/* BIG LOGO - Wrapped in overflow-hidden for the mask effect */}
         <div className="mb-8 overflow-hidden py-2 px-4">
@@ -126,7 +126,7 @@ export default function Loader({ visible = true, progress = 0, brandLogo }) {
         </p>
 
         {/* Minimal Progress Bar Track */}
-        <div className="progress-track w-64 md:w-80 h-[2px] bg-black/10 overflow-hidden">
+        <div className="progress-track w-64 md:w-80 h-0.5 bg-black/10 overflow-hidden">
           <div
             ref={progressBarRef}
             className="h-full bg-black w-0"

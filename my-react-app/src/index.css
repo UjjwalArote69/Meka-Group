@@ -1,1 +1,36 @@
+/* src/index.css */
 @import "tailwindcss";
+
+/* 1. Load the fonts (Fixed the URLs) */
+@font-face {
+    font-family: 'Editorial Old';
+    src: url('/fonts/Editorial-Old.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url('/fonts/Montserrat-VariableFont_wght.woff2') format('woff2');
+    font-weight: 100 900; /* Assuming it's a variable font */
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Montserrat'; /* Grouped under the same family name */
+    src: url('/fonts/Montserrat-Italic-VariableFont_wght.woff2') format('woff2');
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+/* 2. Connect them to Tailwind v4 */
+@theme {
+  /* This makes `font-sans` use Montserrat */
+  --font-sans: "Montserrat", sans-serif;
+  
+  /* This makes `font-serif` use Editorial Old */
+  --font-serif: "Editorial Old", serif;
+}

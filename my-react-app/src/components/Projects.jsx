@@ -52,7 +52,7 @@ const Projects = () => {
 
     // 2. MASSIVE BACKGROUND PARALLAX
     gsap.to(".bg-marquee", {
-      xPercent: -30, // Moves slightly slower/different direction than the main track
+      xPercent: -20, 
       ease: "none",
       scrollTrigger: {
         trigger: containerRef.current,
@@ -75,36 +75,35 @@ const Projects = () => {
       },
     });
 
-    // 4. INDIVIDUAL PROJECT REVEALS (Cinematic Image & Text animations)
+    // 4. INDIVIDUAL PROJECT REVEALS
     panels.forEach((panel, i) => {
-      // Skip the intro panel (index 0) for these specific effects
-      if (i === 0) return; 
+      if (i === 0) return; // Skip intro panel
 
       const imageContainer = panel.querySelector(".img-container");
       const image = panel.querySelector(".parallax-img");
       const textWrap = panel.querySelector(".text-wrap");
 
-      // The Container expands (unveils) from 60% width to 100%
+      // Container Expand (Wipes from left to right)
       gsap.fromTo(
         imageContainer,
-        { clipPath: "polygon(15% 0%, 85% 0%, 85% 100%, 15% 100%)" },
+        { clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)" },
         {
           clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
           ease: "none",
           scrollTrigger: {
             trigger: panel,
             containerAnimation: scrollTween,
-            start: "left 80%", // Triggers when the panel enters 80% of the screen horizontally
-            end: "left 20%",
+            start: "left 75%", 
+            end: "left 25%",
             scrub: true,
           }
         }
       );
 
-      // The Image inside scales down to create a "breathing" effect
+      // Image Scale Down
       gsap.fromTo(
         image,
-        { scale: 1.4 },
+        { scale: 1.3 },
         {
           scale: 1,
           ease: "none",
@@ -121,23 +120,23 @@ const Projects = () => {
       // Text slides up and fades in
       gsap.fromTo(
         textWrap,
-        { y: 80, opacity: 0 },
+        { y: 50, opacity: 0 },
         {
           y: 0,
           opacity: 1,
           duration: 1,
-          ease: "expo.out",
+          ease: "power3.out",
           scrollTrigger: {
             trigger: panel,
             containerAnimation: scrollTween,
-            start: "left 60%", // Pops in exactly when the image is centered
+            start: "left 50%", 
             toggleActions: "play none none reverse",
           }
         }
       );
     });
 
-    // 5. FLOAT THE RED SHIP (Intro panel detail)
+    // 5. FLOAT THE RED SHIP (Intro panel)
     gsap.to(".intro-ship", {
       y: -25,
       rotationZ: 2,
@@ -150,13 +149,13 @@ const Projects = () => {
   }, { scope: containerRef });
 
   return (
-    // Crisp editorial white/gray background
-    <section ref={containerRef} className="w-full h-screen bg-[#F0F0F0] text-black overflow-hidden relative z-10">
+    // Solid, clean off-white background
+    <section ref={containerRef} className="w-full h-screen bg-[#F4F4F4] text-[#111] overflow-hidden relative z-10">
       
       {/* MASSIVE BACKGROUND TEXT (Parallax Layer) */}
       <div className="absolute top-1/2 -translate-y-1/2 left-0 w-[200vw] pointer-events-none z-0">
         <h1 
-          className="bg-marquee text-[15vw] font-black uppercase whitespace-nowrap opacity-5"
+          className="bg-marquee text-[18vw] font-sans font-black uppercase whitespace-nowrap opacity-[0.03]"
           style={{ WebkitTextStroke: "2px #000", color: "transparent" }}
         >
           MEKA ENGINEERING &bull; MEKA ENGINEERING &bull;
@@ -164,73 +163,73 @@ const Projects = () => {
       </div>
 
       {/* GLOBAL PROGRESS BAR */}
-      <div className="absolute bottom-8 left-12 right-12 md:left-24 md:right-24 h-[2px] bg-black/10 z-50">
-        <div className="progress-fill w-full h-full bg-black scale-x-0" />
+      <div className="absolute bottom-6 left-6 right-6 md:bottom-12 md:left-24 md:right-24 h-[2px] bg-black/10 z-50">
+        <div className="progress-fill w-full h-full bg-[#0ea5a4] scale-x-0" />
       </div>
 
       {/* SCROLLING TRACK */}
-      <div 
-        ref={trackRef} 
-        // Dynamic width based on total panels (1 intro + 3 projects = 400vw)
-        className="flex h-full w-[400vw] relative z-10" 
-      >
+      <div ref={trackRef} className="flex h-full w-[400vw] relative z-10">
         
         {/* PANEL 0: INTRO */}
-        <div className="project-panel w-screen h-full flex flex-col justify-center relative flex-shrink-0 px-12 md:px-32">
-          <div className="z-20">
-            <p className="text-sm md:text-lg tracking-[0.3em] font-medium text-black/50 mb-4">OUR PORTFOLIO</p>
-            <h2 className="text-6xl md:text-[8rem] leading-[0.9] font-serif tracking-tighter text-black">
-              Engineering <br />
-              The Future.
-            </h2>
+        <div className="project-panel w-screen h-full flex flex-col justify-center relative flex-shrink-0 px-6 md:px-24">
+          <div className="w-full max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between">
+            <div className="z-20 md:w-1/2">
+              <p className="text-sm md:text-lg tracking-[0.4em] font-sans font-medium text-black/40 mb-6 uppercase">
+                Our Portfolio
+              </p>
+              <h2 className="text-6xl md:text-[8rem] leading-[0.85] tracking-tighter text-[#111] uppercase">
+                <span className="font-sans font-black">Engineering</span> <br />
+                <span className="font-serif italic text-[#0ea5a4] lowercase pr-4">the</span>
+                <span className="font-sans font-black">Future.</span>
+              </h2>
+            </div>
+            <div className="z-20 md:w-1/2 relative h-[40vh] md:h-[60vh] flex items-center justify-center mt-12 md:mt-0">
+              <img 
+                src="/projects/image4.png" 
+                alt="Meka Group Project" 
+                className="intro-ship w-[80%] object-contain drop-shadow-2xl"
+              />
+            </div>
           </div>
-          <img 
-            src="/projects/image4.png" // Fallback to an image if ship is missing
-            alt="Meka Group Project" 
-            className="intro-ship absolute bottom-20 right-10 md:bottom-32 md:right-40 w-72 md:w-[700px] object-contain drop-shadow-2xl z-30"
-          />
         </div>
 
         {/* PANELS 1-3: PROJECTS */}
         {projectData.map((project) => (
           <div 
             key={project.id} 
-            className="project-panel w-screen h-full flex flex-col justify-center relative flex-shrink-0 px-6 md:px-24"
+            className="project-panel w-screen h-full flex items-center justify-center relative flex-shrink-0 px-6 md:px-24"
           >
-            <div className="relative w-full h-[70vh] flex items-center justify-center max-w-[1400px] mx-auto">
+            <div className="w-full h-full max-h-[800px] max-w-[1400px] mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-10 md:gap-20">
               
-              {/* Central Image Mask Container */}
-              <div className="img-container w-full md:w-[60%] h-full overflow-hidden relative shadow-2xl bg-gray-300">
-                <img 
-                  src={project.img} 
-                  alt={project.title.replace('\n', ' ')}
-                  className="parallax-img w-full h-full object-cover transform-gpu"
-                />
+              {/* Left Column: Typography */}
+              <div className="text-wrap w-full md:w-[45%] flex flex-col justify-center z-20">
+                <span className="text-xl md:text-3xl font-sans font-light text-black/30 mb-4 md:mb-8 block">
+                  No. {project.id}
+                </span>
+                
+                {/* Clean, readable Rich Black text */}
+                <h3 className="text-5xl md:text-[6rem] lg:text-[7rem] font-serif uppercase leading-[0.85] tracking-tighter text-[#111] mb-8 md:mb-12">
+                  {project.title}
+                </h3>
+                
+                {/* Solid pill badge for category */}
+                <div className="bg-[#111] px-6 py-3 md:py-4 rounded-full flex items-center gap-4 w-max shadow-xl">
+                  <span className="w-2 h-2 rounded-full bg-[#0ea5a4] animate-pulse"></span>
+                  <p className="text-[10px] md:text-xs tracking-[0.25em] font-sans font-semibold text-white uppercase mt-[2px]">
+                    {project.subtitle}
+                  </p>
+                </div>
               </div>
 
-              {/* Floating Typography Wrapper */}
-              <div className="text-wrap absolute inset-0 flex flex-col justify-between pointer-events-none py-10 md:py-20 z-20">
-                
-                {/* Top Number */}
-                <div className="flex justify-start">
-                  <span className="text-6xl md:text-8xl font-black  mix-blend-difference text-white">
-                    {project.id}
-                  </span>
+              {/* Right Column: Bounded Image */}
+              <div className="w-full md:w-[65%] h-[40vh] md:h-[70vh] relative z-10 mt-12 md:mt-0">
+                <div className="img-container w-full h-full overflow-hidden shadow-2xl rounded-sm bg-gray-200">
+                  <img 
+                    src={project.img} 
+                    alt={project.title.replace('\n', ' ')}
+                    className="parallax-img w-full h-full object-cover transform-gpu"
+                  />
                 </div>
-
-                {/* Bottom Title & Subtitle */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between w-full">
-                  <h3 className="text-5xl md:text-[6rem] font-serif leading-[0.9] tracking-tight text-black mix-blend-difference">
-                    {project.title}
-                  </h3>
-                  
-                  <div className="mt-4 md:mt-0 text-left md:text-right bg-white/90 p-4 md:p-6 backdrop-blur-md">
-                    <p className="text-xs md:text-sm tracking-[0.2em] font-bold text-black">
-                      {project.subtitle}
-                    </p>
-                  </div>
-                </div>
-
               </div>
 
             </div>

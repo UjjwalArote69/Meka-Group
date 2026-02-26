@@ -180,7 +180,7 @@ const Hero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
           
           <h1
             id="hero-text"
-            className="text-white text-5xl md:text-8xl font-bold flex flex-wrap justify-center gap-4 md:gap-8"
+            className="text-white font-serif text-5xl md:text-8xl font-bold flex flex-wrap justify-center gap-4 md:gap-8"
             style={{ textShadow: "0px 10px 30px rgba(0,0,0,0.6)" }}
           >
             <span className="hero-word opacity-0">Build.</span>

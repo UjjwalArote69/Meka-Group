@@ -240,7 +240,7 @@ const Home = ({
       >
         <span
           id="scroll-btn-text"
-          className="absolute bottom-[calc(100%+16px)] whitespace-nowrap text-xs md:text-sm tracking-[0.2em] uppercase font-bold text-white mix-blend-difference transition-opacity duration-300"
+          className="absolute bottom-[calc(100%+16px)] whitespace-nowrap text-xs md:text-sm tracking-[0.2em] uppercase font-sans text-white mix-blend-difference transition-opacity duration-300"
         >
           {navData.text}
         </span>

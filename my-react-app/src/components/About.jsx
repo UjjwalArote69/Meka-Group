@@ -53,17 +53,31 @@ const About = () => {
   const containerRef = useRef(null);
 
   useGSAP(() => {
+    // 1. MASTER SCROLL TRACK (Perfectly synced to viewport center)
+    gsap.to(".scroll-progress-line", {
+      scaleY: 1,
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".chapters-wrapper",
+        start: "top 50%",    
+        end: "bottom 50%",   
+        scrub: true,
+      }
+    });
+
     const chapters = gsap.utils.toArray(".story-chapter");
 
     chapters.forEach((chapter) => {
       const watermark = chapter.querySelector(".chapter-watermark");
       const dot = chapter.querySelector(".chapter-dot");
-      const line = chapter.querySelector(".chapter-line");
-      const content = chapter.querySelector(".chapter-content");
+      const textWrap = chapter.querySelector(".text-wrapper");
 
-      // 1. Parallax effect for the massive background year
+      // Reset starting states
+      gsap.set(dot, { scale: 0.5, backgroundColor: "#ffffff" });
+
+      // Parallax for the giant year watermark
       gsap.to(watermark, {
-        y: -50,
+        y: -100, // Increased distance for a more pronounced 3D effect
         ease: "none",
         scrollTrigger: {
           trigger: chapter,
@@ -73,41 +87,47 @@ const About = () => {
         },
       });
 
-      // 2. The main entrance timeline
-      const tl = gsap.timeline({
+      // 2. THE SCRUBBED ENTRANCE (Fades in perfectly with the scroll wheel)
+      const tlIn = gsap.timeline({
         scrollTrigger: {
           trigger: chapter,
-          start: "top 65%", // Triggers perfectly when chapter reaches reading height
-          toggleActions: "play none none reverse", // Illuminates on scroll down, dims if scrolled back up
-        },
+          start: "top 80%", // Starts fading in near the bottom
+          end: "top 40%",   // Fully lit when it reaches the center
+          scrub: true,
+        }
       });
 
-      tl.to(chapter, { 
-        opacity: 1, 
-        duration: 0.8, 
-        ease: "power2.inOut" 
-      })
-      // Scale up the glowing node
-      .fromTo(
-        dot,
-        { scale: 0 },
-        { scale: 1, duration: 0.5, ease: "back.out(1.7)" },
-        "<" // Starts at the same time as opacity
-      )
-      // Shoot the line downwards
-      .fromTo(
-        line,
-        { scaleY: 0 },
-        { scaleY: 1, duration: 1.2, ease: "expo.out", transformOrigin: "top" },
-        "<0.2"
-      )
-      // Slight vertical slide and blur removal for the text to "snap" into focus
-      .fromTo(
-        content,
-        { y: 30, filter: "blur(8px)" },
-        { y: 0, filter: "blur(0px)", duration: 1, ease: "power3.out" },
-        "<0.1"
-      );
+      tlIn.to(chapter, { opacity: 1, ease: "none" }, 0)
+          .to(dot, { 
+            scale: 1.5, 
+            backgroundColor: "#0ea5a4", 
+            boxShadow: "0 0 20px rgba(14,165,164,0.8)", 
+            ease: "none" 
+          }, 0)
+          // 3D Text Reveal linked to the scroll
+          .fromTo(textWrap, 
+            { y: 50, rotationX: -30, opacity: 0, filter: "blur(12px)" }, 
+            { y: 0, rotationX: 0, opacity: 1, filter: "blur(0px)", ease: "power2.out" }, 
+            0
+          );
+
+      // 3. THE SCRUBBED EXIT (Fades out perfectly as it leaves the center)
+      const tlOut = gsap.timeline({
+        scrollTrigger: {
+          trigger: chapter,
+          start: "bottom 50%", // Starts fading out as it passes the center
+          end: "bottom 20%",   // Fully dimmed near the top
+          scrub: true,
+        }
+      });
+
+      tlOut.to(chapter, { opacity: 0.15, ease: "none" }, 0)
+           .to(dot, { 
+             scale: 0.5, 
+             backgroundColor: "#ffffff", 
+             boxShadow: "0 0 0px rgba(255,255,255,0)", 
+             ease: "none" 
+           }, 0);
     });
   }, { scope: containerRef });
 
@@ -117,7 +137,7 @@ const About = () => {
         
         {/* Section Header */}
         <div className="mb-32 md:mb-48 relative z-20">
-          <h2 className="text-sm md:text-base uppercase tracking-[0.4em] text-gray-500 mb-4 font-medium">
+          <h2 className="text-sm md:text-base uppercase tracking-[0.4em] text-[#0ea5a4] mb-4 font-medium">
             About Us
           </h2>
           <h3 className="text-4xl md:text-7xl font-bold tracking-tight">
@@ -125,17 +145,23 @@ const About = () => {
           </h3>
         </div>
 
-        {/* Chapters */}
-        <div className="flex flex-col gap-32 md:gap-48 relative">
+        {/* Chapters Wrapper */}
+        <div className="chapters-wrapper flex flex-col gap-32 md:gap-48 relative">
           
           {/* Global Background Track */}
-          <div className="hidden md:block absolute left-[30%] top-0 bottom-0 w-px bg-white/5" />
+          <div className="hidden md:block absolute left-[30%] top-4 bottom-12 w-px bg-white/10 z-0" />
+          
+          {/* Global Animated Progress Fill */}
+          <div className="hidden md:block absolute left-[30%] top-4 bottom-12 w-px z-10">
+            <div className="scroll-progress-line w-full h-full bg-[#0ea5a4] origin-top scale-y-0" />
+          </div>
 
           {storyChapters.map((chapter) => (
             <div 
               key={chapter.id} 
-              // Starts dimmed out at 30% opacity
-              className="story-chapter flex flex-col md:flex-row relative opacity-30 transition-opacity"
+              // Chapters start dimmed at 15% opacity
+              className="story-chapter flex flex-col md:flex-row relative opacity-15"
+              style={{ perspective: "1000px" }} // Added perspective for the 3D text roll
             >
               
               {/* Massive Background Watermark */}
@@ -143,29 +169,31 @@ const About = () => {
                 {chapter.id}
               </div>
 
-              {/* Animated Timeline Elements (Desktop only) */}
-              <div className="hidden md:block absolute left-[30%] top-3 bottom-[-192px] w-0.5 z-20">
-                {/* Glowing Dot */}
-                <div className="chapter-dot absolute -left-[5px] top-0 w-3 h-3 rounded-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)]" />
-                {/* The Active Line */}
-                <div className="chapter-line w-full h-full bg-gradient-to-b from-white/60 to-transparent mt-3" />
+              {/* Node Indicator */}
+              <div className="hidden md:block absolute left-[30%] top-3 -translate-x-[5px] z-20">
+                <div className="chapter-dot w-3 h-3 rounded-full bg-white transition-colors" />
               </div>
 
-              {/* Left Side: Year & Title */}
-              <div className="md:w-[35%] pr-10 mb-6 md:mb-0 z-10 relative mt-2">
-                <span className="block text-4xl md:text-5xl font-bold text-white mb-4">
-                  {chapter.id}
-                </span>
-                <h4 className="text-xl md:text-3xl font-semibold leading-snug text-gray-200">
-                  {chapter.title}
-                </h4>
-              </div>
+              {/* Wrapped content for 3D Reveal */}
+              <div className="text-wrapper flex flex-col md:flex-row w-full transform-gpu origin-bottom z-10 relative">
+                
+                {/* Left Side: Year & Title */}
+                <div className="md:w-[35%] pr-10 mb-6 md:mb-0 mt-1">
+                  <span className="block text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
+                    {chapter.id}
+                  </span>
+                  <h4 className="text-xl md:text-3xl font-semibold leading-snug text-gray-200">
+                    {chapter.title}
+                  </h4>
+                </div>
 
-              {/* Right Side: Story Text */}
-              <div className="chapter-content md:w-[65%] md:pl-24 pt-2 md:pt-4 z-10 relative">
-                <p className="text-base md:text-xl leading-relaxed text-gray-400 font-light">
-                  {chapter.text}
-                </p>
+                {/* Right Side: Story Text */}
+                <div className="md:w-[65%] md:pl-24 pt-2 md:pt-4">
+                  <p className="text-base md:text-xl leading-relaxed text-gray-400 font-light">
+                    {chapter.text}
+                  </p>
+                </div>
+                
               </div>
 
             </div>

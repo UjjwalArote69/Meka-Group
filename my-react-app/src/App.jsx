@@ -4,6 +4,9 @@ import Loader from "./components/Loader";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Contact from "./pages/Contact";
+import AboutPage from "./pages/AboutPage";
+import ProjectsPage from "./pages/ProjectsPage";
+import ExpertisePage from "./pages/Expertise";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -60,6 +63,9 @@ export default function App() {
             } 
           />
           <Route path="/contact" element={<Contact/>} />
+          <Route path="/about" element={<AboutPage/>} />
+          <Route path="/projects" element={<ProjectsPage/>} />
+          <Route path="/expertise" element={<ExpertisePage/>} />
         </Routes>
       </div>
     </div>

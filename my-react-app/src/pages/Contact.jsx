@@ -1,76 +1,56 @@
-/* eslint-disable no-unused-vars */
 import React, {
   useState,
   useRef,
 } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   Mail,
   Phone,
   MapPin,
   Send,
   Globe,
+  ArrowRight,
 } from "lucide-react";
 import emailjs from "@emailjs/browser";
+import Footer from "../components/Footer";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Contact = () => {
   const containerRef = useRef(null);
-  const formRef = useRef(null);
   const [formData, setFormData] =
     useState({
       name: "",
       email: "",
-      subject: "Marine Infrastructure",
+      subject: "Marine EPC",
       message: "",
     });
 
   useGSAP(
     () => {
-      const tl = gsap.timeline({
-        defaults: {
-          ease: "power4.out",
-        },
+      // 1. Hero Text Reveal (Matching About/Expertise)
+      gsap.from(".contact-title span", {
+        y: "110%",
+        stagger: 0.1,
+        duration: 1.2,
+        ease: "power4.out",
       });
 
-      tl.fromTo(
-        ".contact-header",
-        { opacity: 0, y: 60 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1.5,
-        },
-      )
-        .fromTo(
-          ".contact-sidebar > *",
-          { opacity: 0, x: -30 },
-          {
-            opacity: 1,
-            x: 0,
-            duration: 1,
-            stagger: 0.1,
-          },
-          "-=1",
-        )
-        .fromTo(
-          ".contact-form-container",
-          {
-            opacity: 0,
-            scale: 0.95,
-            y: 40,
-          },
-          {
-            opacity: 1,
-            scale: 1,
-            y: 0,
-            duration: 1.5,
-          },
-          "-=1.2",
-        );
+      // 2. Sidebar Elements Fade In
+      gsap.from(".sidebar-item", {
+        opacity: 0,
+        x: -30,
+        stagger: 0.1,
+        duration: 1,
+        delay: 0.5,
+        ease: "power3.out",
+      });
 
+      // 3. Floating Watermark Scroll Effect
       gsap.to(".contact-watermark", {
-        y: -100,
+        y: -150,
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top bottom",
@@ -84,201 +64,201 @@ const Contact = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    // Logic for EmailJS (Keep your existing Service/Template IDs)
     emailjs
       .send(
         "YOUR_SERVICE_ID",
         "YOUR_TEMPLATE_ID",
-        formData, // This contains name, email, subject, message
+        formData,
         "YOUR_PUBLIC_KEY",
       )
-      .then(
-        () => {
-          alert(
-            "Message sent successfully!",
-          );
-        },
-        (error) => {
-          alert(
-            "Failed to send message...",
-          );
-        },
+      .then(() =>
+        alert(
+          "Mission Protocol Initiated: Message Sent.",
+        ),
+      )
+      .catch(() =>
+        alert(
+          "Transmission Interrupted: Please try again.",
+        ),
       );
   };
 
   return (
-    <div
+    <main
       ref={containerRef}
-      className="bg-[#050505] min-h-screen text-white pt-32 pb-24 px-6 md:px-12 lg:px-24 relative overflow-hidden"
+      className="bg-[#050505] min-h-screen text-white selection:bg-[#0ea5a4]"
     >
-      {/* BACKGROUND WATERMARK - Lowered opacity for better foreground readability */}
-      <div className="contact-watermark absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[25vw] font-black text-white/1.5 pointer-events-none select-none z-0 tracking-tighter uppercase">
-        Contact
-      </div>
+      {/* --- 1. MINIMALIST HERO --- */}
+      <section className="relative pt-40 pb-20 px-6 md:px-12 max-w-7xl mx-auto overflow-hidden">
+        {/* Subtle Background Blueprint Grid */}
+        <div
+          className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{
+            backgroundImage: `radial-gradient(#ffffff 1px, transparent 1px)`,
+            backgroundSize: "40px 40px",
+          }}
+        ></div>
 
-      <div className="max-w-350 mx-auto relative z-10">
-        {/* HEADER SECTION */}
-        <div className="contact-header mb-20 md:mb-32">
-          <p className="font-sans text-[#0ea5a4] text-xs md:text-sm font-bold tracking-[0.4em] uppercase mb-4">
+        <div className="relative z-10">
+          <span className="text-[#0ea5a4] text-[10px] md:text-xs font-sans tracking-[0.5em] uppercase mb-6 block">
             Global Partnerships
-          </p>
-          <h1 className="text-5xl md:text-8xl font-sans font-black uppercase tracking-tighter leading-none">
-            Get in{" "}
-            <span className="font-serif italic text-white/80 font-light lowercase tracking-tight">
-              touch.
+          </span>
+          <h1 className="contact-title text-[15vw] md:text-[9vw] font-serif uppercase leading-[0.8] tracking-tighter">
+            <span className="block overflow-hidden py-6 -my-2">
+              Connect
+            </span>
+            <span className="block overflow-hidden py-6 -my-6 text-zinc-800">
+              Intelligence
             </span>
           </h1>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24">
-          {/* SIDEBAR */}
-          <div className="contact-sidebar lg:col-span-4 space-y-16">
-            <div className="group">
-              <h4 className="text-[11px] uppercase tracking-[0.4em] text-[#0ea5a4] font-black mb-6">
-                Headquarters
-              </h4>
-              <div className="flex gap-4 items-start">
-                <MapPin
-                  size={22}
-                  className="text-[#0ea5a4] shrink-0 mt-1"
-                />
-                <p className="text-gray-200 text-lg md:text-xl font-medium leading-relaxed">
-                  2nd, Madhuli
-                  Apartments, <br />
-                  Dr Annie Besant Rd,{" "}
-                  <br />
-                  Shiv Sagar Estate,
-                  Worli, <br />
-                  Mumbai, Maharashtra
-                  400018
-                </p>
+      {/* --- 2. THE EDITORIAL GRID --- */}
+      <section className="max-w-7xl mx-auto px-6 md:px-12 pb-32">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
+          {/* LEFT: STICKY INFO PANEL */}
+          <div className="lg:col-span-4 space-y-16">
+            <div className="sticky top-32 space-y-16">
+              <div className="sidebar-item group">
+                <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#0ea5a4] font-bold mb-6">
+                  Headquarters
+                </h4>
+                <div className="flex gap-4">
+                  <MapPin
+                    size={20}
+                    className="text-zinc-600 mt-1"
+                  />
+                  <p className="text-lg text-zinc-300 font-serif leading-relaxed uppercase">
+                    2nd, Madhuli, Dr
+                    Annie Besant Rd,
+                    <br />
+                    Shiv Sagar Estate,
+                    Worli,
+                    <br />
+                    Mumbai 400018
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-8">
-              <h4 className="text-[11px] uppercase tracking-[0.4em] text-[#0ea5a4] font-black mb-6">
-                Direct Channels
-              </h4>
-              <a
-                href="mailto:info@mekagroup.com"
-                className="flex items-center gap-5 group"
-              >
-                <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover:border-[#0ea5a4] group-hover:bg-[#0ea5a4]/10 transition-all duration-300">
-                  <Mail
-                    size={18}
-                    className="text-white group-hover:text-[#0ea5a4]"
-                  />
-                </div>
-                <span className="text-xl md:text-2xl font-medium text-gray-200 group-hover:text-[#0ea5a4] transition-colors">
-                  info@mekagroup.com
-                </span>
-              </a>
-              <a
-                href="tel:+9102240890000"
-                className="flex items-center gap-5 group"
-              >
-                <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover:border-[#0ea5a4] group-hover:bg-[#0ea5a4]/10 transition-all duration-300">
-                  <Phone
-                    size={18}
-                    className="text-white group-hover:text-[#0ea5a4]"
-                  />
-                </div>
-                <span className="text-xl md:text-2xl font-medium text-gray-200 group-hover:text-[#0ea5a4] transition-colors">
-                  +91 022 4089 0000
-                </span>
-              </a>
-            </div>
+              <div className="sidebar-item space-y-8">
+                <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#0ea5a4] font-bold mb-6">
+                  Direct Channels
+                </h4>
+                <a
+                  href="mailto:info@mekagroup.com"
+                  className="flex items-center gap-4 group"
+                >
+                  <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:border-[#0ea5a4] transition-all duration-500">
+                    <Mail size={16} />
+                  </div>
+                  <span className="text-xl font-serif uppercase group-hover:text-[#0ea5a4] transition-colors">
+                    info@mekagroup.com
+                  </span>
+                </a>
+                <a
+                  href="tel:+9102240890000"
+                  className="flex items-center gap-4 group"
+                >
+                  <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:border-[#0ea5a4] transition-all duration-500">
+                    <Phone size={16} />
+                  </div>
+                  <span className="text-xl font-serif uppercase group-hover:text-[#0ea5a4] transition-colors">
+                    +91 22 4089 0000
+                  </span>
+                </a>
+              </div>
 
-            <div className="p-8 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-xl">
-              <h3 className="font-black text-xs uppercase tracking-widest text-white mb-6 flex items-center gap-2">
-                <Globe
-                  size={18}
-                  className="text-[#0ea5a4]"
-                />{" "}
-                Regional Hubs
-              </h3>
-              <ul className="space-y-4 text-base text-gray-300 font-medium">
-                <li className="flex justify-between border-b border-white/5 pb-2">
-                  <span>
-                    Chennai, India
-                  </span>{" "}
-                  <span className="text-[#0ea5a4] text-xs">
-                    Operations
-                  </span>
-                </li>
-                <li className="flex justify-between border-b border-white/5 pb-2">
-                  <span>
-                    Doha, Qatar
-                  </span>{" "}
-                  <span className="text-[#0ea5a4] text-xs">
-                    ME Hub
-                  </span>
-                </li>
-                <li className="flex justify-between border-b border-white/5 pb-2">
-                  <span>Singapore</span>{" "}
-                  <span className="text-[#0ea5a4] text-xs">
-                    APAC Hub
-                  </span>
-                </li>
-              </ul>
+              <div className="sidebar-item p-8 bg-white/5 border border-white/10 rounded-sm">
+                <h3 className="text-[10px] uppercase tracking-widest text-[#0ea5a4] mb-6 flex items-center gap-2">
+                  <Globe size={14} />{" "}
+                  Regional Hubs
+                </h3>
+                <ul className="space-y-4 text-xs font-sans tracking-widest uppercase text-zinc-400">
+                  <li className="flex justify-between border-b border-white/5 pb-2">
+                    <span>
+                      Chennai, India
+                    </span>{" "}
+                    <span className="text-white">
+                      Operations
+                    </span>
+                  </li>
+                  <li className="flex justify-between border-b border-white/5 pb-2">
+                    <span>
+                      Doha, Qatar
+                    </span>{" "}
+                    <span className="text-white">
+                      ME Hub
+                    </span>
+                  </li>
+                  <li className="flex justify-between border-b border-white/5 pb-2">
+                    <span>
+                      Singapore
+                    </span>{" "}
+                    <span className="text-white">
+                      APAC Hub
+                    </span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
 
-          {/* FORM CONTAINER */}
-          <div className="contact-form-container lg:col-span-8">
-            <div className="bg-white/5 border border-white/10 p-8 md:p-14 rounded-3xl backdrop-blur-3xl shadow-2xl">
-              <h2 className="text-3xl font-sans font-black uppercase tracking-tight mb-12">
-                Project Brief
+          {/* RIGHT: SCROLLING FORM PANEL */}
+          <div className="lg:col-span-8">
+            <div className="bg-zinc-950 border border-white/10 p-8 md:p-16 rounded-sm">
+              <h2 className="text-3xl font-serif uppercase tracking-tight mb-16">
+                The Project Brief
               </h2>
 
               <form
                 onSubmit={handleSubmit}
-                className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-12"
+                className="space-y-12"
               >
-                <div className="relative group">
-                  <input
-                    type="text"
-                    required
-                    className="w-full bg-transparent border-b-2 border-white/20 py-4 outline-none focus:border-[#0ea5a4] transition-colors peer text-xl font-medium text-white"
-                    placeholder=" "
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        name: e.target
-                          .value,
-                      })
-                    }
-                  />
-                  <label className="absolute left-0 top-4 text-white/50 pointer-events-none transition-all peer-focus:-top-6 peer-focus:text-[11px] peer-focus:font-black peer-focus:uppercase peer-focus:tracking-[0.2em] peer-focus:text-[#0ea5a4] peer-[:not(:placeholder-shown)]:-top-6 peer-[:not(:placeholder-shown)]:text-[11px] peer-[:not(:placeholder-shown)]:font-black">
-                    Full Name
-                  </label>
-                </div>
-
-                <div className="relative group">
-                  <input
-                    type="email"
-                    required
-                    className="w-full bg-transparent border-b-2 border-white/20 py-4 outline-none focus:border-[#0ea5a4] transition-colors peer text-xl font-medium text-white"
-                    placeholder=" "
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        email:
-                          e.target
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                  {/* Name Input */}
+                  <div className="relative group border-b border-white/20 focus-within:border-[#0ea5a4] transition-all duration-500">
+                    <input
+                      type="text"
+                      required
+                      placeholder="Name"
+                      className="w-full bg-transparent py-4 outline-none text-xl font-serif uppercase placeholder:text-zinc-800"
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          name: e.target
                             .value,
-                      })
-                    }
-                  />
-                  <label className="absolute left-0 top-4 text-white/50 pointer-events-none transition-all peer-focus:-top-6 peer-focus:text-[11px] peer-focus:font-black peer-focus:uppercase peer-focus:tracking-[0.2em] peer-focus:text-[#0ea5a4] peer-[:not(:placeholder-shown)]:-top-6 peer-[:not(:placeholder-shown)]:text-[11px] peer-[:not(:placeholder-shown)]:font-black">
-                    Corporate Email
-                  </label>
+                        })
+                      }
+                    />
+                  </div>
+
+                  {/* Email Input */}
+                  <div className="relative group border-b border-white/20 focus-within:border-[#0ea5a4] transition-all duration-500">
+                    <input
+                      type="email"
+                      required
+                      placeholder="Corporate Email"
+                      className="w-full bg-transparent py-4 outline-none text-xl font-serif uppercase placeholder:text-zinc-800"
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          email:
+                            e.target
+                              .value,
+                        })
+                      }
+                    />
+                  </div>
                 </div>
 
-                <div className="md:col-span-2 relative">
-                  <h4 className="text-[11px] uppercase tracking-[0.2em] text-[#0ea5a4] font-black mb-6">
-                    Service Category
+                {/* Service Selector */}
+                <div>
+                  <h4 className="text-[10px] uppercase tracking-[0.2em] text-[#0ea5a4] font-bold mb-6">
+                    Inquiry Category
                   </h4>
-                  <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-wrap gap-3">
                     {[
                       "Marine EPC",
                       "Dredging",
@@ -295,11 +275,11 @@ const Contact = () => {
                               cat,
                           })
                         }
-                        className={`px-8 py-3 rounded-full border-2 text-[11px] font-black uppercase tracking-widest transition-all ${
+                        className={`px-6 py-2 border text-[10px] font-bold uppercase tracking-widest transition-all duration-500 ${
                           formData.subject ===
                           cat
                             ? "bg-[#0ea5a4] border-[#0ea5a4] text-black"
-                            : "border-white/10 hover:border-white/60 text-white/80"
+                            : "border-white/10 text-zinc-500 hover:border-white/40"
                         }`}
                       >
                         {cat}
@@ -308,12 +288,13 @@ const Contact = () => {
                   </div>
                 </div>
 
-                <div className="md:col-span-2 relative group mt-4">
+                {/* Message */}
+                <div className="group border-b border-white/20 focus-within:border-[#0ea5a4] transition-all duration-500">
                   <textarea
-                    rows="5"
+                    rows="4"
                     required
-                    className="w-full bg-white/3 border-2 border-white/10 rounded-2xl p-6 outline-none focus:border-[#0ea5a4] transition-colors text-xl font-medium text-white placeholder-white/20 resize-none"
-                    placeholder="Describe the scope of your project..."
+                    placeholder="Brief description of the scope..."
+                    className="w-full bg-transparent py-4 outline-none text-xl font-serif uppercase placeholder:text-zinc-800 resize-none"
                     onChange={(e) =>
                       setFormData({
                         ...formData,
@@ -325,34 +306,26 @@ const Contact = () => {
                   ></textarea>
                 </div>
 
-                <div className="md:col-span-2 pt-6">
-                  <button
-                    type="submit"
-                    className="group w-full md:w-auto px-16 py-6 bg-[#0ea5a4] text-black font-black text-sm uppercase tracking-[0.3em] rounded-full flex items-center justify-center gap-4 transition-all hover:bg-white hover:scale-105 active:scale-95 shadow-[0_10px_30px_rgba(14,165,164,0.3)]"
-                  >
-                    Initiate Discussion{" "}
-                    <Send
-                      size={18}
-                      className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
-                    />
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  className="group relative inline-flex items-center gap-6 px-12 py-5 bg-white text-black text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-[#0ea5a4] hover:text-white transition-all duration-700 overflow-hidden"
+                >
+                  <span className="relative z-10">
+                    Initiate Discussion
+                  </span>
+                  <ArrowRight
+                    size={16}
+                    className="relative z-10 group-hover:translate-x-2 transition-transform duration-500"
+                  />
+                </button>
               </form>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="mt-40 pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 text-[11px] font-bold uppercase tracking-[0.3em] text-white/40">
-        <p>
-          © 2026 Meka Group. Precise
-          Engineering. Global Scale.
-        </p>
-        <p className="text-white/60">
-          Worli, Mumbai
-        </p>
-      </div>
-    </div>
+      <Footer />
+    </main>
   );
 };
 

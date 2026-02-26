@@ -30,7 +30,7 @@
 @theme {
   /* This makes `font-sans` use Montserrat */
   --font-sans: "Montserrat", sans-serif;
-  
+  --color-foreground: #ca2e1e;
   /* This makes `font-serif` use Editorial Old */
   --font-serif: "Editorial Old", serif;
 }

@@ -153,7 +153,7 @@ const Companies = () => {
         `}
       </style>
 
-      <div className="max-w-[1800px] mx-auto">
+      <div className="max-w-450 mx-auto">
         
         {/* Section Header */}
         <div className="company-header mb-12 md:mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8 px-6 md:px-12 lg:px-24">
@@ -197,7 +197,7 @@ const Companies = () => {
               />
               
               {/* Dynamic Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-colors duration-700 group-hover:from-[#0ea5a4]/90 group-hover:via-[#0ea5a4]/40 z-10 pointer-events-none" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent transition-colors duration-700 group-hover:from-[#0ea5a4]/90 group-hover:via-[#0ea5a4]/40 z-10 pointer-events-none" />
 
               {/* Number Indicator */}
               <div className="absolute top-6 right-8 z-20 overflow-hidden pointer-events-none">

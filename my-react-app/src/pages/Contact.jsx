@@ -12,6 +12,7 @@ import {
   Send,
   Globe,
 } from "lucide-react";
+import emailjs from "@emailjs/browser";
 
 const Contact = () => {
   const containerRef = useRef(null);
@@ -83,10 +84,26 @@ const Contact = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(
-      "Meka Group Inquiry:",
-      formData,
-    );
+
+    emailjs
+      .send(
+        "YOUR_SERVICE_ID",
+        "YOUR_TEMPLATE_ID",
+        formData, // This contains name, email, subject, message
+        "YOUR_PUBLIC_KEY",
+      )
+      .then(
+        () => {
+          alert(
+            "Message sent successfully!",
+          );
+        },
+        (error) => {
+          alert(
+            "Failed to send message...",
+          );
+        },
+      );
   };
 
   return (

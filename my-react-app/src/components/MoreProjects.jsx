@@ -104,7 +104,7 @@ const MoreProjects = () => {
       {/* --- THE FLOATING IMAGE PREVIEW --- */}
       <div 
         ref={previewRef}
-        className="fixed top-0 left-0 w-[300px] h-[200px] pointer-events-none z-[100] overflow-hidden opacity-0 invisible shadow-2xl scale-75"
+        className="fixed top-0 left-0 w-75 h-50 pointer-events-none z-100 overflow-hidden opacity-0 invisible shadow-2xl scale-75"
       >
         <div className="w-full h-full bg-black/50 relative">
           {archiveProjects.map((project, i) => (
@@ -147,7 +147,7 @@ const MoreProjects = () => {
             >
               
               {/* Animated Border Line */}
-              <div className="row-border absolute bottom-0 left-0 w-full h-[1px] bg-white/10 group-hover:bg-white/40 transition-colors duration-500" />
+              <div className="row-border absolute bottom-0 left-0 w-full h-px bg-white/10 group-hover:bg-white/40 transition-colors duration-500" />
 
               {/* Left Side: Year & Title (Wrapped for Masking) */}
               <div className="flex items-center gap-6 md:gap-12 md:w-1/2 overflow-hidden py-2">

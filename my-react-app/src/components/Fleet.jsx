@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 // src/components/Fleet.jsx
 import React, { useRef, useState } from "react";
 import gsap from "gsap";
@@ -113,13 +112,13 @@ const Fleet = () => {
       {/* THE CUSTOM CURSOR */}
       <div 
         ref={cursorRef}
-        className="fixed top-0 left-0 w-24 h-24 rounded-full bg-white text-black font-sans font-bold text-[10px] uppercase tracking-[0.2em] flex items-center justify-center z-[150] pointer-events-none opacity-0 invisible scale-0 -translate-x-1/2 -translate-y-1/2 mix-blend-difference"
+        className="fixed top-0 left-0 w-24 h-24 rounded-full bg-white text-black font-sans font-bold text-[10px] uppercase tracking-[0.2em] flex items-center justify-center z-150 pointer-events-none opacity-0 invisible scale-0 -translate-x-1/2 -translate-y-1/2 mix-blend-difference"
       >
         Drag
       </div>
       
       {/* Section Header */}
-      <div className="fleet-header max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24 mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
+      <div className="fleet-header max-w-350 mx-auto px-6 md:px-12 lg:px-24 mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
           <p className="font-sans text-[#0ea5a4] text-xs md:text-sm font-semibold tracking-[0.4em] uppercase mb-4">
             Advanced Machinery
@@ -149,7 +148,7 @@ const Fleet = () => {
         {fleetData.map((vessel, i) => (
           <div 
             key={vessel.id} 
-            className="fleet-gallery-item flex flex-col w-[85vw] md:w-[60vw] lg:w-[45vw] flex-shrink-0 group"
+            className="fleet-gallery-item flex flex-col w-[85vw] md:w-[60vw] lg:w-[45vw] shrink-0 group"
           >
             
             {/* 1. Unobstructed Image Container */}
@@ -192,7 +191,7 @@ const Fleet = () => {
         ))}
         
         {/* Spacer to allow the last item to be dragged into the center */}
-        <div className="w-[10vw] flex-shrink-0 pointer-events-none"></div>
+        <div className="w-[10vw] shrink-0 pointer-events-none"></div>
       </div>
 
     </section>

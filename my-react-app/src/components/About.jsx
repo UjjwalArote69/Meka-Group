@@ -168,7 +168,7 @@ const About = () => {
               </div>
 
               {/* Node Indicator */}
-              <div className="hidden md:block absolute left-[30%] top-3 -translate-x-[6px] z-20">
+              <div className="hidden md:block absolute left-[30%] top-3 -translate-x-1.5 z-20">
                 <div className="chapter-dot w-3 h-3 rounded-full bg-white transition-colors" />
               </div>
 

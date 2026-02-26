@@ -106,16 +106,16 @@ export default function Navbar() {
       {/* --- THE MAIN SMART HEADER --- */}
       <header 
         ref={headerRef} 
-        className="fixed top-0 left-0 w-full z-[100] px-6 md:px-12 py-6 flex justify-between items-center text-white transition-all duration-500 border-b border-transparent"
+        className="fixed top-0 left-0 w-full z-100 px-6 md:px-12 py-6 flex justify-between items-center text-white transition-all duration-500 border-b border-transparent"
       >
-        <Link to="/" onClick={() => setIsMenuOpen(false)} className="relative z-[110] flex items-center">
+        <Link to="/" onClick={() => setIsMenuOpen(false)} className="relative z-110 flex items-center">
           {/* Constrained the logo size to prevent layout shifts */}
           <img src="/logo.png" alt="Meka Group" className="h-6 md:h-8 w-auto object-contain" />
         </Link>
 
         <button 
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="relative z-[110] text-xs md:text-sm font-sans font-medium tracking-[0.2em] uppercase flex items-center gap-4 overflow-hidden group"
+          className="relative z-110 text-xs md:text-sm font-sans font-medium tracking-[0.2em] uppercase flex items-center gap-4 overflow-hidden group"
         >
           <div className="relative h-4 w-12 hidden md:block">
             <span className="absolute inset-0 transition-transform duration-500 group-hover:-translate-y-full">
@@ -128,7 +128,7 @@ export default function Navbar() {
           <span className="md:hidden">{isMenuOpen ? "Close" : "Menu"}</span>
 
           {/* Upgraded Hamburger Icon */}
-          <div className="w-8 h-[10px] flex flex-col justify-between items-end relative">
+          <div className="w-8 h-2.5 flex flex-col justify-between items-end relative">
             <span className={`h-[1.5px] bg-white transition-all duration-500 ease-in-out ${isMenuOpen ? 'w-full rotate-45 absolute top-1/2 -translate-y-1/2' : 'w-full group-hover:w-2/3'}`} />
             <span className={`h-[1.5px] bg-white transition-all duration-500 ease-in-out ${isMenuOpen ? 'w-full -rotate-45 absolute top-1/2 -translate-y-1/2' : 'w-2/3 group-hover:w-full'}`} />
           </div>
@@ -138,7 +138,7 @@ export default function Navbar() {
       {/* --- THE FULL SCREEN MENU OVERLAY --- */}
       <div 
         ref={menuRef} 
-        className="fixed inset-0 z-[90] bg-[#050505] text-white flex flex-col justify-center px-6 md:px-24 overflow-hidden"
+        className="fixed inset-0 z-90 bg-[#050505] text-white flex flex-col justify-center px-6 md:px-24 overflow-hidden"
       >
         {/* Massive Background Watermark */}
         <div className="menu-watermark absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[30vw] font-sans font-black text-white pointer-events-none select-none z-0">
@@ -176,7 +176,7 @@ export default function Navbar() {
             <a href="#" className="text-xs tracking-[0.2em] text-white/50 hover:text-white uppercase font-sans transition-colors">Instagram</a>
           </div>
           <div className="text-left md:text-right">
-            <a href="mailto:info@mekagroup.in" className="text-sm md:text-base font-sans font-light text-white hover:text-[#0ea5a4] transition-colors relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-[#0ea5a4] after:scale-x-0 hover:after:scale-x-100 after:origin-right hover:after:origin-left after:transition-transform after:duration-500">
+            <a href="mailto:info@mekagroup.in" className="text-sm md:text-base font-sans font-light text-white hover:text-[#0ea5a4] transition-colors relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-px after:bg-[#0ea5a4] after:scale-x-0 hover:after:scale-x-100 after:origin-right hover:after:origin-left after:transition-transform after:duration-500">
               info@mekagroup.in
             </a>
           </div>

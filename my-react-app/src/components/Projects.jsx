@@ -163,7 +163,7 @@ const Projects = () => {
       </div>
 
       {/* GLOBAL PROGRESS BAR */}
-      <div className="absolute bottom-6 left-6 right-6 md:bottom-12 md:left-24 md:right-24 h-[2px] bg-black/10 z-50">
+      <div className="absolute bottom-6 left-6 right-6 md:bottom-12 md:left-24 md:right-24 h-0.5 bg-black/10 z-50">
         <div className="progress-fill w-full h-full bg-[#0ea5a4] scale-x-0" />
       </div>
 
@@ -171,8 +171,8 @@ const Projects = () => {
       <div ref={trackRef} className="flex h-full w-[400vw] relative z-10">
         
         {/* PANEL 0: INTRO */}
-        <div className="project-panel w-screen h-full flex flex-col justify-center relative flex-shrink-0 px-6 md:px-24">
-          <div className="w-full max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between">
+        <div className="project-panel w-screen h-full flex flex-col justify-center relative shrink-0 px-6 md:px-24">
+          <div className="w-full max-w-350 mx-auto flex flex-col md:flex-row items-center justify-between">
             <div className="z-20 md:w-1/2">
               <p className="text-sm md:text-lg tracking-[0.4em] font-sans font-medium text-black/40 mb-6 uppercase">
                 Our Portfolio
@@ -197,9 +197,9 @@ const Projects = () => {
         {projectData.map((project) => (
           <div 
             key={project.id} 
-            className="project-panel w-screen h-full flex items-center justify-center relative flex-shrink-0 px-6 md:px-24"
+            className="project-panel w-screen h-full flex items-center justify-center relative shrink-0 px-6 md:px-24"
           >
-            <div className="w-full h-full max-h-[800px] max-w-[1400px] mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-10 md:gap-20">
+            <div className="w-full h-full max-h-200 max-w-350 mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-10 md:gap-20">
               
               {/* Left Column: Typography */}
               <div className="text-wrap w-full md:w-[45%] flex flex-col justify-center z-20">
@@ -215,7 +215,7 @@ const Projects = () => {
                 {/* Solid pill badge for category */}
                 <div className="bg-[#111] px-6 py-3 md:py-4 rounded-full flex items-center gap-4 w-max shadow-xl">
                   <span className="w-2 h-2 rounded-full bg-[#0ea5a4] animate-pulse"></span>
-                  <p className="text-[10px] md:text-xs tracking-[0.25em] font-sans font-semibold text-white uppercase mt-[2px]">
+                  <p className="text-[10px] md:text-xs tracking-[0.25em] font-sans font-semibold text-white uppercase mt-0.5">
                     {project.subtitle}
                   </p>
                 </div>

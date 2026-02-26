@@ -178,14 +178,28 @@ const Hero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
 
         <div className="sticky top-0 left-0 w-full h-screen z-10 flex items-center justify-center pointer-events-none overflow-hidden">
           
+          {/* UPGRADED TEXT LAYOUT - Animation untouched */}
           <h1
             id="hero-text"
-            className="text-white font-serif text-5xl md:text-8xl font-bold flex flex-wrap justify-center gap-4 md:gap-8"
-            style={{ textShadow: "0px 10px 30px rgba(0,0,0,0.6)" }}
+            className="flex flex-col md:flex-row flex-wrap items-center justify-center gap-2 md:gap-8 select-none px-4"
           >
-            <span className="hero-word opacity-0">Build.</span>
-            <span className="hero-word opacity-0">Innovate.</span>
-            <span className="hero-word opacity-0">Sustain.</span>
+            {/* BUILD. - Transparent with a crisp white stroke */}
+            <span 
+              className="hero-word opacity-0 font-sans font-black text-6xl md:text-[8rem] uppercase tracking-tighter text-transparent"
+              style={{ WebkitTextStroke: "2px rgba(255, 255, 255, 0.9)" }}
+            >
+              Build.
+            </span>
+
+            {/* innovate. - Elegant serif italic */}
+            <span className="hero-word opacity-0 font-serif italic text-6xl md:text-[8rem] tracking-tight text-white lowercase drop-shadow-2xl">
+              innovate.
+            </span>
+
+            {/* SUSTAIN. - Solid heavy text with brand-colored period */}
+            <span className="hero-word opacity-0 font-sans font-black text-6xl md:text-[8rem] uppercase tracking-tighter text-white drop-shadow-2xl">
+              Sustain<span className="text-[#0ea5a4]">.</span>
+            </span>
           </h1>
 
         </div>

@@ -23,6 +23,8 @@ const MoreProjects = lazy(
     import("../components/MoreProjects"),
 );
 
+const Companies = lazy(() => import('../components/Companies'))
+
 gsap.registerPlugin(ScrollTrigger);
 
 const Home = ({
@@ -223,6 +225,9 @@ const Home = ({
       >
         <div id="about">
           <About />
+        </div>
+        <div id="companies">
+          <Companies/>
         </div>
         <div id="projects">
           <Projects />

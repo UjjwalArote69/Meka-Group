@@ -1,27 +1,20 @@
-/* eslint-disable react-hooks/purity */
-// src/App.jsx
-import React, { useState, useCallback, useRef } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-// Global Components
+import React, { useState, useCallback, useRef, useEffect } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Loader from "./components/Loader";
 import Navbar from "./components/Navbar";
-
-// Pages
 import Home from "./pages/Home";
+import Contact from "./pages/Contact";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
-
+  const location = useLocation(); // Hook to track current URL
+  // eslint-disable-next-line react-hooks/purity
   const loadStartTime = useRef(Date.now());
-  const MIN_LOADER_TIME = 3000; 
+  const MIN_LOADER_TIME = 2000; 
 
-  const handleProgress = useCallback((p) => {
-    setProgress(p);
-  }, []);
-
-  const handleHeroReady = useCallback(() => {
+  // Function to finish loading
+  const finishLoading = useCallback(() => {
     const elapsed = Date.now() - loadStartTime.current;
     const remaining = Math.max(MIN_LOADER_TIME - elapsed, 0);
 
@@ -34,32 +27,41 @@ export default function App() {
     }, remaining);
   }, []);
 
-  // 🚨 REMOVED: The 8-second safety fallback has been completely deleted so the loader never force-quits.
+  const handleProgress = useCallback((p) => {
+    setProgress(p);
+  }, []);
+
+  // Handle route-specific loading
+  useEffect(() => {
+    // If we are NOT on the home page, we don't wait for the Hero frames.
+    if (location.pathname !== "/") {
+      finishLoading();
+    }
+  }, [location.pathname, finishLoading]);
 
   return (
-    <Router>
-      <div className="w-full">
-        <Navbar/>
-        <Loader
-          visible={loading}
-          progress={progress}
-          brandLogo="/logo.png" 
-        />
+    <div className="w-full">
+      <Navbar/>
+      <Loader
+        visible={loading}
+        progress={progress}
+        brandLogo="/logo.png" 
+      />
 
-        <div className={loading ? "pointer-events-none" : "pointer-events-auto"}>
-          <Routes>
-            <Route 
-              path="/" 
-              element={
-                <Home 
-                  onLoadProgress={handleProgress} 
-                  onReady={handleHeroReady} 
-                />
-              } 
-            />
-          </Routes>
-        </div>
+      <div className={loading ? "pointer-events-none" : "pointer-events-auto"}>
+        <Routes>
+          <Route 
+            path="/" 
+            element={
+              <Home 
+                onLoadProgress={handleProgress} 
+                onReady={finishLoading} 
+              />
+            } 
+          />
+          <Route path="/contact" element={<Contact/>} />
+        </Routes>
       </div>
-    </Router>
+    </div>
   );
 }

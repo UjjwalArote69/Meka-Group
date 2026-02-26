@@ -9,43 +9,43 @@ gsap.registerPlugin(ScrollTrigger);
 const storyChapters = [
   {
     id: "1979",
-    title: "Founded in Mumbai",
-    text: "Meka Group was established with a vision to provide engineering excellence in coastal and industrial infrastructure, beginning with small port support works and marine services.",
+    title: "Establishment in Mumbai",
+    text: "Meka Group began its journey in Mumbai under the vision of Dr. Meka Vijay Papa Rao (PhD, UIUC), focusing on specialized civil and marine engineering solutions for India's growing coastline.",
   },
   {
-    id: "1985",
-    title: "First Marine Project",
-    text: "Successfully delivered its first large-scale marine construction contract for a coastal breakwater project, establishing credibility in dredging and shoreline stabilization.",
+    id: "1982",
+    title: "Foundation of Amma Lines",
+    text: "The group established Amma Lines Ltd, which became a cornerstone of the organization, eventually building nearly 70% of the new jetties and ports across Maharashtra and Tamil Nadu.",
   },
   {
-    id: "1992",
-    title: "Expansion into Offshore Services",
-    text: "Expanded capabilities to include offshore pipeline installation and subsea systems, supporting energy and utility sectors with complex marine installations.",
+    id: "1995",
+    title: "Leadership in Subsea Engineering",
+    text: "Meka Infrastructure was founded, establishing the group as a leader in subsea intake and outfall pipelines, providing critical infrastructure for desalination and industrial cooling systems.",
   },
   {
-    id: "2001",
-    title: "Integrated EPC Services",
-    text: "Formalized full EPC (Engineering, Procurement, Construction) services, delivering end-to-end solutions for industrial and maritime infrastructure across India and the Middle East.",
+    id: "2002",
+    title: "The Rewas Port Milestone",
+    text: "The Government of Maharashtra awarded the group a 50-year concession to develop the Rewas Port. This mega-project, later partnered with Reliance, aimed to create one of India's deepest ports.",
   },
   {
     id: "2010",
-    title: "Launch of Heavy Engineering Division",
-    text: "Opened a dedicated fabrication and heavy engineering division, enabling in-house production of large structural modules and vessel components.",
+    title: "Deep-Water Port Innovation",
+    text: "Based on proprietary design patents, the group received approval to develop a ₹6,000 crore deep-water port in West Bengal, further diversifying its port development portfolio.",
   },
   {
-    id: "2015",
-    title: "First International Projects",
-    text: "Completed landmark projects outside India, including port facilities in East Africa and offshore pipelines in the Arabian Gulf, marking Meka’s entry into global infrastructure markets.",
+    id: "2013",
+    title: "Nemmelli Desalination Success",
+    text: "Successfully executed the landmark 100 MLD subsea intake outfall pipeline for the Nemmelli Desalination Plant, demonstrating world-class precision in subsea utility installations.",
   },
   {
-    id: "2020",
-    title: "Advanced Project Digitization",
-    text: "Adopted cutting-edge project digitalization tools, integrating BIM, 3D visualization, and simulation workflows to support high-precision engineering and remote collaboration.",
+    id: "2018",
+    title: "International Expansion",
+    text: "Leveraging its diverse fleet of dredgers and marine equipment, the group expanded operations into the Middle East, notably securing infrastructure and environmental roles in Qatar.",
   },
   {
     id: "2024",
-    title: "Leading Marine Infrastructure Provider",
-    text: "Now recognized as a trusted partner for marine infrastructure, industrial EPC, and offshore installations — partnering with government agencies, energy corporations, and global engineering firms.",
+    title: "Global Marine EPC Leader",
+    text: "Today, Meka Group is recognized as a premier partner for Marine EPC, dredging, and offshore installations, serving government agencies and global energy corporations with a focus on innovation.",
   },
 ];
 
@@ -77,7 +77,7 @@ const About = () => {
 
       // Parallax for the giant year watermark
       gsap.to(watermark, {
-        y: -100, // Increased distance for a more pronounced 3D effect
+        y: -100, 
         ease: "none",
         scrollTrigger: {
           trigger: chapter,
@@ -87,12 +87,12 @@ const About = () => {
         },
       });
 
-      // 2. THE SCRUBBED ENTRANCE (Fades in perfectly with the scroll wheel)
+      // 2. THE SCRUBBED ENTRANCE
       const tlIn = gsap.timeline({
         scrollTrigger: {
           trigger: chapter,
-          start: "top 80%", // Starts fading in near the bottom
-          end: "top 40%",   // Fully lit when it reaches the center
+          start: "top 80%",
+          end: "top 40%", 
           scrub: true,
         }
       });
@@ -104,19 +104,18 @@ const About = () => {
             boxShadow: "0 0 20px rgba(14,165,164,0.8)", 
             ease: "none" 
           }, 0)
-          // 3D Text Reveal linked to the scroll
           .fromTo(textWrap, 
             { y: 50, rotationX: -30, opacity: 0, filter: "blur(12px)" }, 
             { y: 0, rotationX: 0, opacity: 1, filter: "blur(0px)", ease: "power2.out" }, 
             0
           );
 
-      // 3. THE SCRUBBED EXIT (Fades out perfectly as it leaves the center)
+      // 3. THE SCRUBBED EXIT
       const tlOut = gsap.timeline({
         scrollTrigger: {
           trigger: chapter,
-          start: "bottom 50%", // Starts fading out as it passes the center
-          end: "bottom 20%",   // Fully dimmed near the top
+          start: "bottom 50%",
+          end: "bottom 20%",
           scrub: true,
         }
       });
@@ -159,26 +158,25 @@ const About = () => {
           {storyChapters.map((chapter) => (
             <div 
               key={chapter.id} 
-              // Chapters start dimmed at 15% opacity
               className="story-chapter flex flex-col md:flex-row relative opacity-15"
-              style={{ perspective: "1000px" }} // Added perspective for the 3D text roll
+              style={{ perspective: "1000px" }}
             >
               
               {/* Massive Background Watermark */}
-              <div className="chapter-watermark absolute top-[-40px] md:top-[-80px] left-0 md:left-[10%] text-8xl md:text-[180px] font-black text-white/[0.03] select-none pointer-events-none z-0 tracking-tighter">
+              <div className="chapter-watermark absolute -top-10 md:-top-20 left-0 md:left-[10%] text-8xl md:text-[180px] font-black text-white/5 select-none pointer-events-none z-0 tracking-tighter">
                 {chapter.id}
               </div>
 
               {/* Node Indicator */}
-              <div className="hidden md:block absolute left-[30%] top-3 -translate-x-[5px] z-20">
+              <div className="hidden md:block absolute left-[30%] top-3 -translate-x-[6px] z-20">
                 <div className="chapter-dot w-3 h-3 rounded-full bg-white transition-colors" />
               </div>
 
               {/* Wrapped content for 3D Reveal */}
               <div className="text-wrapper flex flex-col md:flex-row w-full transform-gpu origin-bottom z-10 relative">
                 
-                {/* Left Side: Year & Title */}
-                <div className="md:w-[35%] pr-10 mb-6 md:mb-0 mt-1">
+                {/* Fixed Overlap: Left Side matches the 30% line position */}
+                <div className="md:w-[30%] pr-12 md:pr-20 mb-6 md:mb-0 mt-1">
                   <span className="block text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
                     {chapter.id}
                   </span>
@@ -188,8 +186,8 @@ const About = () => {
                 </div>
 
                 {/* Right Side: Story Text */}
-                <div className="md:w-[65%] md:pl-24 pt-2 md:pt-4">
-                  <p className="text-base md:text-xl leading-relaxed text-gray-400 font-light">
+                <div className="md:w-[70%] md:pl-24 pt-2 md:pt-4">
+                  <p className="text-base md:text-2xl leading-relaxed text-gray-400 font-light">
                     {chapter.text}
                   </p>
                 </div>

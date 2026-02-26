@@ -118,7 +118,7 @@ const Hero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
       const minFramesToStart = maxIndex; 
 
       const firstImg = new Image();
-      firstImg.src = `/frames/frame_0000.png`;
+      firstImg.src = `/frames/frame_0000.webp`;
       firstImg.onload = () => {
         images[0] = firstImg;
         renderFrame(0);
@@ -127,7 +127,7 @@ const Hero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
 
       for (let i = 0; i < maxIndex; i++) {
         const img = new Image();
-        const src = `/frames/frame_${i.toString().padStart(4, "0")}.png`;
+        const src = `/frames/frame_${i.toString().padStart(4, "0")}.webp`;
         img.src = src;
 
         img.onload = () => {

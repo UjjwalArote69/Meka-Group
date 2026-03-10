@@ -9,7 +9,7 @@ const PROJECTS_DATA = [
   {
     id: 1,
     title: "The Azure Deepening",
-    category: "Dredging",
+    company: "Amma Lines",
     location: "Port of Singapore",
     year: "2024",
     image: "/frames/frame_0010.webp",
@@ -18,7 +18,7 @@ const PROJECTS_DATA = [
   {
     id: 2,
     title: "Iron Wall Breakwater",
-    category: "Infrastructure",
+    company: "Meka Group",
     location: "Western Coast, India",
     year: "2023",
     image: "/frames/frame_0060.webp",
@@ -27,7 +27,7 @@ const PROJECTS_DATA = [
   {
     id: 3,
     title: "Apex Logistics Hub",
-    category: "Logistics",
+    company: "Meka Dredging",
     location: "Dubai, UAE",
     year: "2024",
     image: "/frames/frame_0120.webp",
@@ -36,7 +36,7 @@ const PROJECTS_DATA = [
   {
     id: 4,
     title: "Coral Restoration Dredge",
-    category: "Dredging",
+    company: "Meka Infra",
     location: "Maldives",
     year: "2022",
     image: "/frames/frame_0080.webp",
@@ -45,7 +45,7 @@ const PROJECTS_DATA = [
   {
     id: 5,
     title: "Titan Shipyard Alpha",
-    category: "Infrastructure",
+    company: "Andhra Civil Construction",
     location: "Mumbai, India",
     year: "2023",
     image: "/frames/frame_0180.webp",
@@ -62,7 +62,7 @@ export default function ProjectsPage() {
 
   // Filter Logic: Filter projects based on state
   const filteredProjects = PROJECTS_DATA.filter(
-    (p) => filter === "All" || p.category === filter
+    (p) => filter === "All" || p.company === filter
   );
 
   useGSAP(() => {
@@ -174,7 +174,7 @@ export default function ProjectsPage() {
                 {/* Project Info */}
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-4 text-[#0ea5a4] text-[10px] uppercase tracking-[0.2em]">
-                    <span>{project.category}</span>
+                    <span>{project.company}</span>
                     <span className="w-8 h-px bg-white/20"></span>
                     <span className="text-gray-500">{project.location}</span>
                   </div>

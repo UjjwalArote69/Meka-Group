@@ -110,7 +110,7 @@ export default function Navbar() {
       >
         <Link to="/" onClick={() => setIsMenuOpen(false)} className="relative z-110 flex items-center">
           {/* Constrained the logo size to prevent layout shifts */}
-          <img src="/logo.png" alt="Meka Group" className="h-6 md:h-8 w-auto object-contain" />
+          <img src="/logo.png" alt="Meka Group" className="h-6 md:h-12 w-auto object-contain" />
         </Link>
 
         <button 

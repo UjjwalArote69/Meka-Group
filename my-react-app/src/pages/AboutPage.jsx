@@ -179,19 +179,19 @@ export default function AboutPage() {
           {[
             { 
               id: "01", 
-              title: "Meka Dredging", 
+              title: "Meka Group", 
               desc: "Commanding a massive fleet of cutter suction and trailing suction hopper dredgers to reshape coastlines.",
               img: "/frames/frame_0050.webp"
             },
             { 
               id: "02", 
-              title: "Maritime Logistics", 
+              title: "Amma Lines", 
               desc: "End-to-end maritime transportation and offshore support driven by state-of-the-art navigation tech.",
               img: "/frames/frame_0100.webp"
             },
             { 
               id: "03", 
-              title: "Heavy Engineering", 
+              title: "Meka Heavy Engineering", 
               desc: "Constructing robust marine infrastructure, breakwaters, and port facilities engineered to last.",
               img: "/frames/frame_0150.webp"
             }

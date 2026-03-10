@@ -8,16 +8,29 @@ gsap.registerPlugin(ScrollTrigger);
 
 // Added an "img" property to each project (cycling through your images)
 const archiveProjects = [
-  { year: "2023", name: "Nhava Sheva Deepening", category: "Dredging", location: "Mumbai, India", img: "/projects/image1.png" },
-  { year: "2022", name: "Kochi LNG Terminal", category: "Marine EPC", location: "Kerala, India", img: "/projects/image2.png" },
-  { year: "2021", name: "Jebel Ali Port Expansion", category: "Coastal Eng.", location: "Dubai, UAE", img: "/projects/image3.png" },
-  { year: "2021", name: "Paradip Breakwater", category: "Stabilization", location: "Odisha, India", img: "/projects/image1.png" },
-  { year: "2020", name: "Ganga Inland Waterway", category: "Infrastructure", location: "Varanasi, India", img: "/projects/image2.png" },
-  { year: "2019", name: "Fujairah Oil Terminal", category: "Offshore", location: "Fujairah, UAE", img: "/projects/image3.png" },
-  { year: "2018", name: "Mormugao Berth 11", category: "Marine EPC", location: "Goa, India", img: "/projects/image1.png" },
-  { year: "2017", name: "Salalah Port Rehab", category: "Dredging", location: "Salalah, Oman", img: "/projects/image2.png" },
-  { year: "2016", name: "Vizag Subsea Pipeline", category: "Subsea", location: "Andhra Pradesh, India", img: "/projects/image3.png" },
-  { year: "2015", name: "Dahej Ro-Ro Terminal", category: "Coastal Eng.", location: "Gujarat, India", img: "/projects/image1.png" },
+  { year: "1988", name: "Vallsons Nhava Sheva Port", category: "Port", location: "Mumbai, India", img: "/more_projects/nhava_sheva.jpg" },
+  { year: "1977", name: "Government of Gujrat Port", category: "Port", location: "Gujrat, India", img: "/more_projects/government_of_gujrat.jpg" },
+  { year: "2023", name: "Marg Limited", category: "Port", location: "Chennai, India", img: "/more_projects/marg_limited.jpg" },
+  // { year: "2022", name: "Hindustan Const. Co. Ltd.", category: "Port", location: "Chennai, India", img: "/more_projects/" },
+
+  // { year: "2021", name: "Grasim Industries Ltd. ", category: "Marine Construction", location: "Mumabi, India", img: "/more_projects/" },
+  { year: "1984", name: "Krishak Bharathi Co-operative Ltd.", category: "Marine Construction", location: "Mumabi, India", img: "/more_projects/krishak.jpg" },
+  { year: "1986", name: "Madras Port", category: "Marine Construction", location: "Madras, India", img: "/more_projects/madras_port.jpg" },
+  // { year: "2021", name: "Andhra Civil Construction Co, Chennai", category: "Marine Construction", location: "Andhra Pradesh, India", img: "/more_projects/" },
+  // { year: "2021", name: "Government of Tamil Nadu", category: "Marine Construction", location: "Tamil Nadu, India", img: "/more_projects/" },
+  { year: "1992", name: "Vikram Ispat Ltd.", category: "Marine Construction", location: "Tamil Nadu, India", img: "/more_projects/vikram_ispat.jpg" },
+
+  // { year: "2021", name: "Mazagaon Dock Ltd.", category: "Dredging and Reclamation Company in India", location: "Odisha, India", img: "/more_projects/" },
+  { year: "1990", name: "Jawaharlal Nehru Port Trust JNPT.", category: "Dredging and Reclamation Company in India", location: "Odisha, India", img: "/more_projects/jnpt.jpg" },
+  // { year: "2021", name: "Orrisa Construction Corporation Ltd.", category: "Dredging and Reclamation Company in India", location: "Odisha, India", img: "/more_projects/" },
+  { year: "2010", name: "Larsen & Tourbo Ltd.", category: "Dredging and Reclamation Company in India", location: "Odisha, India", img: "/more_projects/landt.jpg" },
+  // { year: "2021", name: "Dronagiri Prakalpagrast Jalvahatuk V Dredging Sahakari Sanstha Maryadit", category: "Dredging and Reclamation Company in India", location: "Odisha, India", img: "/more_projects/" },
+
+  { year: "1996", name: "B.M.C", category: "Urban Infrastructure", location: "Varanasi, India", img: "/more_projects/bmc.jpg" },
+  // { year: "2020", name: "Mumbai Muncipal Corp. of Greater Mumbai", category: "Urban Infrastructure", location: "Varanasi, India", img: "/more_projects/" },
+  // { year: "2020", name: "Bholasingh Jaiprakash Co Ltd. Baroda", category: "Urban Infrastructure", location: "Varanasi, India", img: "/more_projects/" },
+  { year: "1987", name: "Urmila & Company, Mumbai", category: "Urban Infrastructure", location: "Mumbai, India", img: "/more_projects/urmila.jpg" },
+  // { year: "2020", name: "Hindustani Const. Co. Ltd. Chennai", category: "Urban Infrastructure", location: "Varanasi, India", img: "/more_projects/" },
 ];
 
 const MoreProjects = () => {
@@ -168,7 +181,7 @@ const MoreProjects = () => {
                   <span className="text-xs md:text-sm tracking-[0.2em] uppercase text-white/40 w-32 group-hover:text-white/80 transition-colors">
                     {project.category}
                   </span>
-                  <span className="text-sm md:text-base font-light text-white/60 group-hover:text-white transition-colors">
+                  <span className="md:pl-20 text-sm md:text-base font-light text-white/60 group-hover:text-white transition-colors">
                     {project.location}
                   </span>
                 </div>

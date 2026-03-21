@@ -12,7 +12,7 @@ import {
 } from "react-router-dom";
 import Loader from "./components/Loader";
 import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
+import Home from "./pages/Landing/Home";
 import Contact from "./pages/Contact";
 import AboutPage from "./pages/AboutPage";
 import ProjectsPage from "./pages/ProjectsPage";

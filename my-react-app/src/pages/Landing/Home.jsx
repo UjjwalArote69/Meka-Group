@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // src/pages/Home.jsx
 import React, {
   useState,
@@ -6,38 +7,40 @@ import React, {
   lazy,
   Suspense,
 } from "react";
-import Hero from "../components/Hero";
+import Hero from "../../components/Hero";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
 const About = lazy(
-  () => import("../components/About"),
+  () => import("../../components/About"),
 );
 const Projects = lazy(
   () =>
-    import("../components/Projects"),
+    import("../../components/Projects"),
 );
 const MoreProjects = lazy(
   () =>
-    import("../components/MoreProjects"),
+    import("../../components/MoreProjects"),
 );
+
+const NewHero = lazy(()=> import("./components/NewHero"))
 
 const Companies = lazy(
   () =>
-    import("../components/Companies"),
+    import("../../components/Companies"),
 );
 
 const Testimonials = lazy(
   () =>
-    import("../components/Testimonials"),
+    import("../../components/Testimonials"),
 );
 
 const Fleet = lazy(
-  () => import("../components/Fleet"),
+  () => import("../../components/Fleet"),
 );
 
-const Footer = lazy(() => import('../components/Footer'));
+const Footer = lazy(() => import('../../components/Footer'));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -206,17 +209,17 @@ const Home = ({
     { scope: containerRef },
   );
 
-  const handleScrollClick = () => {
-    const targetEl =
-      document.querySelector(
-        navData.target,
-      );
-    if (targetEl) {
-      targetEl.scrollIntoView({
-        behavior: "smooth",
-      });
-    }
-  };
+  // const handleScrollClick = () => {
+  //   const targetEl =
+  //     document.querySelector(
+  //       navData.target,
+  //     );
+  //   if (targetEl) {
+  //     targetEl.scrollIntoView({
+  //       behavior: "smooth",
+  //     });
+  //   }
+  // };
 
   return (
     <div
@@ -224,7 +227,7 @@ const Home = ({
       className="w-full relative z-0"
     >
       <div id="hero">
-        <Hero
+        <NewHero
           onLoadProgress={
             onLoadProgress
           }
@@ -261,9 +264,8 @@ const Home = ({
       </Suspense>
 
       {/* --- GLOBAL FLOATING SCROLL BUTTON --- */}
-      <div
+      {/* <div
         id="global-scroll-btn"
-        // FIX APPLIED: We removed all widths/flex columns so the box wraps TIGHTLY around the circular button
         className="fixed z-150 pointer-events-none"
       >
         <span
@@ -296,7 +298,7 @@ const Home = ({
             />
           </svg>
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

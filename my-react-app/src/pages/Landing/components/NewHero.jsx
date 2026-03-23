@@ -1,302 +1,420 @@
-// src/components/Hero.jsx
-import React, { useRef, useEffect } from "react";
+// src/pages/Landing/components/NewHero.jsx
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Hero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
-  const containerRef = useRef(null);
-  const videoRef = useRef(null);
-  const hasCalledReady = useRef(false);
+const STATS = [
+  { value: "45", label: "Years Experience", suffix: "+" },
+  { value: "50", label: "Marine Projects", suffix: "+" },
+  { value: "25", label: "Specialized Vessels", suffix: "+" },
+  { value: "10", label: "Global Reach", suffix: "" },
+];
 
-  // Signal the loader that this hero is ready (no heavy preloading needed)
+const CLIENTS = [
+  "Reliance Industries",
+  "L&T",
+  "ONGC",
+  "Hyundai Heavy",
+  "Mitsui & Co.",
+  "McDermott",
+  "Vatech Wabag",
+  "Indian Navy",
+];
+
+// Detect touch device once — avoids repeated checks
+const IS_TOUCH =
+  typeof window !== "undefined" &&
+  ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+
+const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
+  const containerRef = useRef(null);
+  const videoContainerRef = useRef(null);
+  const videoRef = useRef(null);
+  const ctaRef = useRef(null);
+  const hasCalledReady = useRef(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // ── LOADER HANDOFF ──
   useEffect(() => {
     if (hasCalledReady.current) return;
-
     const bgImage = new Image();
     bgImage.src = "/frames/frame_0001.webp";
-
-    bgImage.onload = () => {
+    const handleLoad = () => {
+      if (hasCalledReady.current) return;
       onLoadProgress(100);
       onReady();
       hasCalledReady.current = true;
     };
-
-    bgImage.onerror = () => {
-      // Even if the image fails, unblock the loader
-      onLoadProgress(100);
-      onReady();
-      hasCalledReady.current = true;
-    };
-
-    // Safety timeout — never block the loader for more than 3s
+    bgImage.onload = handleLoad;
+    bgImage.onerror = handleLoad;
     const timeout = setTimeout(() => {
-      if (!hasCalledReady.current) {
-        onLoadProgress(100);
-        onReady();
-        hasCalledReady.current = true;
-      }
+      if (!hasCalledReady.current) handleLoad();
     }, 3000);
-
     return () => clearTimeout(timeout);
   }, [onLoadProgress, onReady]);
 
+  // ── GSAP ──
   useGSAP(
     () => {
-      // ── 1. HERO BACKGROUND PARALLAX ──
-      gsap.to(".hero-bg", {
-        yPercent: 25,
-        scale: 1.05,
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
+      // 1. ENTRANCE — simple opacity + transform only
+      const tl = gsap.timeline({ delay: 0.1 });
+
+      tl.fromTo(
+        ".hero-bg-img",
+        { scale: 1.1, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 2, ease: "power3.out" }
+      )
+        .fromTo(
+          ".edge-text",
+          { y: 15, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power2.out" },
+          "-=1.5"
+        )
+        .fromTo(
+          ".reveal-text",
+          { yPercent: 110 },
+          { yPercent: 0, duration: 1.2, stagger: 0.12, ease: "expo.out" },
+          "-=1.4"
+        )
+        .fromTo(
+          ".reveal-line",
+          { scaleX: 0 },
+          { scaleX: 1, duration: 1, ease: "expo.out" },
+          "-=1.2"
+        )
+        .fromTo(
+          ".reveal-desc",
+          { opacity: 0, x: 15 },
+          { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" },
+          "-=1.0"
+        )
+        .fromTo(
+          ".hero-cta-circle",
+          { scale: 0, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 1, ease: "elastic.out(1, 0.7)" },
+          "-=0.8"
+        );
+
+      // 2. PARALLAX — DISABLED on touch devices (major mobile perf killer)
+      if (!IS_TOUCH) {
+        gsap.to(".hero-bg-img", {
+          yPercent: 15,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".hero-viewport",
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+
+        gsap.to(".hero-content-layer", {
+          y: -60,
+          opacity: 0,
+          scrollTrigger: {
+            trigger: ".hero-viewport",
+            start: "top top",
+            end: "60% top",
+            scrub: true,
+          },
+        });
+      }
+
+      // 3. STATS COUNT-UP
+      const statNums = gsap.utils.toArray(".stat-val");
+      statNums.forEach((el) => {
+        const target = parseInt(el.getAttribute("data-target"), 10);
+        gsap.fromTo(
+          el,
+          { innerText: 0 },
+          {
+            innerText: target,
+            duration: 2,
+            ease: "power3.out",
+            snap: { innerText: 1 },
+            scrollTrigger: { trigger: ".stats-section", start: "top 85%" },
+            onUpdate: function () {
+              el.innerText = Math.ceil(this.targets()[0].innerText);
+            },
+          }
+        );
       });
 
-      // ── 2. ENTRANCE TIMELINE ──
-      const tl = gsap.timeline({ delay: 0.3 });
-
-      // Background fade in & subtle zoom
-      tl.fromTo(
-        ".hero-bg",
-        { scale: 1.15, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 2, ease: "power2.out" }
-      )
-        // Top label
-        .fromTo(
-          ".hero-label",
-          { opacity: 0, y: 20, letterSpacing: "0.8em" },
+      // 4. VIDEO REVEAL
+      //    Mobile: simple opacity + y (no clipPath — expensive on mobile GPUs)
+      //    Desktop: full clipPath + scale effect
+      if (IS_TOUCH) {
+        gsap.fromTo(
+          ".video-wrapper",
+          { opacity: 0, y: 40 },
           {
             opacity: 1,
             y: 0,
-            letterSpacing: "0.4em",
-            duration: 1.2,
-            ease: "power3.out",
-          },
-          "-=1.4"
-        )
-        // Main heading — word by word reveal
-        .fromTo(
-          ".hero-heading-word",
-          { y: "110%", rotateX: -15 },
-          {
-            y: "0%",
-            rotateX: 0,
-            duration: 1.4,
-            stagger: 0.12,
-            ease: "power4.out",
-          },
-          "-=0.9"
-        )
-        // Subtitle
-        .fromTo(
-          ".hero-subtitle",
-          { opacity: 0, y: 15 },
-          { opacity: 1, y: 0, duration: 1, ease: "power3.out" },
-          "-=0.8"
-        )
-        // Divider line grows from center
-        .fromTo(
-          ".hero-divider",
-          { scaleX: 0 },
-          { scaleX: 1, duration: 0.8, ease: "expo.out" },
-          "-=0.6"
-        )
-        // Video block rises into view
-        .fromTo(
-          ".hero-video-block",
-          { opacity: 0, y: 80, scale: 0.95 },
-          { opacity: 1, y: 0, scale: 1, duration: 1.4, ease: "power3.out" },
-          "-=0.5"
-        )
-        // Quote text fades
-        .fromTo(
-          ".hero-quote",
-          { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 1.2, ease: "power3.out" },
-          "-=0.6"
-        )
-        // Attribution
-        .fromTo(
-          ".hero-attribution",
-          { opacity: 0 },
-          { opacity: 1, duration: 0.8, ease: "power2.out" },
-          "-=0.5"
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: videoContainerRef.current,
+              start: "top 85%",
+              end: "top 50%",
+              scrub: true,
+            },
+          }
         );
+      } else {
+        gsap.fromTo(
+          ".video-wrapper",
+          { scale: 0.7, opacity: 0, y: 80, clipPath: "inset(2% round 50px)" },
+          {
+            scale: 1,
+            opacity: 1,
+            y: 0,
+            clipPath: "inset(0% round 0px)",
+            ease: "power2.inOut",
+            scrollTrigger: {
+              trigger: videoContainerRef.current,
+              start: "top 90%",
+              end: "top 20%",
+              scrub: true,
+            },
+          }
+        );
+      }
 
-      // ── 3. SCROLL-DRIVEN TEXT FADE OUT ──
-      gsap.to(".hero-content-overlay", {
-        yPercent: -15,
-        opacity: 0,
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "40% top",
-          scrub: true,
-        },
+      // 5. MARQUEE
+      gsap.to(".marquee-track", {
+        xPercent: -50,
+        ease: "none",
+        duration: 35,
+        repeat: -1,
       });
     },
     { scope: containerRef }
   );
 
-  // Video play/pause toggle
-  const handleVideoClick = () => {
+  // ── MAGNETIC BUTTON (desktop only) ──
+  const handleMouseMove = useCallback((e) => {
+    if (IS_TOUCH || !ctaRef.current) return;
+    const { left, top, width, height } = ctaRef.current.getBoundingClientRect();
+    const x = (e.clientX - left - width / 2) * 0.4;
+    const y = (e.clientY - top - height / 2) * 0.4;
+    gsap.to(ctaRef.current, { x, y, duration: 0.5, ease: "power3.out" });
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    if (IS_TOUCH || !ctaRef.current) return;
+    gsap.to(ctaRef.current, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" });
+  }, []);
+
+  // ── VIDEO TOGGLE ──
+  const handleVideoToggle = () => {
     const video = videoRef.current;
     if (!video) return;
-    if (video.paused) {
-      video.play();
-    } else {
-      video.pause();
-    }
+    if (video.paused) { video.play(); setIsPlaying(true); }
+    else { video.pause(); setIsPlaying(false); }
   };
 
   return (
     <div ref={containerRef} className="w-full relative z-0">
-      {/* ═══════════════════════════════════════════════
-          SECTION 1: FULL-VIEWPORT HERO
-          ═══════════════════════════════════════════════ */}
-      <section className="relative w-full min-h-screen overflow-hidden bg-[#06181f]">
-        {/* Background Image Layer */}
-        <div className="hero-bg absolute inset-0 w-full h-full">
+
+      {/* ══════════════════════════════════════════════════════
+          SECTION 1 — DARK HERO
+          ══════════════════════════════════════════════════════ */}
+      <section className="hero-viewport relative w-full h-screen overflow-hidden bg-[#040e12]">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-[#040e12]/60 via-[#040e12]/30 to-[#040e12]/80 z-10" />
           <img
-            src="/frames/frame_0001.webp"
-            alt="Marine construction at sea"
-            className="w-full h-full object-cover"
+            src="/hero_image.jpg"
+            alt="Marine construction site"
+            className="hero-bg-img w-full h-full object-cover origin-center"
           />
-          {/* Color overlay to deepen the marine feel */}
-          <div className="absolute inset-0 bg-[#06181f]/60 mix-blend-multiply" />
-          {/* Gradient: darken bottom for text legibility */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#06181f]/30 via-transparent to-[#06181f]/90" />
         </div>
 
-        {/* ── TEXT OVERLAY ── */}
-        <div className="hero-content-overlay relative z-10 flex flex-col items-center justify-center min-h-screen px-6 text-center pt-24">
-          {/* Top Label */}
-          <p className="hero-label font-sans text-[#0ea5a4] text-[9px] md:text-[11px] font-semibold tracking-[0.4em] uppercase mb-8 md:mb-10">
-            40+ Years of Marine Excellence
-          </p>
+        <div className="hero-content-layer relative z-20 flex flex-col justify-between h-full w-full px-6 md:px-12 py-8 md:py-12 pointer-events-none">
+          <div className="w-full max-w-7xl mx-auto flex flex-col justify-center flex-grow mt-10 md:mt-30">
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 lg:gap-0">
+              <div className="relative z-10 flex flex-col">
+                <div className="overflow-hidden py-1">
+                  <h1 className="reveal-text font-sans font-medium text-[15vw] md:text-[8rem] lg:text-[9.5rem] leading-[0.85] tracking-[-0.03em] uppercase text-white">
+                    Marine
+                  </h1>
+                </div>
+                <div className="overflow-hidden py-1 flex items-center gap-4 md:gap-6 -mt-1 md:mt-2">
+                  <div className="reveal-line hidden md:block w-12 lg:w-24 h-[3px] bg-[#0ea5a4] origin-left" />
+                  <h1 className="reveal-text font-serif italic text-[15vw] md:text-[8.5rem] lg:text-[10rem] leading-[0.85] tracking-tight lowercase text-[#0ea5a4]">
+                    engineering.
+                  </h1>
+                </div>
+              </div>
 
-          {/* Main Heading — masked word reveals */}
-          <h1 className="flex flex-col items-center gap-1 md:gap-2 select-none mb-6 md:mb-8">
-            {/* Line 1 */}
-            <span className="overflow-hidden py-2 -my-1" style={{ perspective: "600px" }}>
-              <span className="hero-heading-word block font-sans font-black text-5xl md:text-[7rem] lg:text-[8.5rem] uppercase tracking-tighter text-white leading-[0.9]">
-                Marine
-              </span>
-            </span>
-            {/* Line 2 */}
-            <span className="overflow-hidden py-2 -my-1" style={{ perspective: "600px" }}>
-              <span className="hero-heading-word block font-serif italic text-5xl md:text-[7rem] lg:text-[8.5rem] tracking-tight text-white/80 lowercase leading-[0.9]">
-                construction
-              </span>
-            </span>
-            {/* Line 3 */}
-            <span className="overflow-hidden py-2 -my-1" style={{ perspective: "600px" }}>
-              <span className="hero-heading-word block font-sans font-black text-5xl md:text-[7rem] lg:text-[8.5rem] uppercase tracking-tighter text-white leading-[0.9]">
-                Leaders<span className="text-[#0ea5a4]">.</span>
-              </span>
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="hero-subtitle font-sans text-white/40 text-sm md:text-lg font-light tracking-wide max-w-xl leading-relaxed">
-            Engineering resilient ports, coastlines & offshore infrastructure
-            across <span className="text-white/70 font-medium">110+ countries</span>.
-          </p>
-
-          {/* Divider */}
-          <div className="hero-divider w-16 md:w-24 h-px bg-white/20 mt-10 md:mt-14 origin-center" />
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════
-          SECTION 2: VIDEO FEATURE + QUOTE
-          ═══════════════════════════════════════════════ */}
-      <section className="relative z-10 bg-[#06181f] pb-24 md:pb-32">
-        {/* Video Block — pulled up to overlap the hero */}
-        <div className="hero-video-block relative -mt-24 md:-mt-32 mx-auto w-[90%] md:w-[75%] lg:w-[65%] max-w-[1100px]">
-          {/* The Video Container */}
-          <div
-            onClick={handleVideoClick}
-            className="relative aspect-video overflow-hidden cursor-pointer group bg-black shadow-2xl"
-            style={{ boxShadow: "0 30px 80px -20px rgba(0,0,0,0.7)" }}
-          >
-            {/* 
-              Dummy video — replace src with your real video URL.
-              Using a poster frame from your existing assets.
-            */}
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover"
-              poster="/frames/frame_0100.webp"
-              muted
-              loop
-              playsInline
-              preload="metadata"
-            >
-              {/* Replace this with your actual video source */}
-              <source src="/videos/hero-reel.mp4" type="video/mp4" />
-            </video>
-
-            {/* Play Button Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/20 transition-all duration-500">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-white/60 flex items-center justify-center group-hover:scale-110 group-hover:border-white transition-all duration-500 backdrop-blur-sm bg-white/5">
-                <svg
-                  className="w-6 h-6 md:w-7 md:h-7 text-white ml-1"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M8 5v14l11-7z" />
-                </svg>
+              <div className="reveal-desc flex flex-col gap-3 md:gap-4 max-w-[280px] lg:mb-6 ml-1 md:ml-0">
+                <p className="font-sans text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#0ea5a4] font-bold">
+                  The Meka Standard
+                </p>
+                <p className="font-sans text-xs md:text-sm leading-relaxed text-white/50 font-medium">
+                  Four decades of specialized expertise delivering complex
+                  coastal infrastructure and marine construction globally.
+                </p>
               </div>
             </div>
+          </div>
 
-            {/* Bottom gradient bar */}
-            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
-
-            {/* Video caption */}
-            <div className="absolute bottom-4 left-6 right-6 flex items-center justify-between pointer-events-none">
-              <span className="font-sans text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-white/60 font-medium">
-                Project Reel 2024
+          <div className="flex justify-between items-end w-full">
+            <div className="flex items-center gap-4 overflow-hidden">
+              <div className="edge-text w-12 md:w-20 h-px bg-white/30 origin-left" />
+              <span className="edge-text font-sans text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/40">
+                Scroll to explore
               </span>
-              <span className="font-sans text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-white/40">
-                02:34
+            </div>
+
+            {/* CTA — NO backdrop-blur (kills mobile GPU) */}
+            <div className="hero-cta-circle pointer-events-auto">
+              <a
+                href="#projects"
+                ref={ctaRef}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                className="group relative flex items-center justify-center w-28 h-28 md:w-36 md:h-36 rounded-full border border-white/20 bg-white/5 hover:border-transparent transition-colors duration-500 overflow-hidden cursor-pointer"
+              >
+                <span className="relative z-10 font-sans text-[9px] md:text-[11px] uppercase tracking-[0.2em] text-white font-bold text-center leading-relaxed">
+                  View <br /> Projects
+                </span>
+                <div className="absolute inset-0 bg-[#0ea5a4] rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 ease-out origin-center" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════
+          SECTION 2 — STATS (dark, below viewport)
+          ══════════════════════════════════════════════════════ */}
+      <section className="stats-section relative z-10 bg-[#040e12] py-16 md:py-24 border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-2 md:grid-cols-4 gap-y-12 md:gap-0 divide-x-0 md:divide-x divide-white/10">
+          {STATS.map((stat, i) => (
+            <div key={i} className="flex flex-col items-start md:items-center px-4 md:px-8">
+              <div className="flex items-baseline mb-2">
+                <span
+                  className="stat-val font-sans font-medium text-4xl md:text-6xl text-white tracking-tighter"
+                  data-target={parseInt(stat.value, 10)}
+                >
+                  0
+                </span>
+                <span className="text-[#0ea5a4] font-sans font-light text-3xl md:text-5xl ml-1">
+                  {stat.suffix}
+                </span>
+              </div>
+              <span className="font-sans text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/40">
+                {stat.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════
+          CURVE — dark into white
+          ══════════════════════════════════════════════════════ */}
+      <div className="relative z-10 w-full bg-[#040e12]">
+        <svg
+          viewBox="0 0 1440 120"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full block -mb-px"
+          preserveAspectRatio="none"
+        >
+          <path d="M0,0 L1440,0 L1440,40 Q720,120 0,40 Z" fill="#040e12" />
+          <path d="M0,40 Q720,120 1440,40 L1440,120 L0,120 Z" fill="#f5f5f0" />
+        </svg>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════
+          SECTION 3 — VIDEO (white)
+          ══════════════════════════════════════════════════════ */}
+      <section
+        ref={videoContainerRef}
+        className="relative z-10 bg-[#f5f5f0] py-12 md:py-24 flex flex-col items-center overflow-hidden"
+      >
+        <p className="font-sans text-[10px] md:text-xs uppercase tracking-[0.4em] text-[#0a0a0a]/40 mb-8 md:mb-12 font-medium">
+          Showreel 2024
+        </p>
+
+        {/* Video — NO backdrop-blur on play button */}
+        <div
+          onClick={handleVideoToggle}
+          className="video-wrapper relative aspect-video w-[92%] md:w-[85%] max-w-[1100px] cursor-pointer group bg-[#0a0a0a] shadow-2xl overflow-hidden mx-auto rounded-lg"
+        >
+          <video
+            ref={videoRef}
+            className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-700"
+            poster="/frames/frame_0100.webp"
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          >
+            <source src="/videos/hero-reel.mp4" type="video/mp4" />
+          </video>
+
+          <div
+            className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ${
+              isPlaying ? "bg-black/0" : "bg-black/30"
+            }`}
+          >
+            <div
+              className={`w-16 h-16 md:w-24 md:h-24 rounded-full border-2 border-white/40 flex items-center justify-center bg-black/40 group-hover:scale-110 group-hover:bg-white group-hover:text-[#0a0a0a] transition-all duration-500 ease-out text-white ${
+                isPlaying ? "opacity-0 scale-50" : "opacity-100 scale-100"
+              }`}
+            >
+              <span className="font-sans text-[9px] md:text-[11px] uppercase tracking-[0.3em] font-bold ml-1">
+                Play
               </span>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* ── QUOTE SECTION ── */}
-        <div className="hero-quote max-w-4xl mx-auto px-6 md:px-12 mt-16 md:mt-24 text-center">
-          <blockquote className="font-serif italic text-xl md:text-3xl lg:text-4xl text-white/80 leading-relaxed md:leading-[1.4] tracking-wide">
-            "We do not just build infrastructure — we engineer resilience into
-            the coastlines and ports that power global trade."
-          </blockquote>
-
-          {/* Dot navigation (decorative, matching the OCEARCH style) */}
-          <div className="flex items-center justify-center gap-2 mt-8 md:mt-10">
-            <span className="w-2 h-2 rounded-full bg-[#0ea5a4]" />
-            <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
-            <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
-          </div>
-
-          {/* Attribution */}
-          <div className="hero-attribution mt-6 md:mt-8 flex flex-col items-center gap-1">
-            <p className="font-sans text-white text-sm md:text-base font-semibold tracking-wide">
-              Dr. Meka Vijay Papa Rao
-            </p>
-            <p className="font-sans text-[#0ea5a4] text-[10px] md:text-xs tracking-[0.2em] uppercase font-medium">
-              Founder & Chairman, Meka Group
-            </p>
+      {/* ══════════════════════════════════════════════════════
+          SECTION 4 — MARQUEE (white)
+          ══════════════════════════════════════════════════════ */}
+      <section className="relative z-10 bg-[#f5f5f0] py-12 md:py-20 overflow-hidden">
+        <p className="font-sans text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-[#0a0a0a]/30 text-center mb-12 font-medium">
+          Trusted globally by industry leaders
+        </p>
+        <div className="flex overflow-hidden whitespace-nowrap relative">
+          <div className="absolute left-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-r from-[#f5f5f0] to-transparent z-10" />
+          <div className="absolute right-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-l from-[#f5f5f0] to-transparent z-10" />
+          <div className="marquee-track flex items-center gap-12 md:gap-32 px-8 md:px-12 w-max">
+            {[...CLIENTS, ...CLIENTS].map((client, index) => (
+              <span
+                key={index}
+                className="font-sans text-xs md:text-xl font-bold uppercase tracking-[0.15em] text-[#0a0a0a]/40"
+              >
+                {client}
+              </span>
+            ))}
           </div>
         </div>
       </section>
+
+      {/* ══════════════════════════════════════════════════════
+          BOTTOM CURVE — white into dark About
+          ══════════════════════════════════════════════════════ */}
+      <div className="relative z-10 w-full bg-[#f5f5f0]">
+        <svg
+          viewBox="0 0 1440 120"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full block -mb-px"
+          preserveAspectRatio="none"
+        >
+          <path d="M0,0 L1440,0 L1440,40 Q720,120 0,40 Z" fill="#f5f5f0" />
+          <path d="M0,40 Q720,120 1440,40 L1440,120 L0,120 Z" fill="#0a0a0a" />
+        </svg>
+      </div>
     </div>
   );
 };
 
-export default Hero;
+export default NewHero;

@@ -22,13 +22,11 @@ const Fleet = () => {
   const trackRef = useRef(null);
   const cursorRef = useRef(null);
 
-  // Drag-to-Scroll State
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
   useGSAP(() => {
-    // Section Header Entrance
     gsap.fromTo(
       ".fleet-header",
       { opacity: 0, y: 40 },
@@ -40,11 +38,10 @@ const Fleet = () => {
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top 80%",
-        }
+        },
       }
     );
 
-    // Staggered Entrance for the Gallery Items
     gsap.fromTo(
       ".fleet-gallery-item",
       { opacity: 0, x: 50 },
@@ -57,11 +54,10 @@ const Fleet = () => {
         scrollTrigger: {
           trigger: trackRef.current,
           start: "top 85%",
-        }
+        },
       }
     );
 
-    // Custom Cursor Tracking
     const xTo = gsap.quickTo(cursorRef.current, "x", { duration: 0.2, ease: "power3" });
     const yTo = gsap.quickTo(cursorRef.current, "y", { duration: 0.2, ease: "power3" });
 
@@ -74,12 +70,10 @@ const Fleet = () => {
     return () => window.removeEventListener("mousemove", moveCursor);
   }, { scope: containerRef });
 
-  // Mouse Drag Handlers
   const handleMouseDown = (e) => {
     setIsDragging(true);
     setStartX(e.pageX - trackRef.current.offsetLeft);
     setScrollLeft(trackRef.current.scrollLeft);
-    // Shrink cursor slightly while dragging for tactical feel
     gsap.to(cursorRef.current, { scale: 0.8, duration: 0.2 });
   };
 
@@ -97,103 +91,93 @@ const Fleet = () => {
     if (!isDragging) return;
     e.preventDefault();
     const x = e.pageX - trackRef.current.offsetLeft;
-    const walk = (x - startX) * 2.5; // Multiplier for swipe speed
+    const walk = (x - startX) * 2.5;
     trackRef.current.scrollLeft = scrollLeft - walk;
   };
 
-  // Cursor Hover States for the track
   const handleTrackEnter = () => {
     gsap.to(cursorRef.current, { scale: 1, autoAlpha: 1, duration: 0.4, ease: "back.out(1.5)" });
   };
 
   return (
-    <section ref={containerRef} className="w-full bg-[#050505] text-white py-24 md:py-32 relative z-10 overflow-hidden">
+    <section ref={containerRef} className="w-full bg-[#f5f5f0] text-[#0a0a0a] py-24 md:py-32 relative z-10 overflow-hidden">
+
+      {/* CUSTOM CURSOR — dark on light */}
       
-      {/* THE CUSTOM CURSOR */}
-      <div 
-        ref={cursorRef}
-        className="fixed top-0 left-0 w-24 h-24 rounded-full bg-white text-black font-sans font-bold text-[10px] uppercase tracking-[0.2em] flex items-center justify-center z-150 pointer-events-none opacity-0 invisible scale-0 -translate-x-1/2 -translate-y-1/2 mix-blend-difference"
-      >
-        Drag
-      </div>
-      
-      {/* Section Header */}
-      <div className="fleet-header max-w-350 mx-auto px-6 md:px-12 lg:px-24 mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
+
+      {/* HEADER */}
+      <div className="fleet-header max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24 mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
           <p className="font-sans text-[#0ea5a4] text-xs md:text-sm font-semibold tracking-[0.4em] uppercase mb-4">
             Advanced Machinery
           </p>
-          <h2 className="font-sans font-black text-5xl md:text-7xl uppercase tracking-tighter leading-none">
-            Our <span className="font-serif italic text-white/70 font-light lowercase tracking-tight">Fleet.</span>
+          <h2 className="font-sans font-black text-5xl md:text-7xl uppercase tracking-tighter leading-none text-[#0a0a0a]">
+            Our{" "}
+            <span className="font-serif italic text-[#0a0a0a]/50 font-light lowercase tracking-tight">
+              Fleet.
+            </span>
           </h2>
         </div>
         <div className="md:max-w-sm">
-          <p className="font-sans font-light text-white/50 text-sm md:text-base leading-relaxed">
+          <p className="font-sans font-light text-[#0a0a0a]/50 text-sm md:text-base leading-relaxed">
             Equipped with a state-of-the-art maritime fleet, we execute the most complex coastal and deep-water engineering projects worldwide. Explore our vessels below.
           </p>
         </div>
       </div>
 
       {/* HORIZONTAL DRAG GALLERY */}
-      <div 
+      <div
         ref={trackRef}
         onMouseEnter={handleTrackEnter}
         onMouseLeave={handleMouseLeave}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
-        // Tailwind 'hide-scrollbar' comes from your index.css
-        className={`flex overflow-x-auto gap-8 px-6 md:px-12 lg:px-24 pb-12 hide-scrollbar transition-all duration-300 select-none ${isDragging ? "cursor-grabbing" : "cursor-none"}`}
+        className={`flex overflow-x-auto gap-8 px-6 md:px-12 lg:px-24 pb-12 hide-scrollbar transition-all duration-300 select-none ${
+          isDragging ? "cursor-grabbing" : "cursor-none"
+        }`}
       >
         {fleetData.map((vessel, i) => (
-          <div 
-            key={vessel.id} 
+          <div
+            key={vessel.id}
             className="fleet-gallery-item flex flex-col w-[85vw] md:w-[60vw] lg:w-[45vw] shrink-0 group"
           >
-            
-            {/* 1. Unobstructed Image Container */}
-            <div className="w-full h-[50vh] md:h-[65vh] overflow-hidden rounded-xl bg-[#111] relative">
-              <img 
-                src={vessel.img} 
+            {/* Image */}
+            <div className="w-full h-[50vh] md:h-[65vh] overflow-hidden rounded-xl bg-[#e8e8e3] relative">
+              <img
+                src={vessel.img}
                 alt={`${vessel.name} - ${vessel.type}`}
-                draggable="false" // Prevents default browser ghost-image drag
+                draggable="false"
                 loading={i > 1 ? "lazy" : "eager"}
                 className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 pointer-events-none"
               />
             </div>
 
-            {/* 2. Meta Information below the image */}
+            {/* Meta */}
             <div className="mt-8 flex flex-col md:flex-row justify-between items-start gap-4 pointer-events-none">
-              
-              {/* Left Side: Type & Name */}
               <div>
                 <p className="font-sans text-[#0ea5a4] text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase mb-2">
                   {vessel.type}
                 </p>
-                <h3 className="font-sans font-black text-3xl md:text-5xl uppercase tracking-tighter text-white leading-none">
+                <h3 className="font-sans font-black text-3xl md:text-5xl uppercase tracking-tighter text-[#0a0a0a] leading-none">
                   {vessel.name}
                 </h3>
               </div>
 
-              {/* Right Side: Number & Function */}
               <div className="flex flex-row md:flex-col items-center md:items-end gap-4 md:gap-2">
-                <span className="font-sans font-medium text-white/30 text-sm md:text-base">
+                <span className="font-sans font-medium text-[#0a0a0a]/30 text-sm md:text-base">
                   No. {vessel.id}
                 </span>
-                <span className="bg-white/5 text-white font-mono text-[9px] md:text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-sm border border-white/10 whitespace-nowrap">
+                <span className="bg-[#0a0a0a]/5 text-[#0a0a0a] font-mono text-[9px] md:text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-sm border border-[#0a0a0a]/10 whitespace-nowrap">
                   {vessel.function}
                 </span>
               </div>
-
             </div>
-
           </div>
         ))}
-        
-        {/* Spacer to allow the last item to be dragged into the center */}
-        <div className="w-[10vw] shrink-0 pointer-events-none"></div>
-      </div>
 
+        <div className="w-[10vw] shrink-0 pointer-events-none" />
+      </div>
     </section>
   );
 };

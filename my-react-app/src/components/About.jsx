@@ -1,5 +1,5 @@
 // src/components/About.jsx
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -52,7 +52,35 @@ const storyChapters = [
 const About = () => {
   const containerRef = useRef(null);
 
+  // Robust layout recalculation to prevent premature triggering
+  useEffect(() => {
+    const handleRefresh = () => ScrollTrigger.refresh();
+    window.addEventListener("resize", handleRefresh);
+    
+    // Multiple refreshes to catch lazy-loaded assets and fonts above this section
+    const t1 = setTimeout(handleRefresh, 100);
+    const t2 = setTimeout(handleRefresh, 500);
+    const t3 = setTimeout(handleRefresh, 1500);
+
+    return () => {
+      window.removeEventListener("resize", handleRefresh);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, []);
+
   useGSAP(() => {
+    // 0. RESET INITIAL STATES VIA GSAP (Removes Tailwind conflicts)
+    gsap.set(".scroll-progress-line", { scaleY: 0, transformOrigin: "top" });
+    
+    const chapters = gsap.utils.toArray(".story-chapter");
+    chapters.forEach((chapter) => {
+      gsap.set(chapter, { opacity: 0.15 });
+      gsap.set(chapter.querySelector(".text-wrapper"), { y: 50, rotationX: -20, opacity: 0, filter: "blur(10px)" });
+      gsap.set(chapter.querySelector(".chapter-dot"), { scale: 0.5, backgroundColor: "#ffffff" });
+    });
+
     // 1. MASTER SCROLL TRACK (Perfectly synced to viewport center)
     gsap.to(".scroll-progress-line", {
       scaleY: 1,
@@ -62,18 +90,14 @@ const About = () => {
         start: "top 50%",    
         end: "bottom 50%",   
         scrub: true,
+        invalidateOnRefresh: true,
       }
     });
-
-    const chapters = gsap.utils.toArray(".story-chapter");
 
     chapters.forEach((chapter) => {
       const watermark = chapter.querySelector(".chapter-watermark");
       const dot = chapter.querySelector(".chapter-dot");
       const textWrap = chapter.querySelector(".text-wrapper");
-
-      // Reset starting states
-      gsap.set(dot, { scale: 0.5, backgroundColor: "#ffffff" });
 
       // Parallax for the giant year watermark
       gsap.to(watermark, {
@@ -84,6 +108,7 @@ const About = () => {
           start: "top bottom",
           end: "bottom top",
           scrub: true,
+          invalidateOnRefresh: true,
         },
       });
 
@@ -91,9 +116,10 @@ const About = () => {
       const tlIn = gsap.timeline({
         scrollTrigger: {
           trigger: chapter,
-          start: "top 80%",
-          end: "top 40%", 
+          start: "top 75%", // Starts a bit earlier
+          end: "top 45%",   // Finishes when centered
           scrub: true,
+          invalidateOnRefresh: true,
         }
       });
 
@@ -104,8 +130,7 @@ const About = () => {
             boxShadow: "0 0 20px rgba(14,165,164,0.8)", 
             ease: "none" 
           }, 0)
-          .fromTo(textWrap, 
-            { y: 50, rotationX: -30, opacity: 0, filter: "blur(12px)" }, 
+          .to(textWrap, 
             { y: 0, rotationX: 0, opacity: 1, filter: "blur(0px)", ease: "power2.out" }, 
             0
           );
@@ -117,6 +142,7 @@ const About = () => {
           start: "bottom 50%",
           end: "bottom 20%",
           scrub: true,
+          invalidateOnRefresh: true,
         }
       });
 
@@ -150,15 +176,15 @@ const About = () => {
           {/* Global Background Track */}
           <div className="hidden md:block absolute left-[30%] top-4 bottom-12 w-px bg-white/10 z-0" />
           
-          {/* Global Animated Progress Fill */}
+          {/* Global Animated Progress Fill (Tailwind classes removed to let GSAP handle it) */}
           <div className="hidden md:block absolute left-[30%] top-4 bottom-12 w-px z-10">
-            <div className="scroll-progress-line w-full h-full bg-[#0ea5a4] origin-top scale-y-0" />
+            <div className="scroll-progress-line w-full h-full bg-[#0ea5a4]" />
           </div>
 
           {storyChapters.map((chapter) => (
             <div 
               key={chapter.id} 
-              className="story-chapter flex flex-col md:flex-row relative opacity-15"
+              className="story-chapter flex flex-col md:flex-row relative"
               style={{ perspective: "1000px" }}
             >
               

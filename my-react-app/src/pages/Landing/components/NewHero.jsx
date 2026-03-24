@@ -1,16 +1,38 @@
 // src/pages/Landing/components/NewHero.jsx
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import Companies from "../../../components/Companies";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const STATS = [
-  { value: "45", label: "Years Experience", suffix: "+" },
-  { value: "50", label: "Marine Projects", suffix: "+" },
-  { value: "25", label: "Specialized Vessels", suffix: "+" },
-  { value: "10", label: "Global Reach", suffix: "" },
+  {
+    value: "45",
+    label: "Years Experience",
+    suffix: "+",
+  },
+  {
+    value: "50",
+    label: "Marine Projects",
+    suffix: "+",
+  },
+  {
+    value: "25",
+    label: "Specialized Vessels",
+    suffix: "+",
+  },
+  {
+    value: "10",
+    label: "Global Reach",
+    suffix: "",
+  },
 ];
 
 const CLIENTS = [
@@ -27,23 +49,31 @@ const CLIENTS = [
 // Detect touch device once — avoids repeated checks
 const IS_TOUCH =
   typeof window !== "undefined" &&
-  ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+  ("ontouchstart" in window ||
+    navigator.maxTouchPoints > 0);
 
-const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
+const NewHero = ({
+  onLoadProgress = () => {},
+  onReady = () => {},
+}) => {
   const containerRef = useRef(null);
-  const videoContainerRef = useRef(null);
+  const videoContainerRef =
+    useRef(null);
   const videoRef = useRef(null);
   const ctaRef = useRef(null);
   const hasCalledReady = useRef(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] =
+    useState(false);
 
   // ── LOADER HANDOFF ──
   useEffect(() => {
     if (hasCalledReady.current) return;
     const bgImage = new Image();
-    bgImage.src = "/frames/frame_0001.webp";
+    bgImage.src =
+      "/frames/frame_0001.webp";
     const handleLoad = () => {
-      if (hasCalledReady.current) return;
+      if (hasCalledReady.current)
+        return;
       onLoadProgress(100);
       onReady();
       hasCalledReady.current = true;
@@ -51,7 +81,8 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
     bgImage.onload = handleLoad;
     bgImage.onerror = handleLoad;
     const timeout = setTimeout(() => {
-      if (!hasCalledReady.current) handleLoad();
+      if (!hasCalledReady.current)
+        handleLoad();
     }, 3000);
     return () => clearTimeout(timeout);
   }, [onLoadProgress, onReady]);
@@ -60,42 +91,74 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
   useGSAP(
     () => {
       // 1. ENTRANCE — simple opacity + transform only
-      const tl = gsap.timeline({ delay: 0.1 });
+      const tl = gsap.timeline({
+        delay: 0.1,
+      });
 
       tl.fromTo(
         ".hero-bg-img",
         { scale: 1.1, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 2, ease: "power3.out" }
+        {
+          scale: 1,
+          opacity: 1,
+          duration: 2,
+          ease: "power3.out",
+        },
       )
         .fromTo(
           ".edge-text",
           { y: 15, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power2.out" },
-          "-=1.5"
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power2.out",
+          },
+          "-=1.5",
         )
         .fromTo(
           ".reveal-text",
           { yPercent: 110 },
-          { yPercent: 0, duration: 1.2, stagger: 0.12, ease: "expo.out" },
-          "-=1.4"
+          {
+            yPercent: 0,
+            duration: 1.2,
+            stagger: 0.12,
+            ease: "expo.out",
+          },
+          "-=1.4",
         )
         .fromTo(
           ".reveal-line",
           { scaleX: 0 },
-          { scaleX: 1, duration: 1, ease: "expo.out" },
-          "-=1.2"
+          {
+            scaleX: 1,
+            duration: 1,
+            ease: "expo.out",
+          },
+          "-=1.2",
         )
         .fromTo(
           ".reveal-desc",
           { opacity: 0, x: 15 },
-          { opacity: 1, x: 0, duration: 0.8, ease: "power3.out" },
-          "-=1.0"
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.8,
+            ease: "power3.out",
+          },
+          "-=1.0",
         )
         .fromTo(
           ".hero-cta-circle",
           { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 1, ease: "elastic.out(1, 0.7)" },
-          "-=0.8"
+          {
+            scale: 1,
+            opacity: 1,
+            duration: 1,
+            ease: "elastic.out(1, 0.7)",
+          },
+          "-=0.8",
         );
 
       // 2. PARALLAX — DISABLED on touch devices (major mobile perf killer)
@@ -124,9 +187,15 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
       }
 
       // 3. STATS COUNT-UP
-      const statNums = gsap.utils.toArray(".stat-val");
+      const statNums =
+        gsap.utils.toArray(".stat-val");
       statNums.forEach((el) => {
-        const target = parseInt(el.getAttribute("data-target"), 10);
+        const target = parseInt(
+          el.getAttribute(
+            "data-target",
+          ),
+          10,
+        );
         gsap.fromTo(
           el,
           { innerText: 0 },
@@ -135,11 +204,17 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
             duration: 2,
             ease: "power3.out",
             snap: { innerText: 1 },
-            scrollTrigger: { trigger: ".stats-section", start: "top 85%" },
-            onUpdate: function () {
-              el.innerText = Math.ceil(this.targets()[0].innerText);
+            scrollTrigger: {
+              trigger: ".stats-section",
+              start: "top 85%",
             },
-          }
+            onUpdate: function () {
+              el.innerText = Math.ceil(
+                this.targets()[0]
+                  .innerText,
+              );
+            },
+          },
         );
       });
 
@@ -155,30 +230,39 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
             y: 0,
             ease: "power2.out",
             scrollTrigger: {
-              trigger: videoContainerRef.current,
+              trigger:
+                videoContainerRef.current,
               start: "top 85%",
               end: "top 50%",
               scrub: true,
             },
-          }
+          },
         );
       } else {
         gsap.fromTo(
           ".video-wrapper",
-          { scale: 0.7, opacity: 0, y: 80, clipPath: "inset(2% round 50px)" },
+          {
+            scale: 0.7,
+            opacity: 0,
+            y: 80,
+            clipPath:
+              "inset(2% round 50px)",
+          },
           {
             scale: 1,
             opacity: 1,
             y: 0,
-            clipPath: "inset(0% round 0px)",
+            clipPath:
+              "inset(0% round 0px)",
             ease: "power2.inOut",
             scrollTrigger: {
-              trigger: videoContainerRef.current,
+              trigger:
+                videoContainerRef.current,
               start: "top 90%",
               end: "top 20%",
               scrub: true,
             },
-          }
+          },
         );
       }
 
@@ -190,34 +274,67 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
         repeat: -1,
       });
     },
-    { scope: containerRef }
+    { scope: containerRef },
   );
 
   // ── MAGNETIC BUTTON (desktop only) ──
-  const handleMouseMove = useCallback((e) => {
-    if (IS_TOUCH || !ctaRef.current) return;
-    const { left, top, width, height } = ctaRef.current.getBoundingClientRect();
-    const x = (e.clientX - left - width / 2) * 0.4;
-    const y = (e.clientY - top - height / 2) * 0.4;
-    gsap.to(ctaRef.current, { x, y, duration: 0.5, ease: "power3.out" });
-  }, []);
+  const handleMouseMove = useCallback(
+    (e) => {
+      if (IS_TOUCH || !ctaRef.current)
+        return;
+      const {
+        left,
+        top,
+        width,
+        height,
+      } =
+        ctaRef.current.getBoundingClientRect();
+      const x =
+        (e.clientX - left - width / 2) *
+        0.4;
+      const y =
+        (e.clientY - top - height / 2) *
+        0.4;
+      gsap.to(ctaRef.current, {
+        x,
+        y,
+        duration: 0.5,
+        ease: "power3.out",
+      });
+    },
+    [],
+  );
 
-  const handleMouseLeave = useCallback(() => {
-    if (IS_TOUCH || !ctaRef.current) return;
-    gsap.to(ctaRef.current, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" });
-  }, []);
+  const handleMouseLeave =
+    useCallback(() => {
+      if (IS_TOUCH || !ctaRef.current)
+        return;
+      gsap.to(ctaRef.current, {
+        x: 0,
+        y: 0,
+        duration: 0.7,
+        ease: "elastic.out(1, 0.3)",
+      });
+    }, []);
 
   // ── VIDEO TOGGLE ──
   const handleVideoToggle = () => {
     const video = videoRef.current;
     if (!video) return;
-    if (video.paused) { video.play(); setIsPlaying(true); }
-    else { video.pause(); setIsPlaying(false); }
+    if (video.paused) {
+      video.play();
+      setIsPlaying(true);
+    } else {
+      video.pause();
+      setIsPlaying(false);
+    }
   };
 
   return (
-    <div ref={containerRef} className="w-full relative z-0">
-
+    <div
+      ref={containerRef}
+      className="w-full relative z-0"
+    >
       {/* ══════════════════════════════════════════════════════
           SECTION 1 — DARK HERO
           ══════════════════════════════════════════════════════ */}
@@ -225,7 +342,7 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-b from-[#040e12]/60 via-[#040e12]/30 to-[#040e12]/80 z-10" />
           <img
-            src="/hero_image.jpg"
+            src="/new_hero_image.jpg"
             alt="Marine construction site"
             className="hero-bg-img w-full h-full object-cover origin-center"
           />
@@ -253,8 +370,12 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
                   The Meka Standard
                 </p>
                 <p className="font-sans text-xs md:text-sm leading-relaxed text-white/50 font-medium">
-                  Four decades of specialized expertise delivering complex
-                  coastal infrastructure and marine construction globally.
+                  Four decades of
+                  specialized expertise
+                  delivering complex
+                  coastal infrastructure
+                  and marine
+                  construction globally.
                 </p>
               </div>
             </div>
@@ -273,8 +394,12 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
               <a
                 href="#projects"
                 ref={ctaRef}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
+                onMouseMove={
+                  handleMouseMove
+                }
+                onMouseLeave={
+                  handleMouseLeave
+                }
                 className="group relative flex items-center justify-center w-28 h-28 md:w-36 md:h-36 rounded-full border border-white/20 bg-white/5 hover:border-transparent transition-colors duration-500 overflow-hidden cursor-pointer"
               >
                 <span className="relative z-10 font-sans text-[9px] md:text-[11px] uppercase tracking-[0.2em] text-white font-bold text-center leading-relaxed">
@@ -293,11 +418,17 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
       <section className="stats-section relative z-10 bg-[#040e12] py-16 md:py-24 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-2 md:grid-cols-4 gap-y-12 md:gap-0 divide-x-0 md:divide-x divide-white/10">
           {STATS.map((stat, i) => (
-            <div key={i} className="flex flex-col items-start md:items-center px-4 md:px-8">
+            <div
+              key={i}
+              className="flex flex-col items-start md:items-center px-4 md:px-8"
+            >
               <div className="flex items-baseline mb-2">
                 <span
                   className="stat-val font-sans font-medium text-4xl md:text-6xl text-white tracking-tighter"
-                  data-target={parseInt(stat.value, 10)}
+                  data-target={parseInt(
+                    stat.value,
+                    10,
+                  )}
                 >
                   0
                 </span>
@@ -311,12 +442,13 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
             </div>
           ))}
         </div>
+          
       </section>
 
       {/* ══════════════════════════════════════════════════════
           CURVE — dark into white
           ══════════════════════════════════════════════════════ */}
-      <div className="relative z-10 w-full bg-[#040e12]">
+      <div className="relative -top-0 z-10 w-full bg-[#040e12]">
         <svg
           viewBox="0 0 1440 120"
           fill="none"
@@ -324,10 +456,18 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
           className="w-full block -mb-px"
           preserveAspectRatio="none"
         >
-          <path d="M0,0 L1440,0 L1440,40 Q720,120 0,40 Z" fill="#040e12" />
-          <path d="M0,40 Q720,120 1440,40 L1440,120 L0,120 Z" fill="#f5f5f0" />
+          <path
+            d="M0,0 L1440,0 L1440,40 Q720,120 0,40 Z"
+            fill="#040e12"
+          />
+          <path
+            d="M0,40 Q720,120 1440,40 L1440,120 L0,120 Z"
+            fill="#f5f5f0"
+          />
         </svg>
       </div>
+
+      <Companies />
 
       {/* ══════════════════════════════════════════════════════
           SECTION 3 — VIDEO (white)
@@ -354,17 +494,24 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
             playsInline
             preload="metadata"
           >
-            <source src="/videos/hero-reel.mp4" type="video/mp4" />
+            <source
+              src="/videos/hero-reel.mp4"
+              type="video/mp4"
+            />
           </video>
 
           <div
             className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ${
-              isPlaying ? "bg-black/0" : "bg-black/30"
+              isPlaying
+                ? "bg-black/0"
+                : "bg-black/30"
             }`}
           >
             <div
               className={`w-16 h-16 md:w-24 md:h-24 rounded-full border-2 border-white/40 flex items-center justify-center bg-black/40 group-hover:scale-110 group-hover:bg-white group-hover:text-[#0a0a0a] transition-all duration-500 ease-out text-white ${
-                isPlaying ? "opacity-0 scale-50" : "opacity-100 scale-100"
+                isPlaying
+                  ? "opacity-0 scale-50"
+                  : "opacity-100 scale-100"
               }`}
             >
               <span className="font-sans text-[9px] md:text-[11px] uppercase tracking-[0.3em] font-bold ml-1">
@@ -380,13 +527,17 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
           ══════════════════════════════════════════════════════ */}
       <section className="relative z-10 bg-[#f5f5f0] py-12 md:py-20 overflow-hidden">
         <p className="font-sans text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-[#0a0a0a]/30 text-center mb-12 font-medium">
-          Trusted globally by industry leaders
+          Trusted globally by industry
+          leaders
         </p>
         <div className="flex overflow-hidden whitespace-nowrap relative">
           <div className="absolute left-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-r from-[#f5f5f0] to-transparent z-10" />
           <div className="absolute right-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-l from-[#f5f5f0] to-transparent z-10" />
           <div className="marquee-track flex items-center gap-12 md:gap-32 px-8 md:px-12 w-max">
-            {[...CLIENTS, ...CLIENTS].map((client, index) => (
+            {[
+              ...CLIENTS,
+              ...CLIENTS,
+            ].map((client, index) => (
               <span
                 key={index}
                 className="font-sans text-xs md:text-xl font-bold uppercase tracking-[0.15em] text-[#0a0a0a]/40"
@@ -409,8 +560,14 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
           className="w-full block -mb-px"
           preserveAspectRatio="none"
         >
-          <path d="M0,0 L1440,0 L1440,40 Q720,120 0,40 Z" fill="#f5f5f0" />
-          <path d="M0,40 Q720,120 1440,40 L1440,120 L0,120 Z" fill="#0a0a0a" />
+          <path
+            d="M0,0 L1440,0 L1440,40 Q720,120 0,40 Z"
+            fill="#f5f5f0"
+          />
+          <path
+            d="M0,40 Q720,120 1440,40 L1440,120 L0,120 Z"
+            fill="#0a0a0a"
+          />
         </svg>
       </div>
     </div>

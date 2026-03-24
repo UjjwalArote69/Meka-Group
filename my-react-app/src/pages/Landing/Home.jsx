@@ -8,7 +8,6 @@ import NewHero from "./components/NewHero";
 
 // The rest can remain lazy loaded
 const About = lazy(() => import("../../components/About"));
-const Companies = lazy(() => import("../../components/Companies"));
 const Fleet = lazy(() => import("../../components/Fleet"));
 const Projects = lazy(() => import("../../components/Projects"));
 const MoreProjects = lazy(() => import("../../components/MoreProjects"));
@@ -54,7 +53,6 @@ const Home = ({
 
       <Suspense fallback={<div className="h-screen bg-[#0a0a0a]" />}>
         <div id="about"><About /></div>
-        <div id="companies"><Companies /></div>
         <div id="fleet"><Fleet /></div>
         <div id="projects"><Projects /></div>
         <div id="archive"><MoreProjects /></div>

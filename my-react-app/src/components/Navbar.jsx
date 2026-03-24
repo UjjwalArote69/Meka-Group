@@ -8,14 +8,43 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// ════════════════════════════════════════
+// 1. UPDATED DATA WITH DROPDOWN CHILDREN
+// ════════════════════════════════════════
 const leftLinks = [
   { name: "Home", path: "/" },
-  { name: "Our Legacy", path: "/about" },
-  { name: "Expertise", path: "/expertise" },
+  { 
+    name: "Our Legacy", 
+    path: "/about",
+    children: [
+      { name: "About Us", path: "/about" },
+      { name: "Board of Directors", path: "/about#board" },
+      { name: "Our Values", path: "/about#values" },
+    ]
+  },
+  { 
+    name: 'Business', 
+    path: "/business",
+    children: [
+      { name: "Marine Construction", path: "/business#marine" },
+      { name: "Dredging & Reclamation", path: "/business#dredging" },
+      { name: "Port", path: "/business#port" },
+      { name: "Urban Infrastructure", path: "/business#infrastructure" },
+      { name: "Real Estate", path: "/business#estate" },
+    ]
+  },
 ];
 
 const rightLinks = [
-  { name: "Careers", path: "/careers" },
+  { 
+    name: "Companies", 
+    path: "/companies",
+    children: [
+      { name: "Amma Lines", path: "/companies" },
+      { name: "Meka Dredging", path: "/companies" },
+      { name: "Meka Infrastructure", path: "/companies" },
+    ]
+  },
   { name: "Projects", path: "/projects" },
   { name: "Contact", path: "/contact" },
 ];
@@ -27,10 +56,14 @@ const menuImages = {
   "/about": "/frames/frame_0050.webp",
   "/expertise": "/frames/frame_0080.webp",
   "/careers": "/frames/frame_0040.webp",
+  "/companies": "/frames/frame_0040.webp",
   "/projects": "/frames/frame_0100.webp",
   "/contact": "/frames/frame_0120.webp",
 };
 
+// ════════════════════════════════════════
+// 2. EXISTING FLIP LINK
+// ════════════════════════════════════════
 function FlipLink({ to, children, isActive, onClick }) {
   return (
     <Link
@@ -39,14 +72,14 @@ function FlipLink({ to, children, isActive, onClick }) {
       className="nav-flip-link relative inline-flex flex-col overflow-hidden h-4 group"
     >
       <span
-        className={`block md:text-[25px] xl:text-xs font-sans font-medium uppercase tracking-[0.18em] transition-transform duration-420 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full ${
-          isActive ? "text-white" : "text-white/60"
+        className={`block md:text-[55px] xl:text-xs font-sans font-extrabold uppercase tracking-[0.18em] transition-transform duration-[420ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full ${
+          isActive ? "md:text-black font-extrabold underline underline-offset-2" : "md:text-black/50 "
         }`}
       >
-        {children}
+        {children} 
       </span>
-      <span className="block md:text-[25px] xl:text-xs font-sans font-medium uppercase tracking-[0.18em] text-[#0ea5a4] transition-transform duration-[420ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full">
-        {children}
+      <span className="block md:text-[55px] xl:text-xs font-sans font-medium uppercase tracking-[0.18em] text-[#0ea5a4] transition-transform duration-[420ms] ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full">
+        {children} 
       </span>
       {isActive && (
         <span className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#0ea5a4]" />
@@ -55,6 +88,90 @@ function FlipLink({ to, children, isActive, onClick }) {
   );
 }
 
+// ════════════════════════════════════════
+// 3. NEW: DROPDOWN WRAPPER COMPONENT
+// ════════════════════════════════════════
+function DesktopNavItem({ link, isActive }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const timeoutRef = useRef(null);
+
+  const hasChildren = link.children && link.children.length > 0;
+
+  const handleMouseEnter = () => {
+    clearTimeout(timeoutRef.current);
+    setIsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    // Add a small delay before closing so the mouse can easily move into the dropdown
+    timeoutRef.current = setTimeout(() => setIsOpen(false), 150);
+  };
+
+  useGSAP(() => {
+    if (!dropdownRef.current) return;
+    
+    if (isOpen) {
+      gsap.killTweensOf(dropdownRef.current);
+      gsap.to(dropdownRef.current, {
+        autoAlpha: 1,      // Animates opacity and visibility
+        y: 0,              // Slides up into place
+        duration: 0.3,
+        ease: "power2.out",
+        display: "block",
+      });
+    } else {
+      gsap.killTweensOf(dropdownRef.current);
+      gsap.to(dropdownRef.current, {
+        autoAlpha: 0,
+        y: 10,             // Slides down slightly when hiding
+        duration: 0.2,
+        ease: "power2.in",
+        display: "none",
+      });
+    }
+  }, [isOpen]);
+
+  return (
+    <div 
+      className="relative flex items-center h-full py-4" 
+      onMouseEnter={handleMouseEnter} 
+      onMouseLeave={handleMouseLeave}
+    >
+      <FlipLink to={link.path} isActive={isActive}>
+        {link.name} 
+      </FlipLink>
+
+      {hasChildren && (
+        <div
+          ref={dropdownRef}
+          className="absolute top-full left-0 pt-4 hidden opacity-0 translate-y-2 md:text-black z-50 min-w-[260px]"
+        >
+          {/* Dropdown Panel Design */}
+          <div className="bg-[#0c0c0c] border border-white/[0.08] p-3 shadow-[0_20px_40px_rgba(0,0,0,0.5)] rounded-sm">
+            <div className="h-[2px] w-full bg-gradient-to-r from-[#0ea5a4] to-transparent mb-2 opacity-50" />
+            
+            {link.children.map((child) => (
+              <Link 
+                key={child.name} 
+                to={child.path} 
+                className="group/item flex items-center gap-3 px-4 py-3 transition-colors duration-300 hover:bg-white/[0.04] rounded-sm"
+              >
+                <span className="text-sm font-sans font-medium text-white/60 group-hover/item:text-white group-hover/item:translate-x-1 transition-all duration-300">
+                  {child.name}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ════════════════════════════════════════
+// MAIN NAVBAR
+// ════════════════════════════════════════
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredMenuIndex, setHoveredMenuIndex] = useState(null);
@@ -70,7 +187,7 @@ export default function Navbar() {
   const isActive = useCallback((path) => location.pathname === path, [location.pathname]);
 
   // ════════════════════════════════════════
-  // 1. SCROLL — hide/show + compact + progress
+  // SCROLL — hide/show + compact + progress
   // ════════════════════════════════════════
   useGSAP(() => {
     const showAnim = gsap
@@ -99,7 +216,7 @@ export default function Navbar() {
   }, { scope: headerRef, dependencies: [isMenuOpen] });
 
   // ════════════════════════════════════════
-  // 2. ENTRANCE
+  // ENTRANCE
   // ════════════════════════════════════════
   useGSAP(() => {
     const entranceTl = gsap.timeline({ delay: 1.8 });
@@ -131,7 +248,7 @@ export default function Navbar() {
   }, { scope: headerRef });
 
   // ════════════════════════════════════════
-  // 3. FULLSCREEN MENU TIMELINE
+  // FULLSCREEN MENU TIMELINE
   // ════════════════════════════════════════
   useGSAP(() => {
     gsap.set(menuRef.current, {
@@ -200,7 +317,7 @@ export default function Navbar() {
   }, [isMenuOpen]);
 
   // ════════════════════════════════════════
-  // 4. MENU IMAGE SWAP
+  // MENU IMAGE SWAP
   // ════════════════════════════════════════
   useEffect(() => {
     if (hoveredMenuIndex === null || !menuImageRef.current) return;
@@ -227,8 +344,7 @@ export default function Navbar() {
       </div>
 
       {/* ═══════════════════════════════════════════════
-          HEADER — fully opaque dark bg when scrolled
-          so white links are always readable over any section
+          HEADER
           ═══════════════════════════════════════════════ */}
       <header
         ref={headerRef}
@@ -239,12 +355,11 @@ export default function Navbar() {
         }`}
       >
         <div className="max-w-[1600px] mx-auto px-6 md:px-12 flex items-center justify-between">
-          {/* ── LEFT LINKS ── */}
-          <nav className="hidden lg:flex  items-center gap-7  xl:gap-9 flex-1">
+          
+          {/* ── LEFT LINKS (Updated to use DesktopNavItem) ── */}
+          <nav className="hidden lg:flex items-center gap-7 xl:gap-9 flex-1 h-full">
             {leftLinks.map((link) => (
-              <FlipLink key={link.name} to={link.path} isActive={isActive(link.path)} >
-                {link.name}
-              </FlipLink>
+              <DesktopNavItem key={link.name} link={link} isActive={isActive(link.path)} />
             ))}
           </nav>
 
@@ -263,18 +378,18 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* ── RIGHT SIDE ── */}
+          {/* ── RIGHT SIDE (Updated to use DesktopNavItem) ── */}
           <div className="flex items-center gap-7 xl:gap-9 flex-1 justify-end">
-            <nav className="hidden lg:flex md:text-2xl items-center gap-7 xl:gap-9">
+            <nav className="hidden lg:flex md:text-2xl items-center gap-7 xl:gap-9 h-full">
               {rightLinks.map((link) => {
                 if (link.name === "Contact") {
                   return (
                     <Link
                       key={link.name}
                       to={link.path}
-                      className="nav-cta relative text-[15px] xl:text-xs font-sans font-semibold uppercase tracking-[0.18em] px-7 py-2.5 overflow-hidden group border border-white/20 hover:border-[#0ea5a4] transition-colors duration-500"
+                      className="nav-cta relative text-[35px] xl:text-xs font-sans font-semibold uppercase tracking-[0.18em] px-7 py-2.5 overflow-hidden group border-2 text-black border-black/20 hover:border-[#0ea5a4] transition-colors duration-500 ml-2"
                     >
-                      <span className="absolute inset-0 bg-[#0ea5a4] translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]" />
+                      <span className="absolute  inset-0 bg-[#0ea5a4] translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]" />
                       <span className="relative z-10 group-hover:text-[#050505] transition-colors duration-300">
                         {link.name}
                       </span>
@@ -282,9 +397,7 @@ export default function Navbar() {
                   );
                 }
                 return (
-                  <FlipLink key={link.name} to={link.path} isActive={isActive(link.path)}>
-                    {link.name}
-                  </FlipLink>
+                  <DesktopNavItem key={link.name} link={link} isActive={isActive(link.path)} />
                 );
               })}
             </nav>
@@ -328,13 +441,13 @@ export default function Navbar() {
       </header>
 
       {/* ═══════════════════════════════════════════════
-          FULLSCREEN MENU
+          FULLSCREEN MENU (Unchanged)
           ═══════════════════════════════════════════════ */}
       <div
         ref={menuRef}
         className="fixed inset-0 z-[140] bg-[#050505] text-white overflow-hidden"
       >
-        <div className="menu-bg-text absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[28vw] font-sans font-black text-white pointer-events-none select-none z-0 whitespace-nowrap">
+        <div className="menu-bg-text absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[24vw] font-sans font-black text-white pointer-events-none select-none z-0 whitespace-nowrap">
           MEKA
         </div>
 
@@ -343,7 +456,7 @@ export default function Navbar() {
           <div className="flex-1 flex flex-col justify-center px-8 md:px-16 lg:px-24 pt-28 lg:pt-0">
             <nav className="flex flex-col gap-1 md:gap-2">
               {allLinks.map((link, i) => (
-                <div key={i} className="overflow-hidden py-1.5">
+                <div key={i} className="overflow-hidden py-2">
                   <Link
                     to={link.path}
                     onClick={() => setIsMenuOpen(false)}
@@ -359,7 +472,7 @@ export default function Navbar() {
                       0{i + 1}
                     </span>
 
-                    <span className="relative overflow-hidden block">
+                    <span className="relative overflow-hidden h-8 block">
                       <span className="block text-4xl sm:text-5xl md:text-[5.5rem] font-serif uppercase tracking-tighter transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full leading-[1.1]">
                         {link.name}
                       </span>
@@ -382,12 +495,7 @@ export default function Navbar() {
               ))}
             </nav>
 
-            <div className="menu-counter mt-8 md:mt-12 flex items-center gap-4">
-              <div className="w-12 h-px bg-white/10" />
-              <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-white/25">
-                {String((hoveredMenuIndex ?? 0) + 1).padStart(2, "0")} / {String(allLinks.length).padStart(2, "0")}
-              </span>
-            </div>
+           
           </div>
 
           {/* RIGHT — IMAGE */}
@@ -404,7 +512,7 @@ export default function Navbar() {
                 <span className="font-sans text-[9px] uppercase tracking-[0.3em] text-white/40">
                   {allLinks[hoveredMenuIndex ?? 0]?.name ?? "Home"}
                 </span>
-                <span className="font-sans text-[9px] uppercase tracking-[0.3em] text-[#0ea5a4]">
+                <span className="font-sans text-[30px] uppercase tracking-[0.3em] text-[#0ea5a4]">
                   Meka Group
                 </span>
               </div>
@@ -419,7 +527,7 @@ export default function Navbar() {
               <a
                 key={s}
                 href="#"
-                className="text-[10px] tracking-[0.2em] text-white/30 hover:text-white uppercase font-sans transition-colors duration-300"
+                className="text-[15px] tracking-[0.2em] text-white/30 hover:text-white uppercase font-sans transition-colors duration-300"
               >
                 {s}
               </a>

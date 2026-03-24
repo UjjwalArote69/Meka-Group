@@ -6,11 +6,11 @@ import Loader from "./components/Loader";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Landing/Home";
 import Contact from "./pages/Contact";
-import AboutPage from "./pages/AboutPage";
+import AboutPage from "./pages/About/AboutPage";
 import ProjectsPage from "./pages/ProjectsPage";
-import ExpertisePage from "./pages/Expertise";
+import ExpertisePage from "./pages/Business/Businesses";
 import ScrollToTop from "./components/ScrollToTop";
-import CustomCursor from "./components/layout/CustomCursor";
+// import CustomCursor from "./components/layout/CustomCursor";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -44,7 +44,7 @@ export default function App() {
 
   return (
     <div className="w-full">
-      <CustomCursor />
+      {/* <CustomCursor /> */}
       <Navbar />
       <Loader visible={loading} progress={progress} brandLogo="/logo.png" />
 
@@ -58,7 +58,7 @@ export default function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/expertise" element={<ExpertisePage />} />
+          <Route path="/business" element={<ExpertisePage />} />
         </Routes>
       </div>
     </div>

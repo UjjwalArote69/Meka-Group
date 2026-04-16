@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Footer from '../components/Footer'
+import { Link } from "react-router-dom";
+import Footer from '../components/layout/Footer'
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -88,10 +89,15 @@ export default function ProjectsPage() {
   const [filter, setFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(15);
-  const [hoveredRowId, setHoveredRowId] = useState(null); // Used for "Spotlight Effect"
+  const [hoveredRowId, setHoveredRowId] = useState(null); 
   
   const containerRef = useRef(null);
   const listRef = useRef(null);
+  const navBarRef = useRef(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Filter & Search Logic
   const filteredProjects = PROJECTS_DATA.filter((p) => {
@@ -105,12 +111,19 @@ export default function ProjectsPage() {
   const displayedProjects = filteredProjects.slice(0, visibleCount);
 
   useGSAP(() => {
-    gsap.from(".projects-title span", {
-      y: 150,
-      skewY: 7,
-      stagger: 0.1,
-      duration: 1.5,
-      ease: "power4.out",
+    const heroTl = gsap.timeline({ delay: 0.2 });
+
+    heroTl
+      .fromTo(".hero-subtitle", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" })
+      .fromTo(".hero-word", { yPercent: 110, rotateZ: 3 }, { yPercent: 0, rotateZ: 0, duration: 1.2, stagger: 0.08, ease: "power4.out" }, "-=0.5")
+      .fromTo(".hero-line", { scaleX: 0 }, { scaleX: 1, duration: 1, ease: "power3.out" }, "-=0.8")
+      .fromTo(".hero-desc", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.6");
+
+    // Sticky Nav Shadow
+    ScrollTrigger.create({
+      trigger: navBarRef.current,
+      start: "top top",
+      toggleClass: { targets: navBarRef.current, className: "shadow-[0_10px_30px_rgba(0,0,0,0.04)]" }
     });
 
     gsap.fromTo(".project-row", 
@@ -119,8 +132,16 @@ export default function ProjectsPage() {
         scrollTrigger: { trigger: listRef.current, start: "top 80%" }
       }
     );
+
+    // CTA
+    gsap.fromTo(".cta-text", { y: 40, opacity: 0 }, {
+      y: 0, opacity: 1, duration: 1, ease: "power3.out",
+      scrollTrigger: { trigger: ".cta-section", start: "top 75%" },
+    });
+
   }, { scope: containerRef });
 
+  // Animate changes when filter/search updates
   useEffect(() => {
     gsap.fromTo(".project-row", 
       { opacity: 0, x: -10 },
@@ -129,169 +150,209 @@ export default function ProjectsPage() {
   }, [filter, searchQuery, visibleCount]);
 
   return (
-    <main 
-      ref={containerRef} 
-      className="bg-[#050505] min-h-screen text-white font-sans selection:bg-[#0ea5a4]"
-    >
-      {/* --- HERO --- */}
-      <section className="relative pt-40 pb-12 px-6 md:px-12 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <div className="overflow-hidden">
-            <h1 className="projects-title text-[15vw] md:text-[8vw] font-serif leading-[0.85] uppercase tracking-tighter pt-5">
-              <span className="block">Project</span>
-              <span className="block text-gray-700">Index</span>
-            </h1>
-          </div>
-          <div className="max-w-xs mb-4">
-            <p className="text-gray-400 text-sm leading-relaxed border-l border-[#0ea5a4] pl-4">
-              A precise architectural archive of our engineering defiance spanning decades of maritime and infrastructure development.
-            </p>
-          </div>
-        </div>
-      </section>
+    <>
+      <main 
+        ref={containerRef} 
+        className="bg-[#f5f5f0] text-[#050505] selection:bg-[#0ea5a4] selection:text-white overflow-x-hidden relative"
+      >
+        {/* ── Architectural Structural Line ── */}
+        <div className="fixed left-8 md:left-16 top-0 bottom-0 w-px bg-black/[0.04] z-0 pointer-events-none hidden lg:block" />
 
-      {/* --- COMMAND BAR (Search + Filter) --- */}
-      <nav className="sticky top-0 z-40 bg-[#050505]/90 backdrop-blur-md border-y border-white/5 px-6 md:px-12 py-4">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
+        {/* ═══════════════════════════════════════
+            1. HERO (Editorial Layout)
+            ═══════════════════════════════════════ */}
+        <section className="hero-section relative w-full pt-48 pb-20 px-6 md:px-16 overflow-hidden bg-[#f5f5f0] flex flex-col justify-end min-h-[70vh]">
           
-          <div className="flex flex-wrap items-center gap-6 md:gap-8">
-            <span className="hidden md:block text-[10px] uppercase tracking-[0.3em] text-[#0ea5a4] font-bold">Filter By</span>
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => {
-                  setFilter(cat);
-                  setVisibleCount(15);
-                }}
-                className={`text-xs md:text-sm uppercase tracking-widest transition-all duration-300 ${
-                  filter === cat ? "text-white" : "text-gray-500 hover:text-gray-300"
-                } relative group`}
-              >
-                {cat}
-                {filter === cat && (
-                  <span className="absolute -bottom-2 left-0 w-full h-px bg-[#0ea5a4]" />
-                )}
-              </button>
-            ))}
+          {/* Blueprint Grid */}
+          <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
+            style={{ backgroundImage: "linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)", backgroundSize: "4rem 4rem" }} />
+
+          <div className="relative z-10 w-full max-w-[1600px] mx-auto">
+            <span className="hero-subtitle block text-[#0ea5a4] text-xs font-sans tracking-[0.4em] uppercase font-bold mb-8">
+              The Archive
+            </span>
+
+            <h1 className="text-[16vw] lg:text-[11vw] font-serif uppercase tracking-tighter leading-[0.85] text-[#050505] mix-blend-multiply mb-10">
+              <span className="block overflow-hidden py-5 -my-5">
+                <span className="hero-word block">Project</span>
+              </span>
+              <span className="block overflow-hidden py-5 -my-5 lg:ml-[8vw]">
+                <span className="hero-word block text-black/20">Index</span>
+              </span>
+            </h1>
+
+            <div className="w-full max-w-xl lg:ml-[8vw]">
+              <div className="hero-line w-16 h-[2px] bg-[#0ea5a4] mb-8 origin-left" />
+              <p className="hero-desc text-lg md:text-xl text-gray-600 font-sans leading-relaxed">
+                A precise architectural archive of our engineering defiance, spanning decades of maritime and heavy infrastructure development.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════
+            2. COMMAND BAR (Search + Filter)
+            ═══════════════════════════════════════ */}
+        <div ref={navBarRef} className="sticky top-0 z-40 bg-[#f5f5f0]/90 backdrop-blur-xl border-y border-black/[0.05] transition-all duration-300">
+          <div className="max-w-[1600px] mx-auto px-6 md:px-16 py-4 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            
+            {/* Filter Tags */}
+            <div className="flex flex-wrap items-center gap-4 md:gap-6">
+              <span className="text-[10px] font-sans font-bold tracking-[0.3em] uppercase text-black/30 mr-2">
+                Filter
+              </span>
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => { setFilter(cat); setVisibleCount(15); }}
+                  className={`text-[10px] md:text-[11px] font-sans font-bold tracking-[0.15em] uppercase transition-all duration-300 px-5 py-2.5 border rounded-full ${
+                    filter === cat 
+                      ? "bg-[#0ea5a4] text-white border-[#0ea5a4]" 
+                      : "text-black/60 border-black/[0.08] hover:border-[#0ea5a4] hover:text-[#0ea5a4]"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative w-full md:w-72">
+              <input 
+                type="text" 
+                placeholder="Search clients or projects..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white border border-black/10 text-[#050505] text-[11px] md:text-xs font-sans tracking-wide py-3 px-5 rounded-full focus:outline-none focus:border-[#0ea5a4] transition-colors placeholder:text-gray-400 shadow-sm"
+              />
+              <svg className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+
+          </div>
+        </div>
+
+        {/* ═══════════════════════════════════════
+            3. TYPOGRAPHIC PROJECT INDEX
+            ═══════════════════════════════════════ */}
+        <section ref={listRef} className="max-w-[1600px] mx-auto px-6 md:px-16 py-16 md:py-24 relative z-10">
+          
+          {/* Table Header */}
+          <div className="hidden md:grid grid-cols-12 gap-6 pb-6 border-b border-black/10 text-[10px] font-bold uppercase tracking-[0.25em] text-black/40 mb-4">
+            <div className="col-span-1">No.</div>
+            <div className="col-span-3">Client</div>
+            <div className="col-span-6">Project Details</div>
+            <div className="col-span-2 text-right">Entity</div>
           </div>
 
-          <div className="relative w-full md:w-64">
-            <input 
-              type="text" 
-              placeholder="Search clients or projects..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 text-white text-xs py-2 px-4 rounded-full focus:outline-none focus:border-[#0ea5a4] transition-colors placeholder:text-gray-600"
-            />
-          </div>
+          {/* Project Rows */}
+          <div className="flex flex-col relative" onMouseLeave={() => setHoveredRowId(null)}>
+            {displayedProjects.map((project, index) => {
+              // Spotlight Effect Logic
+              const isHovered = hoveredRowId === project.id;
+              const isFaded = hoveredRowId !== null && !isHovered;
 
-        </div>
-      </nav>
-
-      {/* --- TYPOGRAPHIC PROJECT INDEX --- */}
-      <section ref={listRef} className="max-w-7xl mx-auto px-6 md:px-12 py-16">
-        
-        {/* Table Header */}
-        <div className="hidden md:grid grid-cols-12 gap-6 pb-6 border-b border-white/10 text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-2">
-          <div className="col-span-1">No.</div>
-          <div className="col-span-3">Client</div>
-          <div className="col-span-5">Project Details</div>
-          <div className="col-span-3 text-right">Entity</div>
-        </div>
-
-        {/* Project Rows */}
-        <div className="flex flex-col relative" onMouseLeave={() => setHoveredRowId(null)}>
-          {displayedProjects.map((project, index) => {
-            // Determine opacity based on spotlight hover state
-            const isHovered = hoveredRowId === project.id;
-            const isFaded = hoveredRowId !== null && !isHovered;
-
-            return (
-              <div 
-                key={project.id} 
-                onMouseEnter={() => setHoveredRowId(project.id)}
-                className={`project-row group grid grid-cols-1 md:grid-cols-12 gap-y-2 gap-x-6 py-8 border-b border-white/10 transition-all duration-500 cursor-default ${
-                  isFaded ? "opacity-30 blur-[1px]" : "opacity-100 blur-0"
-                }`}
-              >
-                
-                {/* Index Number */}
-                <div className="hidden md:block col-span-1 text-gray-600 font-mono text-sm group-hover:text-[#0ea5a4] transition-colors duration-300">
-                  {String(index + 1).padStart(3, '0')}
-                </div>
-
-                {/* Client Name */}
-                <div className="col-span-3">
-                  <p className="text-sm md:text-base font-semibold text-gray-200 group-hover:text-white group-hover:translate-x-2 transition-all duration-500">
-                    {project.client}
-                  </p>
-                </div>
-                
-                {/* Project Title */}
-                <div className="col-span-5 pr-4">
-                  <p className="text-sm text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
-                    {project.title}
-                  </p>
-                </div>
-
-                {/* Company & Animated Arrow */}
-                <div className="col-span-3 pt-2 md:pt-0 flex items-start md:items-center justify-between md:justify-end gap-6 overflow-hidden">
-                  <span className="inline-block px-3 py-1 bg-transparent border border-white/10 rounded-full text-[10px] uppercase tracking-wider text-gray-500 group-hover:border-[#0ea5a4]/50 group-hover:text-[#0ea5a4] transition-all duration-300">
-                    {project.company}
-                  </span>
+              return (
+                <div 
+                  key={project.id} 
+                  onMouseEnter={() => setHoveredRowId(project.id)}
+                  className={`project-row group grid grid-cols-1 md:grid-cols-12 gap-y-3 gap-x-6 py-8 md:py-10 border-b border-black/[0.05] transition-all duration-500 cursor-default ${
+                    isFaded ? "opacity-20 blur-[1px]" : "opacity-100 blur-0"
+                  } ${isHovered ? "bg-white/50 -mx-6 px-6 md:-mx-16 md:px-16 rounded-sm shadow-sm border-transparent" : ""}`}
+                >
                   
-                  {/* Sliding Arrow Indicator */}
-                  <div className="text-[#0ea5a4] opacity-0 -translate-x-6 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 ease-out hidden md:block">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M4 12H20M20 12L14 6M20 12L14 18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                  {/* Index Number */}
+                  <div className="hidden md:block col-span-1 font-serif text-lg text-black/20 group-hover:text-[#0ea5a4] transition-colors duration-300">
+                    {String(index + 1).padStart(3, '0')}
                   </div>
+
+                  {/* Client Name */}
+                  <div className="col-span-3">
+                    <p className="text-sm md:text-base font-sans font-bold text-[#050505] group-hover:text-[#0ea5a4] group-hover:translate-x-2 transition-all duration-500">
+                      {project.client}
+                    </p>
+                  </div>
+                  
+                  {/* Project Title */}
+                  <div className="col-span-6 pr-4">
+                    <p className="text-sm md:text-base text-gray-600 font-sans leading-relaxed group-hover:text-[#050505] transition-colors duration-300">
+                      {project.title}
+                    </p>
+                  </div>
+
+                  {/* Company Badge */}
+                  <div className="col-span-2 pt-3 md:pt-0 flex items-start md:items-center justify-between md:justify-end gap-6 overflow-hidden">
+                    <span className={`inline-block px-4 py-2 bg-white border border-black/10 rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-black/60 transition-all duration-300 ${
+                      isHovered ? "border-[#0ea5a4]/30 text-[#0ea5a4] shadow-sm" : ""
+                    }`}>
+                      {project.company}
+                    </span>
+                  </div>
+
                 </div>
-
-              </div>
-            );
-          })}
-        </div>
-        
-        {/* Empty State */}
-        {filteredProjects.length === 0 && (
-          <div className="py-20 text-center text-gray-500 text-sm tracking-widest uppercase">
-            No projects match your search criteria.
+              );
+            })}
           </div>
-        )}
+          
+          {/* Empty State */}
+          {filteredProjects.length === 0 && (
+            <div className="py-32 text-center">
+              <span className="text-black/20 text-4xl mb-4 block">∅</span>
+              <p className="text-black/40 text-[11px] font-bold tracking-[0.25em] uppercase">
+                No projects match your search criteria.
+              </p>
+            </div>
+          )}
 
-        {/* Load More Button */}
-        {visibleCount < filteredProjects.length && (
-          <div className="mt-16 text-center flex justify-center">
-            <button 
-              onClick={() => setVisibleCount(prev => prev + 15)}
-              className="group flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-gray-400 hover:text-white transition-colors"
-            >
-              <span className="w-16 h-[1px] bg-gray-700 group-hover:bg-[#0ea5a4] transition-colors duration-500"></span>
-              Load More ({filteredProjects.length - visibleCount})
-              <span className="w-16 h-[1px] bg-gray-700 group-hover:bg-[#0ea5a4] transition-colors duration-500"></span>
-            </button>
+          {/* Load More Button */}
+          {visibleCount < filteredProjects.length && (
+            <div className="mt-20 text-center flex justify-center">
+              <button 
+                onClick={() => setVisibleCount(prev => prev + 15)}
+                className="group flex items-center gap-6 text-[10px] md:text-[11px] font-bold uppercase tracking-[0.3em] text-black/50 hover:text-[#0ea5a4] transition-colors"
+              >
+                <span className="w-12 h-px bg-black/10 group-hover:bg-[#0ea5a4] transition-colors duration-500"></span>
+                Load More ({filteredProjects.length - visibleCount})
+                <span className="w-12 h-px bg-black/10 group-hover:bg-[#0ea5a4] transition-colors duration-500"></span>
+              </button>
+            </div>
+          )}
+        </section>
+
+        {/* ═══════════════════════════════════════
+            4. CTA SECTION
+            ═══════════════════════════════════════ */}
+        <section className="cta-section relative py-40 md:py-64 px-6 md:px-16 overflow-hidden bg-[#f5f5f0] border-t border-black/[0.06]">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[32vw] font-serif text-black/[0.02] leading-none pointer-events-none select-none whitespace-nowrap">
+            MEKA
           </div>
-        )}
-      </section>
 
-      {/* --- CTA SECTION --- */}
-      <section className="py-32 px-6 border-t border-white/5 relative overflow-hidden">
-        {/* Abstract background grid for the CTA to give it depth */}
-        <div className="absolute inset-0 z-0 opacity-[0.03] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
-        
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h2 className="text-4xl md:text-6xl font-serif uppercase mb-8">Ready to Build?</h2>
-          <p className="text-gray-400 mb-10 max-w-md mx-auto text-sm leading-relaxed">
-            Partner with us to engineer solutions that redefine the boundaries of maritime and heavy infrastructure.
-          </p>
-          <button className="px-12 py-5 bg-white text-black uppercase text-xs font-bold tracking-[0.2em] hover:bg-[#0ea5a4] hover:text-white transition-all duration-500 rounded-full">
-            Initiate Consultation
-          </button>
-        </div>
-      </section>
+          <div className="cta-text max-w-4xl mx-auto text-center relative z-10">
+            <span className="text-[#0ea5a4] text-[11px] font-sans tracking-[0.4em] uppercase font-bold mb-6 block">
+              Start a Project
+            </span>
+            <h2 className="text-5xl md:text-7xl lg:text-8xl font-serif uppercase tracking-tighter text-[#050505] mb-6 leading-[0.85]">
+              Ready to<br />
+              <span className="text-black/15">Build?</span>
+            </h2>
+            <p className="text-gray-600 text-base md:text-lg font-sans leading-relaxed max-w-2xl mx-auto mb-12">
+              Partner with us to engineer solutions that redefine the boundaries of maritime and heavy infrastructure.
+            </p>
+            <div className="flex flex-wrap justify-center gap-5">
+              <Link to="/contact"
+                className="group relative px-10 md:px-12 py-4 bg-[#050505] text-white text-[10px] tracking-[0.3em] uppercase font-bold overflow-hidden rounded-sm shadow-xl hover:shadow-2xl transition-shadow">
+                <span className="absolute inset-0 bg-[#0ea5a4] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]" />
+                <span className="relative z-10">Initiate Consultation</span>
+              </Link>
+            </div>
+          </div>
+        </section>
 
-        <Footer/>
-    </main>
+      </main>
+      
+      {/* FOOTER OUTSIDE MAIN */}
+      <Footer/>
+    </>
   );
 }

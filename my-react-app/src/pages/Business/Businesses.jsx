@@ -13,7 +13,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link, useLocation } from "react-router-dom";
-import Footer from "../../components/Footer";
+import Footer from "../../components/layout/Footer";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -235,12 +235,12 @@ export default function BusinessesPage() {
           </span>
 
           <h1 className="mb-12 md:mb-16">
-            <span className="block overflow- py-2 -my-1">
+            <span className="block overflow-hidden py-5 -my-5">
               <span className="hero-word block text-[14vw] md:text-[10vw] lg:text-[8.5vw] font-serif uppercase tracking-tighter leading-[0.85] text-[#050505]">
                 Integrated
               </span>
             </span>
-            <span className="block overflow- py-2 -my-1 md:ml-[12vw]">
+            <span className="block overflow-hidden py-5 -my-5 md:ml-[12vw]">
               <span className="hero-word block text-[14vw] md:text-[10vw] lg:text-[8.5vw] font-serif uppercase tracking-tighter leading-[0.85] text-black/10">
                 Solutions
               </span>

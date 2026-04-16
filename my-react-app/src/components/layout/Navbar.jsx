@@ -40,9 +40,15 @@ const rightLinks = [
     name: "Companies", 
     path: "/companies",
     children: [
-      { name: "Amma Lines", path: "/companies" },
-      { name: "Meka Dredging", path: "/companies" },
-      { name: "Meka Infrastructure", path: "/companies" },
+      { name: "Amma Lines", path: "/companies#ammalines" },
+      { name: "Meka Dredging", path: "/companies#mekadredging" },
+      { name: "Meka Infrastructure", path: "/companies#mekainfra" },
+      { name: "Meka Heavy Engineering", path: "/companies#mekaheavy" },
+      { name: "Meka Realty", path: "/companies#meka-realty" },
+      { name: "Meka Education", path: "/companies#meka-education" },
+      { name: "Viraj Consulting", path: "/companies#virajce" },
+      { name: "India Ports", path: "/companies#indiaports" },
+      { name: "Meka Consultants", path: "/companies#mekaconsultants" },
     ]
   },
   { name: "Projects", path: "/projects" },
@@ -263,7 +269,7 @@ export default function Navbar() {
     gsap.set(".menu-footer-content", { opacity: 0, y: 20 });
     gsap.set(".menu-bg-text", { opacity: 0, scale: 0.95, rotateZ: -3 });
     gsap.set(".menu-image-frame", { opacity: 0, scale: 0.92 });
-    gsap.set(".menu-counter", { opacity: 0 });
+
 
     tl.current = gsap
       .timeline({ paused: true })
@@ -293,10 +299,6 @@ export default function Navbar() {
         stagger: 0.07,
         ease: "power3.out",
       }, "-=0.8")
-      .to(".menu-counter", {
-        opacity: 1,
-        duration: 0.5,
-      }, "-=0.5")
       .to(".menu-footer-content", {
         opacity: 1,
         y: 0,
@@ -413,25 +415,28 @@ export default function Navbar() {
                 {isMenuOpen ? "Close" : "Menu"}
               </span>
               <div className="w-7 h-[14px] flex flex-col justify-between items-end relative">
+                {/* Top Bar */}
                 <span
-                  className={`h-[1.5px] bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+                  className={`h-[1.5px] transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${
                     isMenuOpen
-                      ? "w-full rotate-45 absolute top-1/2 -translate-y-1/2"
-                      : "w-full group-hover:w-3/5"
+                      ? "bg-white w-full rotate-45 absolute top-1/2 -translate-y-1/2"
+                      : "bg-black w-full group-hover:w-3/5"
                   }`}
                 />
+                {/* Middle Bar */}
                 <span
-                  className={`h-[1.5px] bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+                  className={`h-[1.5px] transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${
                     isMenuOpen
-                      ? "w-0 opacity-0 absolute top-1/2"
-                      : "w-3/5 group-hover:w-full"
+                      ? "bg-white w-0 opacity-0 absolute top-1/2"
+                      : "bg-black w-3/5 group-hover:w-full"
                   }`}
                 />
+                {/* Bottom Bar */}
                 <span
-                  className={`h-[1.5px] bg-white transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+                  className={`h-[1.5px] transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${
                     isMenuOpen
-                      ? "w-full -rotate-45 absolute top-1/2 -translate-y-1/2"
-                      : "w-4/5 group-hover:w-2/5"
+                      ? "bg-white w-full -rotate-45 absolute top-1/2 -translate-y-1/2"
+                      : "bg-black w-4/5 group-hover:w-2/5"
                   }`}
                 />
               </div>

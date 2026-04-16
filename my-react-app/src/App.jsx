@@ -3,13 +3,14 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Route, useLocation, Routes } from "react-router-dom";
 import Loader from "./components/Loader";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/layout/Navbar";
 import Home from "./pages/Landing/Home";
 import Contact from "./pages/Contact";
 import AboutPage from "./pages/About/AboutPage";
 import ProjectsPage from "./pages/ProjectsPage";
 import ExpertisePage from "./pages/Business/Businesses";
 import ScrollToTop from "./components/ScrollToTop";
+import Companies from "./pages/Companies/Companies";
 // import CustomCursor from "./components/layout/CustomCursor";
 
 export default function App() {
@@ -59,6 +60,7 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/business" element={<ExpertisePage />} />
+          <Route path="/companies" element={<Companies />} />
         </Routes>
       </div>
     </div>

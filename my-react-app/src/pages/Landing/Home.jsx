@@ -7,12 +7,12 @@ import gsap from "gsap";
 import NewHero from "./components/NewHero"; 
 
 // The rest can remain lazy loaded
-const About = lazy(() => import("../../components/About"));
-const Fleet = lazy(() => import("../../components/Fleet"));
-const Projects = lazy(() => import("../../components/Projects"));
-const MoreProjects = lazy(() => import("../../components/MoreProjects"));
-const Testimonials = lazy(() => import("../../components/Testimonials"));
-const Footer = lazy(() => import("../../components/Footer"));
+const About = lazy(() => import("./components/About"));
+const Fleet = lazy(() => import("./components/Fleet"));
+const Projects = lazy(() => import("./components/Projects"));
+const MoreProjects = lazy(() => import("./components/MoreProjects"));
+const Testimonials = lazy(() => import("./components/Testimonials"));
+const Footer = lazy(() => import("../../components/layout/Footer"));
 
 gsap.registerPlugin(ScrollTrigger);
 

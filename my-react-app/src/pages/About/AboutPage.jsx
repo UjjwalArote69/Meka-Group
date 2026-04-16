@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Footer from "../../components/Footer";
+import Footer from "../../components/layout/Footer";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -140,15 +140,14 @@ export default function AboutPage() {
               </span>
             </div>
 
-            {/* FIX: "overflow-" → "overflow-hidden" on all 3 title wrappers */}
-            <h1 className="text-[14vw] lg:text-[8.5vw] font-serif uppercase tracking-tighter leading-[0.85] text-[#050505] mix-blend-multiply">
-              <span className="overflow- block pb-2 -mb-2">
+<h1 className="text-[14vw] lg:text-[8.5vw] font-serif uppercase tracking-tighter leading-[0.85] text-[#050505] mix-blend-multiply">
+              <span className="overflow-hidden block py-5 -my-5">
                 <span className="hero-title-word block">Forging</span>
               </span>
-              <span className="overflow- block pb-2 -mb-2 ml-[8vw] lg:ml-[4vw]">
+              <span className="overflow-hidden block py-5 -my-5 ml-[8vw] lg:ml-[4vw]">
                 <span className="hero-title-word block text-black/25">The</span>
               </span>
-              <span className="overflow- block pb-2 -mb-2">
+              <span className="overflow-hidden block py-5 -my-5">
                 <span className="hero-title-word block">Future</span>
               </span>
             </h1>

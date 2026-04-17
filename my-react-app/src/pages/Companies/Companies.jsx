@@ -121,7 +121,7 @@ const COMPANIES = [
     description:
       "Foraying into the education sector with a commitment to building the next generation of engineering talent. Meka Education focuses on maritime studies, vocational training, and technical skill development programs.",
     specialties: ["Maritime Studies", "Vocational Training", "Technical Education", "Skill Development", "Industry Partnerships"],
-    image: "/frames/frame_0050.webp",
+    image: "/logo.png",
     stat: { value: "Next", label: "Generation" },
     layout: "portrait-left"
   },
@@ -186,11 +186,11 @@ export default function CompaniesPage() {
           }
         );
 
-        // Image Inner Parallax (subtle for contained logos)
+        // Image Inner Parallax
         gsap.fromTo(img,
-          { yPercent: -3 },
+          { yPercent: -8 },
           {
-            yPercent: 3,
+            yPercent: 8,
             ease: "none",
             scrollTrigger: { trigger: block, start: "top bottom", end: "bottom top", scrub: true },
           }
@@ -320,9 +320,8 @@ export default function CompaniesPage() {
 
                       <div className="lg:col-span-8">
                         {/* Shorter cinematic banner (aspect-[21/9]) */}
-                        <div className="company-img-wrapper relative aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-sm bg-zinc-200 shadow-xl group mb-10">
-                          <img src={co.image} alt={co.name} className="company-img absolute inset-0 w-full h-full object-contain p-6 md:p-10 grayscale opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-[1.5s]" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-80" />
+                        <div className="company-img-wrapper relative aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-sm bg-white shadow-xl group mb-10 border border-black/[0.06]">
+                          <img src={co.image} alt={co.name} className="company-img absolute -inset-[10%] w-[120%] h-[120%] object-contain p-12 md:p-20 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" />
                           
                           <div className="stat-badge absolute bottom-4 left-4 md:bottom-8 md:left-8 bg-[#f5f5f0]/95 backdrop-blur-xl px-6 py-5 md:px-8 md:py-6 rounded-sm shadow-2xl border border-white/20">
                             <span className="block text-3xl md:text-5xl font-serif text-[#050505] leading-none mb-2 tracking-tight">{co.stat.value}</span>
@@ -364,9 +363,8 @@ export default function CompaniesPage() {
                     
                     {/* Compact Image (aspect-[4/3] instead of extremely tall) */}
                     <div className={`lg:col-span-5 ${!isImageRight ? "lg:[direction:ltr]" : ""}`}>
-                      <div className="company-img-wrapper relative aspect-[4/3] overflow-hidden rounded-sm bg-zinc-200 shadow-xl group">
-                        <img src={co.image} alt={co.name} className="company-img absolute inset-0 w-full h-full object-contain p-6 md:p-10 grayscale opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-[1.5s]" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-80" />
+                      <div className="company-img-wrapper relative aspect-[4/3] overflow-hidden rounded-sm bg-white shadow-xl group border border-black/[0.06]">
+                        <img src={co.image} alt={co.name} className="company-img absolute -inset-[10%] w-[120%] h-[120%] object-contain p-12 md:p-20 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" />
                         
                         <div className="stat-badge absolute bottom-4 right-4 md:bottom-6 md:right-6 bg-[#f5f5f0]/95 backdrop-blur-xl px-5 py-4 md:px-6 md:py-5 rounded-sm shadow-2xl border border-white/20 text-right">
                           <span className="block text-2xl md:text-4xl font-serif text-[#050505] leading-none mb-1 md:mb-2 tracking-tight">{co.stat.value}</span>

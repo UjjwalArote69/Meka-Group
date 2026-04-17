@@ -13,8 +13,8 @@ gsap.registerPlugin(ScrollTrigger);
 // ════════════════════════════════════════
 const leftLinks = [
   { name: "Home", path: "/" },
-  { 
-    name: "Our Legacy", 
+  {
+    name: "Our Legacy",
     path: "/about",
     children: [
       { name: "About Us", path: "/about" },
@@ -22,8 +22,8 @@ const leftLinks = [
       { name: "Our Values", path: "/about#values" },
     ]
   },
-  { 
-    name: 'Business', 
+  {
+    name: 'Business',
     path: "/business",
     children: [
       { name: "Marine Construction", path: "/business#marine" },
@@ -33,11 +33,12 @@ const leftLinks = [
       { name: "Real Estate", path: "/business#estate" },
     ]
   },
+  { name: "Projects", path: "/projects" },
 ];
 
 const rightLinks = [
-  { 
-    name: "Companies", 
+  {
+    name: "Companies",
     path: "/companies",
     children: [
       { name: "Amma Lines", path: "/companies#ammalines" },
@@ -51,7 +52,7 @@ const rightLinks = [
       { name: "Meka Consultants", path: "/companies#mekaconsultants" },
     ]
   },
-  { name: "Projects", path: "/projects" },
+  { name: "Careers", path: "/careers" },
   { name: "Contact", path: "/contact" },
 ];
 
@@ -60,10 +61,10 @@ const allLinks = [...leftLinks, ...rightLinks];
 const menuImages = {
   "/": "/frames/frame_0001.webp",
   "/about": "/frames/frame_0050.webp",
-  "/expertise": "/frames/frame_0080.webp",
-  "/careers": "/frames/frame_0040.webp",
-  "/companies": "/frames/frame_0040.webp",
+  "/business": "/frames/frame_0080.webp",
   "/projects": "/frames/frame_0100.webp",
+  "/companies": "/frames/frame_0040.webp",
+  "/careers": "/frames/frame_0060.webp",
   "/contact": "/frames/frame_0120.webp",
 };
 

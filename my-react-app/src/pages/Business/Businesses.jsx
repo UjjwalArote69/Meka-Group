@@ -50,7 +50,7 @@ const BUSINESSES = [
       "Underwater Rock Blasting",
       "Channel Deepening",
     ],
-    image: "/companies/meka_dregding.webp",
+    image: "/business/dredging.jpg",
     stat: { value: "150+", label: "Dredging Projects" },
     company: "Meka Dredging Company",
   },
@@ -68,7 +68,7 @@ const BUSINESSES = [
       "Ground Improvement Works",
       "Subsea Utility Installations",
     ],
-    image: "/companies/meka_infra.png",
+    image: "/business/infra.jpg",
     stat: { value: "100", label: "MLD Nemmelli Plant" },
     company: "Meka Infrastructure Pvt. Ltd.",
   },
@@ -104,7 +104,7 @@ const BUSINESSES = [
       "Urban Regeneration Projects",
       "Mixed-use Developments",
     ],
-    image: "/companies/meka_realty.jpg",
+    image: "/business/estate.jpg",
     stat: { value: "Mumbai", label: "Flagship Market" },
     company: "Meka Realty",
   },
@@ -137,17 +137,10 @@ export default function BusinessesPage() {
       const heroTl = gsap.timeline({ delay: 0.2 });
 
       heroTl
-        .fromTo(".hero-label", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" })
-        .fromTo(".hero-word", { yPercent: 110, rotateZ: 3 }, { yPercent: 0, rotateZ: 0, duration: 1.4, stagger: 0.12, ease: "expo.out" }, "-=0.5")
+        .fromTo(".hero-subtitle", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" })
+        .fromTo(".hero-word", { yPercent: 110, rotateZ: 3 }, { yPercent: 0, rotateZ: 0, duration: 1.2, stagger: 0.08, ease: "power4.out" }, "-=0.5")
         .fromTo(".hero-line", { scaleX: 0 }, { scaleX: 1, duration: 1.2, ease: "expo.out" }, "-=1.0")
-        .fromTo(".hero-desc", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.8")
-        .fromTo(".hero-scroll-cue", { opacity: 0 }, { opacity: 1, duration: 0.6 }, "-=0.4");
-
-      // bg number parallax
-      gsap.to(".hero-bg-number", {
-        yPercent: -30, opacity: 0, ease: "none",
-        scrollTrigger: { trigger: ".hero-section", start: "top top", end: "bottom top", scrub: true },
-      });
+        .fromTo(".hero-desc", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, "-=0.6");
 
       // ════════════════════════════════
       // BUSINESS SECTIONS
@@ -219,48 +212,27 @@ export default function BusinessesPage() {
       {/* ═══════════════════════════════════════
           1. HERO
           ═══════════════════════════════════════ */}
-      <section className="hero-section relative w-full min-h-screen flex flex-col justify-end pb-16 md:pb-24 px-6 md:px-12 overflow-hidden">
-        {/* Blueprint grid */}
-        <div className="absolute inset-0 z-0 opacity-[0.025] pointer-events-none"
-          style={{ backgroundImage: "linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)", backgroundSize: "5rem 5rem" }} />
-
-        {/* Giant bg number */}
-        <div className="hero-bg-number absolute top-[10%] right-[-5%] md:right-[5%] text-[45vw] md:text-[35vw] font-serif text-black/[0.03] leading-none pointer-events-none select-none z-0">
-          05
-        </div>
+      <section className="hero-section relative w-full pt-48 pb-20 px-6 md:px-16 overflow-hidden bg-[#f5f5f0] flex flex-col justify-end min-h-[70vh]">
 
         <div className="relative z-10 w-full max-w-[1600px] mx-auto">
-          <span className="hero-label block text-[#0ea5a4] text-[11px] md:text-xs font-sans tracking-[0.5em] uppercase font-bold mb-8 md:mb-12">
+          <span className="hero-subtitle block text-[#0ea5a4] text-xs font-sans tracking-[0.4em] uppercase font-bold mb-8">
             Our Businesses
           </span>
 
-          <h1 className="mb-12 md:mb-16">
+          <h1 className="text-[16vw] lg:text-[11vw] font-serif uppercase tracking-tighter leading-[0.85] text-[#050505] mix-blend-multiply mb-10">
             <span className="block overflow-hidden py-5 -my-5">
-              <span className="hero-word block text-[14vw] md:text-[10vw] lg:text-[8.5vw] font-serif uppercase tracking-tighter leading-[0.85] text-[#050505]">
-                Integrated
-              </span>
+              <span className="hero-word block">Integrated</span>
             </span>
-            <span className="block overflow-hidden py-5 -my-5 md:ml-[12vw]">
-              <span className="hero-word block text-[14vw] md:text-[10vw] lg:text-[8.5vw] font-serif uppercase tracking-tighter leading-[0.85] text-black/10">
-                Solutions
-              </span>
+            <span className="block overflow-hidden py-5 -my-5 lg:ml-[8vw]">
+              <span className="hero-word block text-black/20">Solutions</span>
             </span>
           </h1>
 
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 md:gap-16">
-            <div className="max-w-lg">
-              <div className="hero-line w-16 h-[2px] bg-[#0ea5a4] mb-6 origin-left" />
-              <p className="hero-desc text-base md:text-lg text-gray-600 font-sans leading-relaxed">
-                From marine construction and dredging to port development and urban infrastructure — five specialized verticals delivering end-to-end engineering solutions across India and the Middle East.
-              </p>
-            </div>
-
-            <div className="hero-scroll-cue flex items-center gap-4 opacity-0">
-              <div className="w-12 h-px bg-black/20" />
-              <span className="text-[10px] font-sans tracking-[0.3em] uppercase text-black/30 font-bold">
-                Scroll to explore
-              </span>
-            </div>
+          <div className="w-full max-w-xl lg:ml-[8vw]">
+            <div className="hero-line w-16 h-[2px] bg-[#0ea5a4] mb-8 origin-left" />
+            <p className="hero-desc text-lg md:text-xl text-gray-600 font-sans leading-relaxed">
+              From marine construction and dredging to port development and urban infrastructure — five specialized verticals delivering end-to-end engineering solutions across India and the Middle East.
+            </p>
           </div>
         </div>
       </section>

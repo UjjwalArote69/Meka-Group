@@ -11,6 +11,7 @@ import ProjectsPage from "./pages/ProjectsPage";
 import ExpertisePage from "./pages/Business/Businesses";
 import ScrollToTop from "./components/ScrollToTop";
 import Companies from "./pages/Companies/Companies";
+import CareersPage from "./pages/Careers";
 // import CustomCursor from "./components/layout/CustomCursor";
 
 export default function App() {
@@ -61,6 +62,7 @@ export default function App() {
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/business" element={<ExpertisePage />} />
           <Route path="/companies" element={<Companies />} />
+          <Route path="/careers" element={<CareersPage />} />
         </Routes>
       </div>
     </div>

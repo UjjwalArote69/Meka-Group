@@ -94,6 +94,11 @@ export default function ProjectsPage() {
   const containerRef = useRef(null);
   const listRef = useRef(null);
   const navBarRef = useRef(null);
+  const imageRevealRef = useRef(null);
+
+  // Set up GSAP quickTo for 60fps buttery smooth cursor tracking
+  const xTo = useRef(null);
+  const yTo = useRef(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -111,6 +116,10 @@ export default function ProjectsPage() {
   const displayedProjects = filteredProjects.slice(0, visibleCount);
 
   useGSAP(() => {
+    // Initialize quickTo for mouse follow
+    xTo.current = gsap.quickTo(imageRevealRef.current, "x", { duration: 0.4, ease: "power3" });
+    yTo.current = gsap.quickTo(imageRevealRef.current, "y", { duration: 0.4, ease: "power3" });
+
     const heroTl = gsap.timeline({ delay: 0.2 });
 
     heroTl
@@ -149,12 +158,42 @@ export default function ProjectsPage() {
     );
   }, [filter, searchQuery, visibleCount]);
 
+  // Track Mouse Movement over the list
+  const handleMouseMove = (e) => {
+    if (xTo.current && yTo.current) {
+      xTo.current(e.clientX);
+      yTo.current(e.clientY);
+    }
+  };
+
+  // Determine which image to show (using your existing 4 images as placeholders cyclically)
+  const hoveredProjectImage = hoveredRowId 
+    ? `/projects/image${((hoveredRowId - 1) % 4) + 1}.png` 
+    : null;
+
   return (
     <>
       <main 
         ref={containerRef} 
         className="bg-[#f5f5f0] text-[#050505] selection:bg-[#0ea5a4] selection:text-white overflow-x-hidden relative"
       >
+        {/* Floating Cursor Image Reveal Container */}
+        <div 
+          ref={imageRevealRef}
+          className={`pointer-events-none fixed top-0 left-0 z-50 w-64 md:w-80 aspect-[4/3] overflow-hidden rounded-sm shadow-2xl transition-all duration-300 ease-out origin-center ${
+            hoveredRowId ? "opacity-100 scale-100" : "opacity-0 scale-75"
+          }`}
+          style={{ transform: "translate(-50%, -50%)" }} // Center on cursor
+        >
+          {hoveredProjectImage && (
+            <img 
+              src={hoveredProjectImage} 
+              alt="Project Preview" 
+              className="w-full h-full object-cover"
+            />
+          )}
+        </div>
+
         {/* ── Architectural Structural Line ── */}
         <div className="fixed left-8 md:left-16 top-0 bottom-0 w-px bg-black/[0.04] z-0 pointer-events-none hidden lg:block" />
 
@@ -236,7 +275,11 @@ export default function ProjectsPage() {
         {/* ═══════════════════════════════════════
             3. TYPOGRAPHIC PROJECT INDEX
             ═══════════════════════════════════════ */}
-        <section ref={listRef} className="max-w-[1600px] mx-auto px-6 md:px-16 py-16 md:py-24 relative z-10">
+        <section 
+          ref={listRef} 
+          className="max-w-[1600px] mx-auto px-6 md:px-16 py-16 md:py-24 relative z-10"
+          onMouseMove={handleMouseMove} // Added mouse tracking here
+        >
           
           {/* Table Header */}
           <div className="hidden md:grid grid-cols-12 gap-6 pb-6 border-b border-black/10 text-[10px] font-bold uppercase tracking-[0.25em] text-black/40 mb-4">

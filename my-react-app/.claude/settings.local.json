@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npx vite *)",
+      "Bash(lsof -ti:5174)",
+      "Bash(xargs kill *)",
+      "Bash(netstat -ano)",
+      "Bash(awk '{print $5}')",
+      "Bash(xargs -I{} taskkill //PID {} //F)",
+      "Bash(cat index.html)",
+      "Bash(cat public/index.html)",
+      "Bash(wc *)",
+      "Bash(npm audit *)",
+      "Bash(ls -lhS public/*.jpg public/*.png public/*.webp)",
+      "Bash(npx eslint *)",
+      "Bash(npm uninstall *)",
+      "Bash(node -e \"const en = require\\('./src/i18n/locales/en.json'\\); const hi = require\\('./src/i18n/locales/hi.json'\\); const ar = require\\('./src/i18n/locales/ar.json'\\); console.log\\('JSON OK'\\); console.log\\('en top-keys:', Object.keys\\(en\\).length\\); console.log\\('hi top-keys:', Object.keys\\(hi\\).length\\); console.log\\('ar top-keys:', Object.keys\\(ar\\).length\\);\")"
+    ]
+  }
+}

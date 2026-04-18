@@ -4,37 +4,28 @@ import React, {
   useEffect,
   useState,
   useCallback,
+  useMemo,
 } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useTranslation } from "react-i18next";
 import Companies from "../../../components/Companies";
+import useIsMobile from "../../../hooks/useIsMobile";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const STATS = [
-  {
-    value: "45",
-    label: "Years Experience",
-    suffix: "+",
-  },
-  {
-    value: "50",
-    label: "Marine Projects",
-    suffix: "+",
-  },
-  {
-    value: "25",
-    label: "Specialized Vessels",
-    suffix: "+",
-  },
-  {
-    value: "10",
-    label: "Global Reach",
-    suffix: "",
-  },
+// ──────────────────────────────────────────────────────────────
+//  STRUCTURAL DATA — label/copy resolved via t() inside the component
+// ──────────────────────────────────────────────────────────────
+const STAT_IDS = [
+  { value: 45, key: "stats.yearsExperience",     suffix: "+" },
+  { value: 50, key: "stats.marineProjects",       suffix: "+" },
+  { value: 25, key: "stats.specializedVessels",   suffix: "+" },
+  { value: 10, key: "stats.globalReach",          suffix: "" },
 ];
 
+// Client list is proper-noun brand marks — kept as Latin script across locales.
 const CLIENTS = [
   "Reliance Industries",
   "L&T",
@@ -46,125 +37,152 @@ const CLIENTS = [
   "Indian Navy",
 ];
 
-// Detect touch device once — avoids repeated checks
-const IS_TOUCH =
-  typeof window !== "undefined" &&
-  ("ontouchstart" in window ||
-    navigator.maxTouchPoints > 0);
+const DEPLOYMENT_IDS = [
+  { code: "QA-04", key: "nfxp" },
+  { code: "IN-12", key: "kochi" },
+  { code: "IN-07", key: "hazira" },
+  { code: "IN-03", key: "rewas" },
+];
 
-const NewHero = ({
-  onLoadProgress = () => {},
-  onReady = () => {},
-}) => {
-  const containerRef = useRef(null);
-  const videoContainerRef =
-    useRef(null);
-  const videoRef = useRef(null);
-  const ctaRef = useRef(null);
-  const hasCalledReady = useRef(false);
-  const [isPlaying, setIsPlaying] =
-    useState(false);
+// ──────────────────────────────────────────────────────────────
+//  COMPONENT
+// ──────────────────────────────────────────────────────────────
+const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
+  const { t } = useTranslation();
+  const STATS = useMemo(
+    () => STAT_IDS.map((s) => ({ ...s, label: t(s.key) })),
+    [t]
+  );
+  const DEPLOYMENTS = useMemo(
+    () =>
+      DEPLOYMENT_IDS.map((d) => ({
+        code: d.code,
+        site: t(`hero.deployments.${d.key}.site`),
+        coord: t(`hero.deployments.${d.key}.coord`),
+      })),
+    [t]
+  );
+  const containerRef      = useRef(null);
+  const videoContainerRef = useRef(null);
+  const heroVideoRef      = useRef(null);
+  const ctaRef            = useRef(null);
+  const hasCalledReady    = useRef(false);
+
+  const [deployIndex, setDeployIndex] = useState(0);
+
+  // SSR-safe environment detection
+  const [isTouch] = useState(() =>
+    typeof window !== "undefined" &&
+    ("ontouchstart" in window || navigator.maxTouchPoints > 0)
+  );
+
+  // Pointer-coarse devices only (phones/tablets) — used to skip the 41MB hero
+  // video. Distinct from isTouch, which also matches desktops with a touchscreen.
+  const isMobile = useIsMobile();
+  
+  // Reduced-motion is intentionally NOT honoured here — Windows 11 defaults
+  // "Animation effects" off, which previously made the hero reveal snap to
+  // final state for those users. The animation is core to the brand feel,
+  // so we always play it.
+  const prefersReducedMotion = false;
 
   // ── LOADER HANDOFF ──
   useEffect(() => {
     if (hasCalledReady.current) return;
-    const bgImage = new Image();
-    bgImage.src =
-      "/frames/frame_0001.webp";
-    const handleLoad = () => {
-      if (hasCalledReady.current)
-        return;
+
+    const markReady = () => {
+      if (hasCalledReady.current) return;
+      hasCalledReady.current = true;
       onLoadProgress(100);
       onReady();
-      hasCalledReady.current = true;
     };
-    bgImage.onload = handleLoad;
-    bgImage.onerror = handleLoad;
-    const timeout = setTimeout(() => {
-      if (!hasCalledReady.current)
-        handleLoad();
-    }, 3000);
+
+    const timeout = setTimeout(markReady, 2500);
+    
+    // Check if the hero video is ready
+    if (heroVideoRef.current && heroVideoRef.current.readyState >= 3) {
+      markReady();
+    }
+
     return () => clearTimeout(timeout);
   }, [onLoadProgress, onReady]);
 
-  // ── GSAP ──
+  // ── LIVE DEPLOYMENT TICKER ──
+  useEffect(() => {
+    let id;
+    const start = () => {
+      id = setInterval(
+        () => setDeployIndex((i) => (i + 1) % DEPLOYMENTS.length),
+        4000
+      );
+    };
+    const stop = () => {
+      if (id) clearInterval(id);
+      id = null;
+    };
+    const onVisibility = () => (document.hidden ? stop() : start());
+
+    start();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, []);
+
+  // ── GSAP ANIMATIONS ──
   useGSAP(
     () => {
-      // 1. ENTRANCE — simple opacity + transform only
-      const tl = gsap.timeline({
-        delay: 0.1,
-      });
-
-      tl.fromTo(
-        ".hero-bg-img",
-        { scale: 1.1, opacity: 0 },
-        {
-          scale: 1,
-          opacity: 1,
-          duration: 2,
-          ease: "power3.out",
-        },
-      )
-        .fromTo(
-          ".edge-text",
-          { y: 15, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            stagger: 0.1,
-            ease: "power2.out",
-          },
-          "-=1.5",
-        )
-        .fromTo(
-          ".reveal-text",
-          { yPercent: 110 },
-          {
-            yPercent: 0,
-            duration: 1.2,
-            stagger: 0.12,
-            ease: "expo.out",
-          },
-          "-=1.4",
-        )
-        .fromTo(
-          ".reveal-line",
-          { scaleX: 0 },
-          {
-            scaleX: 1,
-            duration: 1,
-            ease: "expo.out",
-          },
-          "-=1.2",
-        )
-        .fromTo(
-          ".reveal-desc",
-          { opacity: 0, x: 15 },
-          {
-            opacity: 1,
-            x: 0,
-            duration: 0.8,
-            ease: "power3.out",
-          },
-          "-=1.0",
-        )
-        .fromTo(
-          ".hero-cta-circle",
-          { scale: 0, opacity: 0 },
-          {
-            scale: 1,
-            opacity: 1,
-            duration: 1,
-            ease: "elastic.out(1, 0.7)",
-          },
-          "-=0.8",
+      if (prefersReducedMotion) {
+        gsap.set(
+          [
+            ".hero-bg-media",
+            ".hero-eyebrow",
+            ".reveal-line-1",
+            ".reveal-line-2",
+            ".accent-line",
+            ".hero-right-col > *",
+            ".hero-bottom-bar > *",
+            ".hero-cta",
+            ".video-wrapper",
+          ],
+          { clearProps: "all", opacity: 1, x: 0, y: 0, scale: 1, yPercent: 0, scaleX: 1 }
         );
+        gsap.utils.toArray(".stat-val").forEach((el) => {
+          el.innerText = el.getAttribute("data-target");
+        });
+        return;
+      }
 
-      // 2. PARALLAX — DISABLED on touch devices (major mobile perf killer)
-      if (!IS_TOUCH) {
-        gsap.to(".hero-bg-img", {
-          yPercent: 15,
+      const tl = gsap.timeline({ delay: 0.1 });
+      tl.fromTo(".hero-bg-media",
+          { scale: 1.1, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 2.2, ease: "power3.out" })
+        .fromTo(".hero-eyebrow",
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.9, ease: "power3.out" }, "-=1.6")
+        .fromTo(".reveal-line-1",
+          { yPercent: 115 },
+          { yPercent: 0, duration: 1.2, ease: "expo.out" }, "-=0.9")
+        .fromTo(".reveal-line-2",
+          { yPercent: 115 },
+          { yPercent: 0, duration: 1.2, ease: "expo.out" }, "-=1.0")
+        .fromTo(".accent-line",
+          { scaleX: 0 },
+          { scaleX: 1, duration: 1, ease: "expo.out" }, "-=1.0")
+        .fromTo(".hero-right-col > *",
+          { opacity: 0, x: 20 },
+          { opacity: 1, x: 0, duration: 0.9, stagger: 0.1, ease: "power3.out" }, "-=1.0")
+        .fromTo(".hero-bottom-bar > *",
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.9, stagger: 0.08, ease: "power3.out" }, "-=0.9")
+        .fromTo(".hero-cta",
+          { scale: 0, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 1, ease: "elastic.out(1, 0.7)" }, "-=0.7");
+
+      if (!isTouch) {
+        gsap.to(".hero-bg-media", {
+          yPercent: 8,
           ease: "none",
           scrollTrigger: {
             trigger: ".hero-viewport",
@@ -173,239 +191,285 @@ const NewHero = ({
             scrub: true,
           },
         });
-
         gsap.to(".hero-content-layer", {
-          y: -60,
-          opacity: 0,
+          y: -40,
+          opacity: 0.1,
           scrollTrigger: {
             trigger: ".hero-viewport",
             start: "top top",
-            end: "60% top",
+            end: "75% top",
             scrub: true,
           },
         });
       }
 
-      // 3. STATS COUNT-UP
-      const statNums =
-        gsap.utils.toArray(".stat-val");
-      statNums.forEach((el) => {
-        const target = parseInt(
-          el.getAttribute(
-            "data-target",
-          ),
-          10,
-        );
-        gsap.fromTo(
-          el,
+      gsap.utils.toArray(".stat-val").forEach((el) => {
+        const target = parseInt(el.getAttribute("data-target"), 10);
+        gsap.fromTo(el,
           { innerText: 0 },
           {
             innerText: target,
             duration: 2,
             ease: "power3.out",
             snap: { innerText: 1 },
-            scrollTrigger: {
-              trigger: ".stats-section",
-              start: "top 85%",
+            scrollTrigger: { trigger: ".stats-section", start: "top 85%" },
+            onUpdate() {
+              el.innerText = Math.ceil(this.targets()[0].innerText);
             },
-            onUpdate: function () {
-              el.innerText = Math.ceil(
-                this.targets()[0]
-                  .innerText,
-              );
-            },
-          },
+          }
         );
       });
 
-      // 4. VIDEO REVEAL
-      //    Mobile: simple opacity + y (no clipPath — expensive on mobile GPUs)
-      //    Desktop: full clipPath + scale effect
-      if (IS_TOUCH) {
-        gsap.fromTo(
-          ".video-wrapper",
+      if (isTouch) {
+        gsap.fromTo(".video-wrapper",
           { opacity: 0, y: 40 },
           {
-            opacity: 1,
-            y: 0,
-            ease: "power2.out",
+            opacity: 1, y: 0, ease: "power2.out",
             scrollTrigger: {
-              trigger:
-                videoContainerRef.current,
-              start: "top 85%",
-              end: "top 50%",
-              scrub: true,
+              trigger: videoContainerRef.current,
+              start: "top 85%", end: "top 50%", scrub: true,
             },
-          },
-        );
+          });
       } else {
-        gsap.fromTo(
-          ".video-wrapper",
+        gsap.fromTo(".video-wrapper",
+          { scale: 0.8, opacity: 0, y: 50, clipPath: "inset(4% round 32px)" },
           {
-            scale: 0.7,
-            opacity: 0,
-            y: 80,
-            clipPath:
-              "inset(2% round 50px)",
-          },
-          {
-            scale: 1,
-            opacity: 1,
-            y: 0,
-            clipPath:
-              "inset(0% round 0px)",
+            scale: 1, opacity: 1, y: 0, clipPath: "inset(0% round 0px)",
             ease: "power2.inOut",
             scrollTrigger: {
-              trigger:
-                videoContainerRef.current,
-              start: "top 90%",
-              end: "top 20%",
-              scrub: true,
+              trigger: videoContainerRef.current,
+              start: "top 90%", end: "top 30%", scrub: true,
             },
-          },
-        );
+          });
       }
 
-      // 5. MARQUEE
       gsap.to(".marquee-track", {
-        xPercent: -50,
-        ease: "none",
-        duration: 35,
-        repeat: -1,
+        xPercent: -50, ease: "none", duration: 40, repeat: -1,
       });
     },
-    { scope: containerRef },
+    { scope: containerRef, dependencies: [prefersReducedMotion, isTouch] }
   );
 
-  // ── MAGNETIC BUTTON (desktop only) ──
-  const handleMouseMove = useCallback(
-    (e) => {
-      if (IS_TOUCH || !ctaRef.current)
-        return;
-      const {
-        left,
-        top,
-        width,
-        height,
-      } =
-        ctaRef.current.getBoundingClientRect();
-      const x =
-        (e.clientX - left - width / 2) *
-        0.4;
-      const y =
-        (e.clientY - top - height / 2) *
-        0.4;
-      gsap.to(ctaRef.current, {
-        x,
-        y,
-        duration: 0.5,
-        ease: "power3.out",
-      });
-    },
-    [],
-  );
+  // ── MAGNETIC CTA ──
+  const handleMouseMove = useCallback((e) => {
+    if (isTouch || prefersReducedMotion || !ctaRef.current) return;
+    const { left, top, width, height } = ctaRef.current.getBoundingClientRect();
+    const x = (e.clientX - left - width / 2) * 0.35;
+    const y = (e.clientY - top - height / 2) * 0.35;
+    gsap.to(ctaRef.current, { x, y, duration: 0.5, ease: "power3.out" });
+  }, [isTouch, prefersReducedMotion]);
 
-  const handleMouseLeave =
-    useCallback(() => {
-      if (IS_TOUCH || !ctaRef.current)
-        return;
-      gsap.to(ctaRef.current, {
-        x: 0,
-        y: 0,
-        duration: 0.7,
-        ease: "elastic.out(1, 0.3)",
-      });
-    }, []);
+  const handleMouseLeave = useCallback(() => {
+    if (isTouch || prefersReducedMotion || !ctaRef.current) return;
+    gsap.to(ctaRef.current, {
+      x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)",
+    });
+  }, [isTouch, prefersReducedMotion]);
 
-  // ── VIDEO TOGGLE ──
-  const handleVideoToggle = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (video.paused) {
-      video.play();
-      setIsPlaying(true);
-    } else {
-      video.pause();
-      setIsPlaying(false);
-    }
-  };
+
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full relative z-0"
-    >
+    <div ref={containerRef} className="w-full relative z-0">
       {/* ══════════════════════════════════════════════════════
-          SECTION 1 — DARK HERO
+          SECTION 1 — EDITORIAL HERO
           ══════════════════════════════════════════════════════ */}
-      <section className="hero-viewport relative w-full h-screen overflow-hidden bg-[#040e12]">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#040e12]/60 via-[#040e12]/30 to-[#040e12]/80 z-10" />
-          <img
-            src="/new_hero_image.jpg"
-            alt="Marine construction site"
-            className="hero-bg-img w-full h-full object-cover origin-center"
-          />
-        </div>
+      <section className="hero-viewport relative w-full min-h-screen min-h-[100svh] overflow-hidden bg-[#f5f5f0] flex flex-col justify-between">
 
-        <div className="hero-content-layer relative z-20 flex flex-col justify-between h-full w-full px-6 md:px-12 py-8 md:py-12 pointer-events-none">
-          <div className="w-full max-w-7xl mx-auto flex flex-col justify-center flex-grow mt-10 md:mt-30">
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 lg:gap-0">
-              <div className="relative z-10 flex flex-col">
-                <div className="overflow-hidden py-5 -my-5">
-                  <h1 className="reveal-text font-sans font-medium text-[15vw] md:text-[8rem] lg:text-[9.5rem] leading-[0.85] tracking-[-0.03em] uppercase text-white">
-                    Marine
-                  </h1>
-                </div>
-                <div className="overflow-hidden py-5 -my-5 flex items-center gap-4 md:gap-6 mt-0 md:mt-2">
-                  <div className="reveal-line hidden md:block w-12 lg:w-24 h-[3px] bg-[#0ea5a4] origin-left" />
-                  <h1 className="reveal-text font-serif italic text-[15vw] md:text-[8.5rem] lg:text-[10rem] leading-[0.85] tracking-tight lowercase text-[#0ea5a4]">
-                    engineering.
-                  </h1>
+        {/* Blueprint grid with radial fade mask */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 z-[1] opacity-[0.05] pointer-events-none"
+          style={{
+            backgroundImage:
+              "linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)",
+            backgroundSize: "4rem 4rem",
+            WebkitMaskImage: "radial-gradient(ellipse at center 40%, black 25%, transparent 75%)",
+            maskImage: "radial-gradient(ellipse at center 40%, black 25%, transparent 75%)",
+          }}
+        />
+
+        {/* ── CONTENT LAYER ── */}
+        <div className="hero-content-layer relative z-30 flex-1 w-full flex flex-col px-6 md:px-20 pt-24 md:pt-28 pb-8 md:pb-12 pointer-events-none">
+
+
+          {/* ═══ MAIN SPREAD ═══ */}
+          <div className="flex-1 w-full max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+
+            {/* LEFT — Typography */}
+            <div className="lg:col-span-7 flex flex-col relative z-10 order-2 lg:order-1 lg:pr-10">
+              <h1 className="mix-blend-multiply m-0">
+                {/* Wrapper padding is em-based so it scales with font-size; this
+                    gives Devanagari matras and Arabic diacritics enough room
+                    inside the overflow-hidden reveal mask. */}
+                <span className="block overflow-hidden py-[0.18em] -my-[0.18em]">
+                  <span className="reveal-line-1 block font-sans font-medium text-[16vw] md:text-[8.5rem] lg:text-[10rem] 2xl:text-[11rem] leading-[0.9] tracking-[-0.04em] uppercase text-[#050505]">
+                    {t("hero.marine")}
+                  </span>
+                </span>
+                <span className="flex items-end gap-3 md:gap-5 mt-2 lg:mt-4">
+                  <span
+                    aria-hidden="true"
+                    className="accent-line hidden md:block w-12 lg:w-20 h-[3px] bg-[#0ea5a4] origin-left rtl:origin-right shrink-0 mb-4 lg:mb-6"
+                  />
+                  <span className="block overflow-hidden py-[0.18em] -my-[0.18em]">
+                    <span className="reveal-line-2 block font-serif italic text-[13vw] md:text-[6.5rem] lg:text-[7.5rem] 2xl:text-[8rem] leading-[0.95] tracking-tight lowercase text-[#0ea5a4]">
+                      {t("hero.engineering")}
+                    </span>
+                  </span>
+                </span>
+              </h1>
+
+              <p className="mt-8 lg:mt-12 max-w-lg font-sans text-sm md:text-[15px] leading-relaxed text-black/60 font-medium">
+                {t("hero.description")}
+              </p>
+            </div>
+
+            {/* RIGHT — Unconditional Video Asset */}
+            <div className="lg:col-span-5 relative order-1 lg:order-2 lg:pl-6 w-full max-w-[500px] mx-auto pointer-events-auto">
+              <div className="relative w-full aspect-[4/5] lg:aspect-[3/4] overflow-hidden rounded-md bg-zinc-900 shadow-[0_30px_60px_rgba(0,0,0,0.12)]">
+                
+                {/* On true mobile devices (pointer: coarse) we skip the 40MB
+                    loop and serve a still image — saves data, CPU and battery
+                    on phones/tablets. Desktops (including touchscreen laptops
+                    with a mouse) get the full video with preload="auto". */}
+                {isMobile ? (
+                  <img
+                    src="/new_hero_image.jpg"
+                    alt={t("hero.videoAlt")}
+                    loading="eager"
+                    decoding="async"
+                    className="hero-bg-media w-full h-full object-cover origin-center"
+                  />
+                ) : (
+                  <video
+                    ref={heroVideoRef}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="auto"
+                    poster="/new_hero_image.jpg"
+                    aria-label={t("hero.videoAriaLabel")}
+                    className="hero-bg-media w-full h-full object-cover origin-center"
+                  >
+                    <source src="/videos/hero.mp4" type="video/mp4" />
+                    <source src="/videos/hero-reel.mp4" type="video/mp4" />
+                  </video>
+                )}
+
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"
+                />
+
+                {/* Live Indicator overlay on video */}
+                <div
+                  aria-hidden="true"
+                  className="absolute top-5 right-5 flex items-center gap-2 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full pointer-events-none"
+                >
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0ea5a4] opacity-75" />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#0ea5a4]" />
+                  </span>
+                  <span className="font-sans text-[9px] uppercase tracking-[0.25em] text-white font-bold">
+                    {t("hero.live")}
+                  </span>
                 </div>
               </div>
 
-              <div className="reveal-desc flex flex-col gap-3 md:gap-4 max-w-[280px] lg:mb-6 ml-1 md:ml-0">
-                <p className="font-sans text-[10px] md:text-xs uppercase tracking-[0.25em] text-[#0ea5a4] font-bold">
-                  The Meka Standard
-                </p>
-                <p className="font-sans text-xs md:text-sm leading-relaxed text-white/50 font-medium">
-                  Four decades of
-                  specialized expertise
-                  delivering complex
-                  coastal infrastructure
-                  and marine
-                  construction globally.
-                </p>
-              </div>
+              {/* Offset Accent Frame */}
+              <div
+                aria-hidden="true"
+                className="absolute -bottom-6 -right-6 md:-bottom-8 md:-right-8 w-24 md:w-36 aspect-square border-2 border-[#0ea5a4]/30 -z-10 hidden md:block"
+              />
             </div>
           </div>
 
-          <div className="flex justify-between items-end w-full">
-            <div className="flex items-center gap-4 overflow-hidden">
-              <div className="edge-text w-12 md:w-20 h-px bg-white/30 origin-left" />
-              <span className="edge-text font-sans text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white/40">
-                Scroll to explore
-              </span>
+          {/* ═══ BOTTOM BAR ═══ */}
+          <div className="hero-bottom-bar w-full max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-3 items-end gap-8 mt-16 lg:mt-auto pt-8 border-t border-black/[0.04]">
+
+            {/* Live deployment ticker (Left aligned on desktop) */}
+            <div
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+              className="hidden md:flex flex-col items-start gap-2 text-left justify-end pb-4"
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0ea5a4] opacity-75" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#0ea5a4]" />
+                </span>
+                <span className="font-sans text-[9px] uppercase tracking-[0.3em] text-black/40 font-bold">
+                  {t("hero.activeDeployment")}
+                </span>
+              </div>
+              <div className="relative h-10 overflow-hidden w-full max-w-[300px]">
+                {DEPLOYMENTS.map((d, i) => (
+                  <div
+                    key={d.code}
+                    aria-hidden={i !== deployIndex}
+                    className="absolute inset-x-0 top-0 transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)]"
+                    style={{
+                      opacity: i === deployIndex ? 1 : 0,
+                      transform:
+                        i === deployIndex
+                          ? "translateY(0)"
+                          : i < deployIndex
+                          ? "translateY(-120%)"
+                          : "translateY(120%)",
+                    }}
+                  >
+                    <p className="font-sans text-[13px] text-[#050505] font-semibold whitespace-nowrap">
+                      {d.code} <span className="text-black/30 font-normal mx-2">/</span> {d.site}
+                    </p>
+                    <p className="font-sans text-[9px] uppercase tracking-[0.25em] text-[#0ea5a4] font-bold mt-1">
+                      {d.coord}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* CTA — NO backdrop-blur (kills mobile GPU) */}
-            <div className="hero-cta-circle pointer-events-auto">
+            {/* Scroll indicator (Centered on desktop) */}
+            <div className="hidden md:flex flex-col items-center justify-end gap-4 pb-4" aria-hidden="true">
+              <span className="font-sans text-[9px] uppercase tracking-[0.3em] text-black/40 font-bold">
+                {t("hero.scroll")}
+              </span>
+              <div className="relative w-px h-16 bg-black/10 overflow-hidden">
+                <div className="absolute inset-0 bg-[#0ea5a4] animate-[slideDown_2s_ease-in-out_infinite]" />
+              </div>
+            </div>
+
+            {/* CTA (Right aligned on desktop) */}
+            <div className="pointer-events-auto flex justify-end">
               <a
                 href="#projects"
                 ref={ctaRef}
-                onMouseMove={
-                  handleMouseMove
-                }
-                onMouseLeave={
-                  handleMouseLeave
-                }
-                className="group relative flex items-center justify-center w-28 h-28 md:w-36 md:h-36 rounded-full border border-white/20 bg-white/5 hover:border-transparent transition-colors duration-500 overflow-hidden cursor-pointer"
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                className="hero-cta group relative flex items-center justify-center w-28 h-28 md:w-32 md:h-32 rounded-full bg-[#050505] hover:bg-[#0ea5a4] transition-colors duration-500 overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0ea5a4] focus-visible:ring-offset-4 focus-visible:ring-offset-[#f5f5f0]"
               >
-                <span className="relative z-10 font-sans text-[9px] md:text-[11px] uppercase tracking-[0.2em] text-white font-bold text-center leading-relaxed">
-                  View <br /> Projects
+                <span className="relative z-10 font-sans text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white font-bold text-center leading-relaxed">
+                  {t("hero.viewProjects")}
                 </span>
-                <div className="absolute inset-0 bg-[#0ea5a4] rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 ease-out origin-center" />
+                <svg
+                  aria-hidden="true"
+                  className="absolute inset-0 w-full h-full animate-[spin_20s_linear_infinite] pointer-events-none motion-reduce:animate-none"
+                  viewBox="0 0 100 100"
+                >
+                  <defs>
+                    <path
+                      id="cta-circle"
+                      d="M 50, 50 m -40, 0 a 40,40 0 1,1 80,0 a 40,40 0 1,1 -80,0"
+                    />
+                  </defs>
+                  <text className="fill-white/40 text-[7px] tracking-[0.3em] font-bold uppercase">
+                    <textPath href="#cta-circle">
+                      {t("hero.ctaCircle")}
+                    </textPath>
+                  </text>
+                </svg>
               </a>
             </div>
           </div>
@@ -413,134 +477,61 @@ const NewHero = ({
       </section>
 
       {/* ══════════════════════════════════════════════════════
-          SECTION 2 — STATS (dark, below viewport)
+          SECTION 2 — STATS
           ══════════════════════════════════════════════════════ */}
-      <section className="stats-section relative z-10 bg-[#040e12] py-16 md:py-24 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-2 md:grid-cols-4 gap-y-12 md:gap-0 divide-x-0 md:divide-x divide-white/10">
+      <section className="stats-section relative z-10 bg-[#f5f5f0] py-16 md:py-24 border-t border-b border-black/[0.06]">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-2 md:grid-cols-4 gap-y-12 md:gap-0 divide-x-0 md:divide-x divide-black/[0.06]">
           {STATS.map((stat, i) => (
-            <div
-              key={i}
-              className="flex flex-col items-start md:items-center px-4 md:px-8"
-            >
+            <div key={i} className="flex flex-col items-start md:items-center px-4 md:px-8">
               <div className="flex items-baseline mb-2">
                 <span
-                  className="stat-val font-sans font-medium text-4xl md:text-6xl text-white tracking-tighter"
-                  data-target={parseInt(
-                    stat.value,
-                    10,
-                  )}
+                  className="stat-val font-serif text-5xl md:text-7xl text-[#050505] tracking-tighter"
+                  data-target={stat.value}
                 >
                   0
                 </span>
-                <span className="text-[#0ea5a4] font-sans font-light text-3xl md:text-5xl ml-1">
-                  {stat.suffix}
-                </span>
+                {stat.suffix && (
+                  <span className="text-[#0ea5a4] font-serif text-4xl md:text-6xl ml-1">
+                    {stat.suffix}
+                  </span>
+                )}
               </div>
-              <span className="font-sans text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/40">
+              <span className="font-sans text-[10px] md:text-xs uppercase tracking-[0.2em] text-black/40 font-bold">
                 {stat.label}
               </span>
             </div>
           ))}
         </div>
-          
       </section>
-
-      {/* ══════════════════════════════════════════════════════
-          CURVE — dark into white
-          ══════════════════════════════════════════════════════ */}
-      <div className="relative -top-0 z-10 w-full bg-[#040e12]">
-        <svg
-          viewBox="0 0 1440 120"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full block -mb-px"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M0,0 L1440,0 L1440,40 Q720,120 0,40 Z"
-            fill="#040e12"
-          />
-          <path
-            d="M0,40 Q720,120 1440,40 L1440,120 L0,120 Z"
-            fill="#f5f5f0"
-          />
-        </svg>
-      </div>
 
       <Companies />
 
+
       {/* ══════════════════════════════════════════════════════
-          SECTION 3 — VIDEO (white)
+          SECTION 4 — MARQUEE
           ══════════════════════════════════════════════════════ */}
       <section
-        ref={videoContainerRef}
-        className="relative z-10 bg-[#f5f5f0] py-12 md:py-24 flex flex-col items-center overflow-hidden"
+        aria-label="Trusted by"
+        className="relative z-10 bg-[#f5f5f0] py-12 md:py-20 overflow-hidden border-t border-black/[0.05]"
       >
-        <p className="font-sans text-[10px] md:text-xs uppercase tracking-[0.4em] text-[#0a0a0a]/40 mb-8 md:mb-12 font-medium">
-          Showreel 2024
-        </p>
-
-        {/* Video — NO backdrop-blur on play button */}
-        <div
-          onClick={handleVideoToggle}
-          className="video-wrapper relative aspect-video w-[92%] md:w-[85%] max-w-[1100px] cursor-pointer group bg-[#0a0a0a] shadow-2xl overflow-hidden mx-auto rounded-lg"
-        >
-          <video
-            ref={videoRef}
-            className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-700"
-            poster="/frames/frame_0100.webp"
-            muted
-            loop
-            playsInline
-            preload="metadata"
-          >
-            <source
-              src="/videos/hero-reel.mp4"
-              type="video/mp4"
-            />
-          </video>
-
-          <div
-            className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ${
-              isPlaying
-                ? "bg-black/0"
-                : "bg-black/30"
-            }`}
-          >
-            <div
-              className={`w-16 h-16 md:w-24 md:h-24 rounded-full border-2 border-white/40 flex items-center justify-center bg-black/40 group-hover:scale-110 group-hover:bg-white group-hover:text-[#0a0a0a] transition-all duration-500 ease-out text-white ${
-                isPlaying
-                  ? "opacity-0 scale-50"
-                  : "opacity-100 scale-100"
-              }`}
-            >
-              <span className="font-sans text-[9px] md:text-[11px] uppercase tracking-[0.3em] font-bold ml-1">
-                Play
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════
-          SECTION 4 — MARQUEE (white)
-          ══════════════════════════════════════════════════════ */}
-      <section className="relative z-10 bg-[#f5f5f0] py-12 md:py-20 overflow-hidden">
-        <p className="font-sans text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-[#0a0a0a]/30 text-center mb-12 font-medium">
-          Trusted globally by industry
-          leaders
+        <p className="font-sans text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-black/40 text-center mb-12 font-bold">
+          {t("trustedGlobally")}
         </p>
         <div className="flex overflow-hidden whitespace-nowrap relative">
-          <div className="absolute left-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-r from-[#f5f5f0] to-transparent z-10" />
-          <div className="absolute right-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-l from-[#f5f5f0] to-transparent z-10" />
+          <div
+            aria-hidden="true"
+            className="absolute left-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-r from-[#f5f5f0] to-transparent z-10"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute right-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-l from-[#f5f5f0] to-transparent z-10"
+          />
           <div className="marquee-track flex items-center gap-12 md:gap-32 px-8 md:px-12 w-max">
-            {[
-              ...CLIENTS,
-              ...CLIENTS,
-            ].map((client, index) => (
+            {[...CLIENTS, ...CLIENTS].map((client, index) => (
               <span
                 key={index}
-                className="font-sans text-xs md:text-xl font-bold uppercase tracking-[0.15em] text-[#0a0a0a]/40"
+                aria-hidden={index >= CLIENTS.length}
+                className="font-sans text-xs md:text-xl font-bold uppercase tracking-[0.15em] text-black/30"
               >
                 {client}
               </span>
@@ -550,26 +541,31 @@ const NewHero = ({
       </section>
 
       {/* ══════════════════════════════════════════════════════
-          BOTTOM CURVE — white into dark About
+          CURVE 
           ══════════════════════════════════════════════════════ */}
       <div className="relative z-10 w-full bg-[#f5f5f0]">
         <svg
+          aria-hidden="true"
           viewBox="0 0 1440 120"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
           className="w-full block -mb-px"
           preserveAspectRatio="none"
         >
-          <path
-            d="M0,0 L1440,0 L1440,40 Q720,120 0,40 Z"
-            fill="#f5f5f0"
-          />
-          <path
-            d="M0,40 Q720,120 1440,40 L1440,120 L0,120 Z"
-            fill="#0a0a0a"
-          />
+          <path d="M0,40 Q720,120 1440,40 L1440,120 L0,120 Z" fill="#0a0a0a" />
         </svg>
       </div>
+
+      <style>{`
+        @keyframes slideDown {
+          0%   { transform: translateY(-100%); }
+          100% { transform: translateY(100%); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-\\[slideDown_2s_ease-in-out_infinite\\],
+          .animate-ping {
+            animation: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

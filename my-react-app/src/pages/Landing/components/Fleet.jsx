@@ -1,26 +1,42 @@
 // src/components/Fleet.jsx
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useTranslation } from "react-i18next";
+import useIsMobile from "../../../hooks/useIsMobile";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const fleetData = [
-  { id: "01", name: "Aero Star", type: "Crew Boat", img: "/fleet/Aero Star.png", function: "High-Speed Transport" },
-  { id: "02", name: "Amma Boat", type: "Support Vessel", img: "/fleet/Amma Boat.png", function: "Offshore Supply & Logistics" },
-  { id: "03", name: "CB 04", type: "Crane Barge", img: "/fleet/Cb 04.png", function: "Heavy Lifting & Installation" },
-  { id: "04", name: "Essar Dredge IV", type: "Heavy Dredger", img: "/fleet/Essar Dredge IV.jpeg", function: "Deep Channel Dredging" },
-  { id: "05", name: "FT3", type: "Flat Top Barge", img: "/fleet/FT3.png", function: "Bulk Material Transport" },
-  { id: "06", name: "Hansita III", type: "Piling Rig", img: "/fleet/Hansita III.png", function: "Marine Foundation & Drilling" },
-  { id: "07", name: "Meka 2", type: "Cutter Suction Dredger", img: "/fleet/Meka 2.png", function: "Land Reclamation Services" },
-  { id: "08", name: "Meka 3", type: "Cutter Suction Dredger", img: "/fleet/Meka 3.png", function: "Land Reclamation Services" },
+// Vessel names are proper nouns — kept as Latin script across locales.
+// Type and function copy is resolved via t() inside the component.
+const FLEET_META = [
+  { id: "01", name: "Aero Star",       img: "/fleet/Aero Star.webp" },
+  { id: "02", name: "Amma Boat",       img: "/fleet/Amma Boat.webp" },
+  { id: "03", name: "CB 04",           img: "/fleet/Cb 04.webp" },
+  { id: "04", name: "Essar Dredge IV", img: "/fleet/Essar Dredge IV.webp" },
+  { id: "05", name: "FT3",             img: "/fleet/FT3.webp" },
+  { id: "06", name: "Hansita III",     img: "/fleet/Hansita III.webp" },
+  { id: "07", name: "Meka 2",          img: "/fleet/Meka 2.webp" },
+  { id: "08", name: "Meka 3",          img: "/fleet/Meka 3.webp" },
 ];
 
 const Fleet = () => {
+  const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const containerRef = useRef(null);
   const trackRef = useRef(null);
   const cursorRef = useRef(null);
+
+  const fleetData = useMemo(
+    () =>
+      FLEET_META.map((v) => ({
+        ...v,
+        type: t(`fleet.vessels.${v.id}.type`),
+        function: t(`fleet.vessels.${v.id}.function`),
+      })),
+    [t]
+  );
 
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -58,6 +74,10 @@ const Fleet = () => {
       }
     );
 
+    // Cursor-follower is desktop-only — mobile has no pointer to track and
+    // the mousemove listener wastes CPU on touch devices.
+    if (isMobile || !cursorRef.current) return;
+
     const xTo = gsap.quickTo(cursorRef.current, "x", { duration: 0.2, ease: "power3" });
     const yTo = gsap.quickTo(cursorRef.current, "y", { duration: 0.2, ease: "power3" });
 
@@ -68,7 +88,7 @@ const Fleet = () => {
 
     window.addEventListener("mousemove", moveCursor);
     return () => window.removeEventListener("mousemove", moveCursor);
-  }, { scope: containerRef });
+  }, { scope: containerRef, dependencies: [isMobile] });
 
   const handleMouseDown = (e) => {
     setIsDragging(true);
@@ -109,18 +129,18 @@ const Fleet = () => {
       <div className="fleet-header max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24 mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
           <p className="font-sans text-[#0ea5a4] text-xs md:text-sm font-semibold tracking-[0.4em] uppercase mb-4">
-            Advanced Machinery
+            {t("fleet.sectionLabel")}
           </p>
-          <h2 className="font-sans font-black text-5xl md:text-7xl uppercase tracking-tighter leading-none text-[#0a0a0a]">
-            Our{" "}
+          <h2 className="font-sans font-black text-4xl sm:text-5xl md:text-7xl 2xl:text-8xl uppercase tracking-tighter leading-none text-[#0a0a0a]">
+            {t("fleet.our")}{" "}
             <span className="font-serif italic text-[#0a0a0a]/50 font-light lowercase tracking-tight">
-              Fleet.
+              {t("fleet.fleet")}
             </span>
           </h2>
         </div>
         <div className="md:max-w-sm">
           <p className="font-sans font-light text-[#0a0a0a]/50 text-sm md:text-base leading-relaxed">
-            Equipped with a state-of-the-art maritime fleet, we execute the most complex coastal and deep-water engineering projects worldwide. Explore our vessels below.
+            {t("fleet.desc")}
           </p>
         </div>
       </div>
@@ -133,7 +153,7 @@ const Fleet = () => {
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
-        className={`flex overflow-x-auto gap-8 px-6 md:px-12 lg:px-24 pb-12 hide-scrollbar transition-all duration-300 select-none ${
+        className={`flex overflow-x-auto gap-4 sm:gap-6 md:gap-8 px-6 md:px-12 lg:px-24 pb-12 hide-scrollbar transition-all duration-300 select-none ${
           isDragging ? "cursor-grabbing" : "cursor-none"
         }`}
       >
@@ -149,6 +169,7 @@ const Fleet = () => {
                 alt={`${vessel.name} - ${vessel.type}`}
                 draggable="false"
                 loading={i > 1 ? "lazy" : "eager"}
+                decoding="async"
                 className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 pointer-events-none"
               />
             </div>

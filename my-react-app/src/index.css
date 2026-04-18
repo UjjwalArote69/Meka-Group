@@ -65,3 +65,104 @@
     scrollbar-width: none;  /* Firefox */
   }
 }
+
+/* ════════════════════════════════════════════════════════
+   RTL support for Arabic
+   ════════════════════════════════════════════════════════ */
+[dir="rtl"] {
+  text-align: right;
+}
+
+/* GSAP animations often tween scaleX from 0 with an explicit origin. In
+   RTL those should start from the opposite edge so the reveal feels
+   correct. These rules mirror the most common transform-origin utilities. */
+[dir="rtl"] .origin-left {
+  transform-origin: right;
+}
+[dir="rtl"] .origin-right {
+  transform-origin: left;
+}
+[dir="rtl"] .origin-top-left {
+  transform-origin: top right;
+}
+[dir="rtl"] .origin-bottom-left {
+  transform-origin: bottom right;
+}
+
+/* Arabic and Devanagari have no case — `text-transform: uppercase`
+   has no effect but leaves layout alone. Italic styling on Arabic
+   also produces a slanted mess in most fonts; disable it on RTL
+   runs so body copy stays legible. */
+[dir="rtl"] em,
+[dir="rtl"] i,
+[dir="rtl"] .italic {
+  font-style: normal;
+}
+
+/* Non-Latin scripts need more vertical breathing room for diacritics
+   (Devanagari matras, Arabic tashkeel). Nudge tight line-heights up
+   globally for these languages so headings aren't clipped. */
+html[lang="hi"] h1,
+html[lang="hi"] h2,
+html[lang="hi"] h3,
+html[lang="ar"] h1,
+html[lang="ar"] h2,
+html[lang="ar"] h3 {
+  line-height: 1.15;
+}
+
+/* Arabic doesn't use letter-spacing the same way Latin does; heavy
+   negative tracking actively breaks glyph joining. Reset letter-spacing
+   on Arabic text to preserve proper Arabic ligatures. */
+html[lang="ar"] * {
+  letter-spacing: 0 !important;
+}
+
+/* ── Custom scrollbar — matches Meka palette (cream track, ink thumb,
+   teal accent on hover). Kept slim and understated to fit the editorial
+   feel of the site. Scoped to pointer-fine devices so mobile keeps its
+   native, hide-when-idle scrollbar. */
+@media (pointer: fine) {
+  /* Firefox */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: #050505 #f5f5f0;
+  }
+
+  /* WebKit (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f5f5f0;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #050505;
+    border: 2px solid #f5f5f0;
+    border-radius: 999px;
+    transition: background-color 180ms ease;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #0ea5a4;
+  }
+  ::-webkit-scrollbar-corner {
+    background: #f5f5f0;
+  }
+
+  /* On dark surfaces (navbar drawer, footer, chat panel), invert the
+     track/thumb so the bar stays legible against #050505. */
+  .scrollbar-dark {
+    scrollbar-color: #0ea5a4 #0a0a0a;
+  }
+  .scrollbar-dark::-webkit-scrollbar-track {
+    background: #0a0a0a;
+  }
+  .scrollbar-dark::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-color: #0a0a0a;
+  }
+  .scrollbar-dark::-webkit-scrollbar-thumb:hover {
+    background: #0ea5a4;
+  }
+}

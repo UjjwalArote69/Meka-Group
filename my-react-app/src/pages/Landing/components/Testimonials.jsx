@@ -1,38 +1,34 @@
 // src/components/Testimonials.jsx
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useTranslation } from "react-i18next";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const testimonials = [
-  {
-    id: "01",
-    quote: "We are immensely satisfied with the performance of Meka while executing the work. They are committed to achieve the targets and complete the work. They have got a large marine spread and extensive experience to take up challenging marine works. We wish them success in their future ventures.",
-    name: "CR Pradeep",
-    role: "Additional GM - Projects, Vatech Wabag",
-    img: "/testimonials/crpradeep.jpg"
-  },
-  {
-    id: "02",
-    quote: "Meka Dredging have performed to our entire satisfaction while executing this work. They have got the experienced and skilled staff to execute such and similar works. We wish them success for their future ventures!",
-    name: "Vipinkant Doshi",
-    role: "Reliance Industries",
-    img: "/testimonials/vipinkantdoshi.jpg"
-  },
-  {
-    id: "03",
-    quote: "The work has been carried out in an excellent workmanship like manner. The project displayed Amma Lines professionalism and technical expertise for marine works. They have got the experienced staff and a team of specialized underwater divers to take up challenging work. They have also got a large fleet of marine equipments and dredging equipments. We are immensely satisfied with their performance. We strongly recommend Amma Lines for such and similar marine construction works and wish them all the success for their ventures.",
-    name: "AK Upadhyay",
-    role: "DGM - Civil Projects, L & T Hazira Works",
-    img: '/testimonials/akupadhyay.png'
-  },
+// Names stay as proper nouns. Quote + role copy is pulled from the locale
+// via testimonials.entries.<id>.
+const TESTIMONIAL_META = [
+  { id: "01", name: "CR Pradeep",       img: "/testimonials/crpradeep.jpg" },
+  { id: "02", name: "Vipinkant Doshi",  img: "/testimonials/vipinkantdoshi.jpg" },
+  { id: "03", name: "AK Upadhyay",      img: "/testimonials/akupadhyay.png" },
 ];
 
 const Testimonials = () => {
+  const { t } = useTranslation();
   const containerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
+
+  const testimonials = useMemo(
+    () =>
+      TESTIMONIAL_META.map((p) => ({
+        ...p,
+        quote: t(`testimonials.entries.${p.id}.quote`),
+        role:  t(`testimonials.entries.${p.id}.role`),
+      })),
+    [t]
+  );
 
   useGSAP(() => {
     gsap.fromTo(
@@ -86,7 +82,7 @@ const Testimonials = () => {
       
       {/* Background Watermark */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none z-0">
-        <span className="text-[40vw] font-serif italic text-black/[0.03] leading-none">
+        <span className="text-[40vw] 2xl:text-[30rem] font-serif italic text-black/[0.03] leading-none">
           &ldquo;
         </span>
       </div>
@@ -96,7 +92,7 @@ const Testimonials = () => {
         {/* Section Header */}
         <div className="test-header mb-12 md:mb-16">
           <p className="font-sans text-[#0ea5a4] text-xs md:text-sm font-semibold tracking-[0.4em] uppercase mb-4">
-            Client Perspectives
+            {t("testimonials.sectionLabel")}
           </p>
           <div className="w-16 h-px bg-black/15" />
         </div>
@@ -120,9 +116,11 @@ const Testimonials = () => {
             {/* The Avatar */}
             <div className="author-img relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-black/5 overflow-hidden border border-black/10 shrink-0 shadow-lg flex items-center justify-center">
               <span className="absolute text-black/30 text-xs text-center p-2">No Img</span>
-              <img 
-                src={testimonials[activeIndex].img} 
-                alt={testimonials[activeIndex].name} 
+              <img
+                src={testimonials[activeIndex].img}
+                alt={testimonials[activeIndex].name}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover brightness-95 contrast-110 relative z-10"
                 onError={(e) => e.target.style.display = 'none'}
               />

@@ -1,28 +1,33 @@
-/* eslint-disable react-hooks/purity */
 // src/App.jsx
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useEffect, lazy, Suspense } from "react";
 import { Route, useLocation, Routes } from "react-router-dom";
 import Loader from "./components/Loader";
 import Navbar from "./components/layout/Navbar";
 import Home from "./pages/Landing/Home";
-import Contact from "./pages/Contact";
-import AboutPage from "./pages/About/AboutPage";
-import ProjectsPage from "./pages/ProjectsPage";
-import ExpertisePage from "./pages/Business/Businesses";
 import ScrollToTop from "./components/ScrollToTop";
-import Companies from "./pages/Companies/Companies";
-import CareersPage from "./pages/Careers";
-// import CustomCursor from "./components/layout/CustomCursor";
+import ErrorBoundary from "./components/ErrorBoundary";
+import MekaAssistant from "./components/MekaAssistant";
+
+// Route code-splitting — each non-home route ships its own chunk so the
+// initial landing bundle doesn't carry Leaflet, the calculator, etc.
+const Contact              = lazy(() => import("./pages/Contact"));
+const AboutPage            = lazy(() => import("./pages/About/AboutPage"));
+const ProjectsPage         = lazy(() => import("./pages/ProjectsPage"));
+const ExpertisePage        = lazy(() => import("./pages/Business/Businesses"));
+const Companies            = lazy(() => import("./pages/Companies/Companies"));
+const CareersPage          = lazy(() => import("./pages/Careers"));
+const NotFound             = lazy(() => import("./pages/NotFound"));
+const CapabilityCalculator = lazy(() => import("./components/CapabilityCalculator"));
 
 export default function App() {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
+  const [loadStartTime] = useState(() => Date.now());
   const location = useLocation();
-  const loadStartTime = useRef(Date.now());
   const MIN_LOADER_TIME = 2000;
 
   const finishLoading = useCallback(() => {
-    const elapsed = Date.now() - loadStartTime.current;
+    const elapsed = Date.now() - loadStartTime;
     const remaining = Math.max(MIN_LOADER_TIME - elapsed, 0);
 
     setProgress(100);
@@ -32,7 +37,7 @@ export default function App() {
         setLoading(false);
       }, 500);
     }, remaining);
-  }, []);
+  }, [loadStartTime]);
 
   const handleProgress = useCallback((p) => {
     setProgress(p);
@@ -40,31 +45,47 @@ export default function App() {
 
   useEffect(() => {
     if (location.pathname !== "/") {
+      // Skip the landing-page loader when the user lands on any other route.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       finishLoading();
     }
   }, [location.pathname, finishLoading]);
 
   return (
-    <div className="w-full">
-      {/* <CustomCursor /> */}
-      <Navbar />
-      <Loader visible={loading} progress={progress} brandLogo="/logo.png" />
+    <ErrorBoundary>
+      <div className="w-full">
+        {/* Skip to content — accessibility */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[999] focus:bg-[#0ea5a4] focus:text-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:uppercase focus:tracking-widest focus:rounded-sm"
+        >
+          Skip to main content
+        </a>
 
-      <div className={loading ? "pointer-events-none" : "pointer-events-auto"}>
-        <ScrollToTop />
-        <Routes>
-          <Route
-            path="/"
-            element={<Home onLoadProgress={handleProgress} onReady={finishLoading} />}
-          />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/business" element={<ExpertisePage />} />
-          <Route path="/companies" element={<Companies />} />
-          <Route path="/careers" element={<CareersPage />} />
-        </Routes>
+        <Navbar />
+        <Loader visible={loading} progress={progress} brandLogo="/logo.png" />
+
+        <div id="main-content" className={loading ? "pointer-events-none" : "pointer-events-auto"}>
+          <ScrollToTop />
+          <Suspense fallback={null}>
+            <Routes>
+              <Route
+                path="/"
+                element={<Home onLoadProgress={handleProgress} onReady={finishLoading} />}
+              />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/projects" element={<ProjectsPage />} />
+              <Route path="/business" element={<ExpertisePage />} />
+              <Route path="/companies" element={<Companies />} />
+              <Route path="/careers" element={<CareersPage />} />
+              <Route path="/scope" element={<CapabilityCalculator />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </div>
+        {!loading && <MekaAssistant />}
       </div>
-    </div>
+    </ErrorBoundary>
   );
 }

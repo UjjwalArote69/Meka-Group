@@ -3,6 +3,7 @@ import React, { useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useTranslation } from "react-i18next";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,6 +20,7 @@ const companyData = [
 ];
 
 const Companies = () => {
+  const { t } = useTranslation();
   const containerRef = useRef(null);
   const trackRef = useRef(null);
 
@@ -78,18 +80,18 @@ const Companies = () => {
         <div className="company-header mb-12 md:mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8 px-6 md:px-12 lg:px-24">
           <div>
             <p className="font-sans text-[#0ea5a4] text-xs md:text-sm font-semibold tracking-[0.4em] uppercase mb-6">
-              Our Divisions
+              {t("companies.ourDivisions")}
             </p>
             <h2 className="font-sans font-black text-5xl md:text-7xl uppercase tracking-tighter leading-none text-[#111]">
-              The Meka <br />
+              {t("companies.theMeka")} <br />
               <span className="font-serif italic text-black/40 font-light lowercase tracking-tight">
-                group.
+                {t("companies.group")}
               </span>
             </h2>
           </div>
           <div className="md:max-w-md pointer-events-none">
             <p className="font-sans font-medium text-black/50 text-sm md:text-base leading-relaxed">
-              Operating through nine highly specialized divisions, Meka Group delivers integrated, end-to-end engineering solutions for the world's most demanding environments.
+              {t("companies.divisionsDesc")}
             </p>
           </div>
         </div>
@@ -121,6 +123,8 @@ const Companies = () => {
                   src={company.img}
                   alt={company.name}
                   draggable="false"
+                  loading="lazy"
+                  decoding="async"
                   className={`${["01", "04", "05", "08"].includes(company.id) ? "w-[160%] h-[160%]" : "w-auto h-auto max-w-[80%] max-h-[80%]"} object-contain transition-transform duration-500 ease-out group-hover:scale-110 pointer-events-none relative z-10`}
                 />
               </div>

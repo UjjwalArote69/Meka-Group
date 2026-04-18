@@ -1,0 +1,600 @@
+{
+  "nav": {
+    "home": "Home",
+    "ourLegacy": "Our Legacy",
+    "aboutUs": "About Us",
+    "boardOfDirectors": "Board of Directors",
+    "ourValues": "Our Values",
+    "business": "Business",
+    "marineConstruction": "Marine Construction",
+    "dredgingReclamation": "Dredging & Reclamation",
+    "port": "Port",
+    "urbanInfrastructure": "Urban Infrastructure",
+    "realEstate": "Real Estate",
+    "projects": "Projects",
+    "companies": "Companies",
+    "careers": "Careers",
+    "contact": "Contact",
+    "menu": "Menu",
+    "close": "Close"
+  },
+
+  "hero": {
+    "marine": "Marine",
+    "engineering": "engineering.",
+    "mekaStandard": "The Meka Standard",
+    "heroDesc": "Four decades of specialized expertise delivering complex coastal infrastructure and marine construction globally.",
+    "description": "Four and a half decades of specialized expertise delivering complex coastal infrastructure and marine construction across India and the Middle East.",
+    "scrollToExplore": "Scroll to explore",
+    "scroll": "Scroll",
+    "viewProjects": "View Projects",
+    "live": "Live",
+    "activeDeployment": "Active Deployment",
+    "ctaCircle": "Explore Projects · Since 1979 · Explore Projects · Since 1979 ·",
+    "videoAlt": "Meka marine construction",
+    "videoAriaLabel": "Meka marine construction — atmospheric loop",
+    "deployments": {
+      "nfxp":   { "site": "North Field Expansion",     "coord": "25.5°N, 51.5°E" },
+      "kochi":  { "site": "Kochi LNG Terminal",        "coord": "9.9°N, 76.2°E"  },
+      "hazira": { "site": "Hazira Marine Works",       "coord": "21.1°N, 72.6°E" },
+      "rewas":  { "site": "Rewas Port Development",    "coord": "18.4°N, 72.9°E" }
+    }
+  },
+
+  "stats": {
+    "yearsExperience": "Years Experience",
+    "marineProjects": "Marine Projects",
+    "specializedVessels": "Specialized Vessels",
+    "globalReach": "Global Reach",
+    "yearsOfExcellence": "Years of Excellence",
+    "vesselsInFleet": "Vessels in Fleet",
+    "majorProjects": "Major Projects",
+    "globalPartners": "Global Partners"
+  },
+
+  "showreel": "Showreel 2024",
+  "play": "Play",
+  "trustedGlobally": "Trusted globally by industry leaders",
+
+  "about": {
+    "sectionLabel": "About Us",
+    "sectionTitle": "Our Legacy",
+    "theMekaGroupStory": "The Meka Group Story",
+    "forging": "Forging",
+    "the": "The",
+    "future": "Future",
+    "heroDesc": "Decades of maritime engineering excellence. We reshape coastlines, build tomorrow's infrastructure, and engineer resilience into every project.",
+    "yearsOfExcellence": "Years of Excellence",
+    "textReveal1": "Since our inception, Meka Group has stood at the vanguard of maritime engineering. ",
+    "textReveal2": "We do not just build infrastructure; we engineer resilience. ",
+    "textReveal3": "From complex dredging operations to massive fleet logistics, ",
+    "textReveal4": "our legacy is written in the deep waters and towering ports across the subcontinent.",
+    "leadership": "Leadership",
+    "boardOfDirectors": "Board of Directors",
+    "boardDesc": "Guided by decades of experience, our leadership team steers Meka Group toward sustainable growth and engineering excellence.",
+    "corePrinciples": "Core Principles",
+    "ourValues": "Our Values",
+    "valuesDesc": "These foundational pillars govern every project we undertake, every partnership we build, and every decision we make across our global operations.",
+    "chapters": {
+      "1979": {
+        "title": "Establishment in Mumbai",
+        "text": "Meka Group began its journey in Mumbai under the vision of Dr. Meka Vijay Papa Rao (PhD, UIUC), focusing on specialized civil and marine engineering solutions for India's growing coastline."
+      },
+      "1982": {
+        "title": "Foundation of Amma Lines",
+        "text": "The group established Amma Lines Ltd, which became a cornerstone of the organization, eventually building nearly 70% of the new jetties and ports across Maharashtra and Tamil Nadu."
+      },
+      "1995": {
+        "title": "Leadership in Subsea Engineering",
+        "text": "Meka Infrastructure was founded, establishing the group as a leader in subsea intake and outfall pipelines, providing critical infrastructure for desalination and industrial cooling systems."
+      },
+      "2002": {
+        "title": "The Rewas Port Milestone",
+        "text": "The Government of Maharashtra awarded the group a 50-year concession to develop the Rewas Port. This mega-project, later partnered with Reliance, aimed to create one of India's deepest ports."
+      },
+      "2010": {
+        "title": "Deep-Water Port Innovation",
+        "text": "Based on proprietary design patents, the group received approval to develop a ₹6,000 crore deep-water port in West Bengal, further diversifying its port development portfolio."
+      },
+      "2013": {
+        "title": "Nemmelli Desalination Success",
+        "text": "Successfully executed the landmark 100 MLD subsea intake outfall pipeline for the Nemmelli Desalination Plant, demonstrating world-class precision in subsea utility installations."
+      },
+      "2018": {
+        "title": "International Expansion",
+        "text": "Leveraging its diverse fleet of dredgers and marine equipment, the group expanded operations into the Middle East, notably securing infrastructure and environmental roles in Qatar."
+      },
+      "2024": {
+        "title": "Global Marine EPC Leader",
+        "text": "Today, Meka Group is recognized as a premier partner for Marine EPC, dredging, and offshore installations, serving government agencies and global energy corporations with a focus on innovation."
+      }
+    },
+    "values": {
+      "safetyFirst": "Safety First",
+      "safetyFirstDesc": "Uncompromising commitment to the health and safety of our workforce, partners, and the communities we operate in.",
+      "resilience": "Resilience",
+      "resilienceDesc": "Engineering infrastructure that withstands the test of time and the harshest marine environments.",
+      "innovation": "Innovation",
+      "innovationDesc": "Leveraging cutting-edge technology and advanced engineering methods to solve complex maritime challenges.",
+      "integrity": "Integrity",
+      "integrityDesc": "Upholding the highest standards of transparency, honesty, and ethics in all global operations.",
+      "sustainability": "Sustainability",
+      "sustainabilityDesc": "Deeply committed to minimizing our environmental footprint and protecting delicate marine ecosystems.",
+      "excellence": "Excellence",
+      "excellenceDesc": "Delivering superior quality, precision, and craftsmanship in every project, no matter the scale.",
+      "collaboration": "Collaboration",
+      "collaborationDesc": "Fostering strong partnerships and seamless teamwork to achieve extraordinary, large-scale outcomes.",
+      "accountability": "Accountability",
+      "accountabilityDesc": "Taking full ownership of our actions, decisions, and the long-term success of our infrastructure builds.",
+      "empowerment": "Empowerment",
+      "empowermentDesc": "Investing heavily in our people, nurturing talent, and encouraging decisive leadership at every organizational level."
+    },
+    "directors": {
+      "chairman": "Chairman and Managing Director",
+      "ceo": "Group CEO & Director",
+      "cofounder": "Co-Founder & Director"
+    }
+  },
+
+  "fleet": {
+    "sectionLabel": "Advanced Machinery",
+    "our": "Our",
+    "fleet": "Fleet.",
+    "desc": "Equipped with a state-of-the-art maritime fleet, we execute the most complex coastal and deep-water engineering projects worldwide. Explore our vessels below.",
+    "vessels": {
+      "01": { "type": "Crew Boat",              "function": "High-Speed Transport" },
+      "02": { "type": "Support Vessel",         "function": "Offshore Supply & Logistics" },
+      "03": { "type": "Crane Barge",            "function": "Heavy Lifting & Installation" },
+      "04": { "type": "Heavy Dredger",          "function": "Deep Channel Dredging" },
+      "05": { "type": "Flat Top Barge",         "function": "Bulk Material Transport" },
+      "06": { "type": "Piling Rig",             "function": "Marine Foundation & Drilling" },
+      "07": { "type": "Cutter Suction Dredger", "function": "Land Reclamation Services" },
+      "08": { "type": "Cutter Suction Dredger", "function": "Land Reclamation Services" }
+    }
+  },
+
+  "projects": {
+    "ourPortfolio": "Our Portfolio",
+    "engineering": "Engineering",
+    "the": "the",
+    "future": "Future.",
+    "theArchive": "The Archive",
+    "projectIndex": "Project",
+    "index": "Index",
+    "archiveDesc": "A precise architectural archive of our engineering defiance, spanning decades of maritime and heavy infrastructure development.",
+    "filter": "Filter",
+    "searchPlaceholder": "Search clients or projects...",
+    "noResults": "No projects match your search criteria.",
+    "loadMore": "Load More",
+    "no": "No.",
+    "client": "Client",
+    "projectDetails": "Project Details",
+    "entity": "Entity",
+    "startAProject": "Start a Project",
+    "readyTo": "Ready to",
+    "build": "Build?",
+    "readyToBuildDesc": "Partner with us to engineer solutions that redefine the boundaries of maritime and heavy infrastructure.",
+    "initiateConsultation": "Initiate Consultation",
+    "carousel": {
+      "01": { "subtitle": "MARINE CONSTRUCTION" },
+      "02": { "subtitle": "DREDGING & RECLAMATION" },
+      "03": { "subtitle": "PORT DEVELOPMENT" }
+    }
+  },
+
+  "archive": {
+    "sectionLabel": "Archive",
+    "sectionTitle": "More Projects",
+    "viewFullArchive": "View Full Archive",
+    "categories": {
+      "port":     "Port",
+      "marine":   "Marine Construction",
+      "dredging": "Dredging and Reclamation",
+      "urban":    "Urban Infrastructure"
+    },
+    "locations": {
+      "mumbai":    "Mumbai, India",
+      "gujarat":   "Gujarat, India",
+      "chennai":   "Chennai, India",
+      "madras":    "Madras, India",
+      "tamilnadu": "Tamil Nadu, India",
+      "odisha":    "Odisha, India",
+      "varanasi":  "Varanasi, India"
+    }
+  },
+
+  "testimonials": {
+    "sectionLabel": "Client Perspectives",
+    "entries": {
+      "01": {
+        "quote": "We are immensely satisfied with the performance of Meka while executing the work. They are committed to achieve the targets and complete the work. They have got a large marine spread and extensive experience to take up challenging marine works. We wish them success in their future ventures.",
+        "role":  "Additional GM - Projects, Vatech Wabag"
+      },
+      "02": {
+        "quote": "Meka Dredging have performed to our entire satisfaction while executing this work. They have got the experienced and skilled staff to execute such and similar works. We wish them success for their future ventures!",
+        "role":  "Reliance Industries"
+      },
+      "03": {
+        "quote": "The work has been carried out in an excellent workmanship like manner. The project displayed Amma Lines professionalism and technical expertise for marine works. They have got the experienced staff and a team of specialized underwater divers to take up challenging work. They have also got a large fleet of marine equipments and dredging equipments. We are immensely satisfied with their performance. We strongly recommend Amma Lines for such and similar marine construction works and wish them all the success for their ventures.",
+        "role":  "DGM - Civil Projects, L & T Hazira Works"
+      }
+    }
+  },
+
+  "companies": {
+    "ourDivisions": "Our Divisions",
+    "theMeka": "The Meka",
+    "group": "group.",
+    "divisionsDesc": "Operating through nine highly specialized divisions, Meka Group delivers integrated, end-to-end engineering solutions for the world's most demanding environments.",
+    "theEcosystem": "The Powerhouse",
+    "nine": "One Vision,",
+    "strengths": "Nine Forces.",
+    "ecosystemDesc": "A unified force of specialized entities operating across marine construction, dredging, port development, infrastructure, and consulting since 1978.",
+    "index": "Index",
+    "est": "Est.",
+    "visitWebsite": "Visit Website",
+    "workWithUs": "Work With Us",
+    "oneGroup": "One Legacy,",
+    "nineStrengths": "Infinite Reach.",
+    "ctaDesc": "Each company brings specialized expertise. Together, they deliver integrated solutions for the world's most demanding maritime and infrastructure projects.",
+    "getInTouch": "Get in Touch",
+    "viewProjects": "View Projects",
+    "entities": {
+      "ammalines": {
+        "subtitle": "Marine & Coastal Construction",
+        "description": "The flagship marine construction arm of the Meka Group. With a 40-year legacy, Amma Lines has built most of India's major breakwaters — including the longest at Tuticorin Port — along with jetties, cofferdams, caissons, and coastal protection infrastructure.",
+        "specialties": ["Breakwater Construction", "Pile & Block Jetties", "Sheet Piling", "Cofferdam & Caisson Works", "Soil Improvement"],
+        "statLabel": "Of Maharashtra's Jetties"
+      },
+      "mekadredging": {
+        "subtitle": "Capital Dredging & Reclamation",
+        "description": "One of India's leading capital dredging companies, operating an advanced fleet of cutter suction and trailing suction hopper dredgers. From deep-water channel maintenance to large-scale land reclamation, we reshape India's coastline.",
+        "specialties": ["CSD & TSHD Operations", "Land Reclamation", "Rock Dredging", "Channel Deepening", "Beach Nourishment"],
+        "statLabel": "Dredging Projects"
+      },
+      "mekainfra": {
+        "subtitle": "Subsea Pipelines & Outfalls",
+        "description": "A leader in subsea intake and outfall pipeline engineering. Meka Infrastructure provides critical infrastructure for desalination plants and industrial cooling systems — including the landmark 100 MLD Nemmelli Desalination Plant.",
+        "specialties": ["Subsea Intake Pipelines", "Outfall Systems", "Desalination Infrastructure", "Trenching & Backfilling", "Pipeline Installation"],
+        "statLabel": "Nemmelli Plant"
+      },
+      "mekaheavy": {
+        "subtitle": "Offshore Fabrication & Shipbuilding",
+        "description": "A strategic arm dedicated to high-capacity fabrication, shipbuilding, and structural solutions for the offshore and energy sectors. Delivering heavy-lift platforms and marine structures built to the most demanding specifications.",
+        "specialties": ["Heavy Fabrication", "Shipbuilding", "Offshore Structures", "Structural Steel Works", "Marine Equipment"],
+        "statLabel": "Lift Specialists"
+      },
+      "indiaports": {
+        "subtitle": "Port Development & Operations",
+        "description": "The port development division managing the landmark Rewas Port — a 50-year concession from the Government of Maharashtra. India Ports is creating one of India's deepest and most modern port facilities through a partnership with Reliance.",
+        "specialties": ["Greenfield Port Development", "BOOST Model", "Terminal Operations", "Navigation Engineering", "Port Infrastructure"],
+        "statLabel": "Rewas Concession"
+      },
+      "virajce": {
+        "subtitle": "Marine & Geotechnical Consulting",
+        "description": "End-to-end project management, hydrographic surveys, and technical consultancy for coastal and marine infrastructure. Viraj provides the engineering intelligence that underpins complex offshore and harbor projects.",
+        "specialties": ["Hydrographic Surveys", "Geotechnical Investigations", "Project Management", "Marine Design Consulting", "Environmental Assessments"],
+        "statLabel": "Marine Specialists"
+      },
+      "mekaconsultants": {
+        "subtitle": "Strategic & Management Advisory",
+        "description": "A multidisciplinary consultancy offering strategic management, human capital services, and technical advisory. From IT solutions and manpower to financial consulting, Meka Consultants supports the group's diverse operations.",
+        "specialties": ["Strategic Advisory", "Human Capital Services", "IT Solutions", "Financial Consulting", "Project Advisory"],
+        "statLabel": "Disciplinary"
+      },
+      "meka-realty": {
+        "subtitle": "Premium Urban Development",
+        "description": "Entering the real estate space with a vision to create sustainable, functional urban environments. Meka Realty brings the same engineering rigor from our marine heritage into premium residential and commercial developments in Mumbai.",
+        "specialties": ["Residential Development", "Commercial Properties", "Sustainable Design", "Urban Regeneration", "Mixed-use Projects"],
+        "statLabel": "Flagship Market"
+      },
+      "meka-education": {
+        "subtitle": "Knowledge & Skill Development",
+        "description": "Foraying into the education sector with a commitment to building the next generation of engineering talent. Meka Education focuses on maritime studies, vocational training, and technical skill development programs.",
+        "specialties": ["Maritime Studies", "Vocational Training", "Technical Education", "Skill Development", "Industry Partnerships"],
+        "statLabel": "Generation"
+      }
+    }
+  },
+
+  "business": {
+    "ourBusinesses": "Our Businesses",
+    "integrated": "Integrated",
+    "solutions": "Solutions",
+    "heroDesc": "From marine construction and dredging to port development and urban infrastructure — five specialized verticals delivering end-to-end engineering solutions across India and the Middle East.",
+    "getInTouch": "Get in Touch",
+    "letsBuild": "Let's Build",
+    "together": "Together.",
+    "ctaDesc": "Whether it's a new marine EPC project, port development, or urban infrastructure — we'd love to hear from you.",
+    "contactUs": "Contact Us",
+    "viewProjects": "View Projects",
+    "taglines": {
+      "marine": "Foundation of the Group",
+      "dredging": "Reshaping Coastlines",
+      "infrastructure": "Building Livable Cities",
+      "port": "Gateways of Commerce",
+      "estate": "Premium Urban Living"
+    },
+    "verticals": {
+      "marine": {
+        "title": "Marine\nConstruction",
+        "description": "Based on principles of innovation and engineering, our marine construction projects form the foundation of the Meka Group. From coastal protection and breakwaters to port facilities and offshore structures, we build infrastructure that withstands the harshest marine environments.",
+        "statLabel": "Years Experience",
+        "services": [
+          "Coastal Protection & Revetment",
+          "Port & Harbor Development",
+          "Offshore Platforms & Structures",
+          "Underwater Construction & Maintenance",
+          "Marina & Waterfront Development"
+        ]
+      },
+      "dredging": {
+        "title": "Dredging &\nReclamation",
+        "description": "One of India's top capital dredging and reclamation companies, operating an advanced fleet of cutter suction and trailing suction hopper dredgers. We maintain vital waterways, create land from the sea, and execute deep-water channel projects with centimeter-level precision.",
+        "statLabel": "Dredging Projects",
+        "services": [
+          "Capital & Maintenance Dredging",
+          "Land Reclamation",
+          "Beach Nourishment",
+          "Underwater Rock Blasting",
+          "Channel Deepening"
+        ]
+      },
+      "infrastructure": {
+        "title": "Urban\nInfrastructure",
+        "description": "Taking up EPC work for the urban infrastructure segment — from intake and outfall pipelines to sheet piling, treatment plants, and ground improvement. We deliver the critical systems that cities depend on for water, sanitation, and resilience.",
+        "statLabel": "MLD Nemmelli Plant",
+        "services": [
+          "Intake & Outfall Pipelines",
+          "Sheet Piling & Retaining Walls",
+          "Water Treatment Plants",
+          "Ground Improvement Works",
+          "Subsea Utility Installations"
+        ]
+      },
+      "port": {
+        "title": "Port\nDevelopment",
+        "description": "Design and development of ports on Build-Own-Operate-Share-Transfer basis. Our landmark Rewas Port project — a 50-year concession from the Government of Maharashtra — exemplifies our vision for creating India's deepest and most modern port facilities.",
+        "statLabel": "Rewas Concession",
+        "services": [
+          "Greenfield Port Development",
+          "Terminal Design & Construction",
+          "Navigation Channel Engineering",
+          "Breakwater & Berth Construction",
+          "Port Operations & Management"
+        ]
+      },
+      "estate": {
+        "title": "Real\nEstate",
+        "description": "Developing quality residential and commercial spaces in India's largest real estate market. Meka Realty brings the same engineering rigor and commitment to excellence from our marine heritage into creating sustainable urban environments.",
+        "statLabel": "Flagship Market",
+        "services": [
+          "Premium Residential Development",
+          "Commercial Complexes",
+          "Sustainable Design & Construction",
+          "Urban Regeneration Projects",
+          "Mixed-use Developments"
+        ]
+      }
+    }
+  },
+
+  "careers": {
+    "joinTheLegacy": "Join the Legacy",
+    "build": "Build",
+    "withUs": "With Us",
+    "heroDesc": "Four decades of engineering excellence. Join a team that reshapes coastlines, builds tomorrow's infrastructure, and engineers resilience into every project.",
+    "whyMekaGroup": "Why Meka Group",
+    "legacyOfExcellence": "Legacy of Excellence",
+    "legacyDesc": "45+ years of pioneering marine construction and coastal infrastructure across India and beyond.",
+    "diverseOpportunities": "Diverse Opportunities",
+    "diverseDesc": "Nine specialized companies spanning marine, dredging, ports, infrastructure, real estate, and consulting.",
+    "growthImpact": "Growth & Impact",
+    "growthDesc": "Work on landmark projects that shape India's coastline and infrastructure for generations to come.",
+    "openPositions": "Open Positions",
+    "dontSeeYourRole": "Don't see your role?",
+    "sendResume": "Send us your resume",
+    "getInTouch": "Get in Touch",
+    "jobApplication": "Job Application",
+    "applicationSuccess": "Application submitted successfully!",
+    "applicationSuccessDetail": "Please also email your CV to <strong>careers@meka.com</strong> for faster processing.",
+    "applicationError": "Something went wrong. Please try again or email careers@meka.com directly.",
+    "groups": {
+      "management":  "Management",
+      "engineering": "Engineering",
+      "legal":       "Contracts & Legal",
+      "crew":        "Marine Crew",
+      "support":     "Specialist & Support",
+      "other":       "Other"
+    },
+    "steps": {
+      "personal":     "Personal",
+      "position":     "Position",
+      "location":     "Location",
+      "compensation": "Compensation",
+      "resume":       "Resume"
+    },
+    "sections": {
+      "personal":     "Personal Information",
+      "position":     "Position & Experience",
+      "location":     "Location Details",
+      "compensation": "Compensation & Current Role",
+      "resume":       "Resume & Submission"
+    },
+    "fields": {
+      "fullName":         "Full Name",
+      "email":            "Email",
+      "phone":            "Phone Number",
+      "dob":              "Date of Birth",
+      "foundOpening":     "Where did you find this opening?",
+      "specify":          "Please specify",
+      "whichPosition":    "Which position are you interested in?",
+      "notFresher":       "If you are not a fresher, apply for a position you have experience in.",
+      "searchPositions":  "Search positions...",
+      "clear":            "Clear",
+      "noMatches":        "No positions match \"{{query}}\"",
+      "selectPosition":   "Please select a position",
+      "specifyPosition":  "Specify position",
+      "yearsExperience":  "Years of Experience",
+      "availability":     "Availability to Join",
+      "required":         "Required",
+      "presentCity":      "Present City",
+      "presentState":     "Present State",
+      "hometown":         "Hometown / City",
+      "homeState":        "Home State",
+      "distanceWorli":    "Distance from Meka Group HQ, Worli Mumbai",
+      "distanceDetail":   "Only for Head office applicants",
+      "presentSalary":    "Present / Last Salary (INR Lacs)",
+      "expectedSalary":   "Expected Salary (INR Lacs)",
+      "salaryNote":       "If in USD/AED/QAR, preface with currency",
+      "currentCompany":   "Current / Last Company, Location & Designation",
+      "smoke":            "Do you smoke?",
+      "drink":            "Do you drink?",
+      "yes":              "Yes",
+      "no":               "No",
+      "resumeText":       "Paste your resume text here"
+    },
+    "nav": {
+      "back":      "Back",
+      "next":      "Next",
+      "submit":    "Submit Application",
+      "submitting": "Submitting…"
+    }
+  },
+
+  "contact": {
+    "globalPartnerships": "Global Partnerships",
+    "connect": "Connect",
+    "intelligence": "Intelligence",
+    "headquarters": "Headquarters",
+    "directChannels": "Direct Channels",
+    "regionalHubs": "Regional Hubs",
+    "operations": "Operations",
+    "meHub": "ME Hub",
+    "apacHub": "APAC Hub",
+    "theProjectBrief": "The Project Brief",
+    "name": "Name",
+    "corporateEmail": "Corporate Email",
+    "inquiryCategory": "Inquiry Category",
+    "messagePlaceholder": "Brief description of the scope...",
+    "initiateDiscussion": "Initiate Discussion",
+    "messageSent": "Mission Protocol Initiated: Message Sent.",
+    "messageError": "Transmission Interrupted: Please try again.",
+    "phonePlaceholder": "Phone (optional)",
+    "phoneSrLabel": "Phone",
+    "categories": {
+      "Marine EPC":         "Marine EPC",
+      "Dredging":           "Dredging",
+      "Subsea":             "Subsea",
+      "Heavy Engineering":  "Heavy Engineering",
+      "Other":              "Other"
+    }
+  },
+
+  "footer": {
+    "tagline": "Engineering resilience. Forging maritime infrastructure at a global scale.",
+    "directory": "Directory",
+    "headquarters": "Headquarters",
+    "presence": "Presence",
+    "copyright": "© 2026 Meka Group. Precise Engineering.",
+    "addressLine1": "Shiv Sagar Estate, Worli,",
+    "addressLine2": "Mumbai, MH 400018"
+  },
+
+  "notFound": {
+    "pageTitle": "404 — Page Not Found | Meka Group",
+    "errorLabel": "Error 404",
+    "lost": "Lost",
+    "atSea": " at Sea.",
+    "desc": "The page you're looking for doesn't exist or has been moved.",
+    "backHome": "Back to Home"
+  },
+
+  "langSwitcher": {
+    "en": "EN",
+    "hi": "हिं",
+    "ar": "عر"
+  },
+
+  "assistant": {
+    "open": "Open Meka Assistant",
+    "close": "Close Meka Assistant",
+    "dialogLabel": "Meka Assistant chat",
+    "title": "Meka Assistant",
+    "subtitle": "Ask about our work, fleet & services",
+    "greeting": "Hi — I'm Meka Assistant. Ask me about our fleet, projects, or capabilities across marine, dredging and infrastructure.",
+    "thinking": "Thinking…",
+    "placeholder": "Ask Meka Assistant…",
+    "placeholderNoKey": "Chat is not configured",
+    "send": "Send message",
+    "disclaimer": "Powered by Gemini · Responses may be inaccurate",
+    "fallbackReply": "Sorry — I wasn't able to generate a reply. Please try rephrasing.",
+    "errorUnavailable": "The assistant is temporarily unavailable. Please try again.",
+    "errorNotConfigured": "Chat is not configured. Please reach us via the Contact page.",
+    "errorReplyUpstream": "I ran into a problem reaching the assistant service. You can still reach us via the Contact page.",
+    "errorReplyNoKey": "The assistant isn't connected right now. You can still reach us via the Contact page.",
+    "prompts": {
+      "services": "What services does Meka offer?",
+      "offshore": "Do you do offshore pipeline work?",
+      "dredger": "Which dredger suits deep channel work?",
+      "quote": "How do I request a quote?"
+    }
+  },
+
+  "calculator": {
+    "sectionLabel": "Capability Calculator",
+    "pageTitle": "Capability Calculator | Meka Group",
+    "pageDescription": "Scope your marine, dredging or infrastructure project in three steps. Get matched to the right Meka entity and fleet assets before you talk to our team.",
+    "heading": "Scope your project",
+    "intro": "Three quick steps — we'll match your project to the right Meka entity and suggest fleet assets before you talk to our team.",
+    "steps": {
+      "type": "Type",
+      "region": "Region",
+      "scale": "Scale",
+      "result": "Result"
+    },
+    "questions": {
+      "typeTitle": "What kind of project?",
+      "typeSubtitle": "Pick the primary scope. We'll handle hybrid and multi-discipline work too.",
+      "regionTitle": "Where is it?",
+      "regionSubtitle": "We've mobilised across all Indian coasts, inland waterways and the Gulf.",
+      "scaleTitle": "What's the scale?",
+      "scaleSubtitle": "Rough scope — you can always refine this with our engineering team."
+    },
+    "types": {
+      "port": { "label": "Ports & Harbours", "desc": "Breakwaters, berths, wharves, fishery harbours" },
+      "marine": { "label": "Marine Construction", "desc": "Jetties, caisson bridges, piled structures" },
+      "dredging": { "label": "Dredging & Reclamation", "desc": "Cutter suction, maintenance, land reclamation" },
+      "offshore": { "label": "Offshore Pipelines", "desc": "HDPE pipeline LSTK, intake/outfall, trenching" },
+      "urban": { "label": "Urban Infrastructure", "desc": "Water mains, canal earthwork, shore protection" }
+    },
+    "regions": {
+      "west": { "label": "West Coast India", "desc": "Mumbai, Gujarat, Kerala" },
+      "east": { "label": "East Coast India", "desc": "Chennai, Odisha, Andhra" },
+      "inland": { "label": "Inland India", "desc": "Canals, rivers, reservoirs" },
+      "gulf": { "label": "Gulf / Middle East", "desc": "Qatar, UAE, Saudi offshore" },
+      "other": { "label": "Other / International", "desc": "Tell us more" }
+    },
+    "scales": {
+      "small": { "label": "Small", "desc": "Under 3 months · single-vessel deployment" },
+      "medium": { "label": "Medium", "desc": "3–12 months · multi-asset project" },
+      "large": { "label": "Large / EPC", "desc": "12+ months · full-scope LSTK contract" }
+    },
+    "result": {
+      "label": "Recommended Match",
+      "capacitySmall": "Focused single-team deployment with rapid mobilisation.",
+      "capacityMedium": "Multi-asset deployment coordinated by the relevant Meka entity.",
+      "capacityLarge": "Full EPC / LSTK execution with coordinated Meka Group delivery.",
+      "regionGulf": "Active track record in Qatar and the Middle East offshore — ready to mobilise.",
+      "regionInland": "Inland execution capability from canal earthwork and water-main projects.",
+      "regionDefault": "Strong operational base across Indian coasts with established logistics.",
+      "summaryType": "Project Type",
+      "summaryRegion": "Region",
+      "summaryScale": "Scale",
+      "fleetHeading": "Suggested Fleet Assets",
+      "cta": "Talk to {{entity}}",
+      "reset": "Start over",
+      "back": "← Back"
+    }
+  }
+}

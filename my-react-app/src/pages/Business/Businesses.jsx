@@ -8,111 +8,45 @@
 //  Port Development, Real Estate
 // ═══════════════════════════════════════════════════════════════
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
+import { Helmet } from "react-helmet-async";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link, useLocation } from "react-router-dom";
 import Footer from "../../components/layout/Footer";
+import { useTranslation } from "react-i18next";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const BUSINESSES = [
-  {
-    id: "01",
-    slug: "marine",
-    title: "Marine\nConstruction",
-    tagline: "Foundation of the Group",
-    description:
-      "Based on principles of innovation and engineering, our marine construction projects form the foundation of the Meka Group. From coastal protection and breakwaters to port facilities and offshore structures, we build infrastructure that withstands the harshest marine environments.",
-    services: [
-      "Coastal Protection & Revetment",
-      "Port & Harbor Development",
-      "Offshore Platforms & Structures",
-      "Underwater Construction & Maintenance",
-      "Marina & Waterfront Development",
-    ],
-    image: "/projects/image2.png",
-    stat: { value: "45+", label: "Years Experience" },
-    company: "Amma Lines Pvt. Ltd.",
-  },
-  {
-    id: "02",
-    slug: "dredging",
-    title: "Dredging &\nReclamation",
-    tagline: "Reshaping Coastlines",
-    description:
-      "One of India's top capital dredging and reclamation companies, operating an advanced fleet of cutter suction and trailing suction hopper dredgers. We maintain vital waterways, create land from the sea, and execute deep-water channel projects with centimeter-level precision.",
-    services: [
-      "Capital & Maintenance Dredging",
-      "Land Reclamation",
-      "Beach Nourishment",
-      "Underwater Rock Blasting",
-      "Channel Deepening",
-    ],
-    image: "/business/dredging.jpg",
-    stat: { value: "150+", label: "Dredging Projects" },
-    company: "Meka Dredging Company",
-  },
-  {
-    id: "03",
-    slug: "infrastructure",
-    title: "Urban\nInfrastructure",
-    tagline: "Building Livable Cities",
-    description:
-      "Taking up EPC work for the urban infrastructure segment — from intake and outfall pipelines to sheet piling, treatment plants, and ground improvement. We deliver the critical systems that cities depend on for water, sanitation, and resilience.",
-    services: [
-      "Intake & Outfall Pipelines",
-      "Sheet Piling & Retaining Walls",
-      "Water Treatment Plants",
-      "Ground Improvement Works",
-      "Subsea Utility Installations",
-    ],
-    image: "/business/infra.jpg",
-    stat: { value: "100", label: "MLD Nemmelli Plant" },
-    company: "Meka Infrastructure Pvt. Ltd.",
-  },
-  {
-    id: "04",
-    slug: "port",
-    title: "Port\nDevelopment",
-    tagline: "Gateways of Commerce",
-    description:
-      "Design and development of ports on Build-Own-Operate-Share-Transfer basis. Our landmark Rewas Port project — a 50-year concession from the Government of Maharashtra — exemplifies our vision for creating India's deepest and most modern port facilities.",
-    services: [
-      "Greenfield Port Development",
-      "Terminal Design & Construction",
-      "Navigation Channel Engineering",
-      "Breakwater & Berth Construction",
-      "Port Operations & Management",
-    ],
-    image: "/more_projects/nhava_sheva.jpg",
-    stat: { value: "50yr", label: "Rewas Concession" },
-    company: "India Ports",
-  },
-  {
-    id: "05",
-    slug: "estate",
-    title: "Real\nEstate",
-    tagline: "Premium Urban Living",
-    description:
-      "Developing quality residential and commercial spaces in India's largest real estate market. Meka Realty brings the same engineering rigor and commitment to excellence from our marine heritage into creating sustainable urban environments.",
-    services: [
-      "Premium Residential Development",
-      "Commercial Complexes",
-      "Sustainable Design & Construction",
-      "Urban Regeneration Projects",
-      "Mixed-use Developments",
-    ],
-    image: "/business/estate.jpg",
-    stat: { value: "Mumbai", label: "Flagship Market" },
-    company: "Meka Realty",
-  },
+// Structural data — stat values, images, company/brand names stay constant
+// across locales. Title, description, services, taglines and stat labels are
+// resolved via t() inside the component.
+const BUSINESS_META = [
+  { id: "01", slug: "marine",         image: "/projects/image2.png",           stat: "45+",    company: "Amma Lines Pvt. Ltd." },
+  { id: "02", slug: "dredging",       image: "/business/dredging.jpg",         stat: "150+",   company: "Meka Dredging Company" },
+  { id: "03", slug: "infrastructure", image: "/business/infra.jpg",            stat: "100",    company: "Meka Infrastructure Pvt. Ltd." },
+  { id: "04", slug: "port",           image: "/more_projects/nhava_sheva.jpg", stat: "50yr",   company: "India Ports" },
+  { id: "05", slug: "estate",         image: "/business/estate.jpg",           stat: "Mumbai", company: "Meka Realty" },
 ];
 
 export default function BusinessesPage() {
+  const { t } = useTranslation();
   const containerRef = useRef(null);
   const location = useLocation();
+
+  const BUSINESSES = useMemo(
+    () =>
+      BUSINESS_META.map((b) => ({
+        ...b,
+        title:       t(`business.verticals.${b.slug}.title`),
+        tagline:     t(`business.taglines.${b.slug}`),
+        description: t(`business.verticals.${b.slug}.description`),
+        services:    t(`business.verticals.${b.slug}.services`, { returnObjects: true }),
+        statLabel:   t(`business.verticals.${b.slug}.statLabel`),
+      })),
+    [t]
+  );
 
   // ── Scroll to hash section (e.g. /business#marine) ──
   useEffect(() => {
@@ -120,9 +54,9 @@ export default function BusinessesPage() {
       const id = location.hash.replace("#", "");
       const element = document.getElementById(id);
       if (element) {
-        setTimeout(() => {
+        requestAnimationFrame(() => {
           element.scrollIntoView({ behavior: "smooth" });
-        }, 100);
+        });
       }
     } else {
       window.scrollTo(0, 0);
@@ -208,30 +142,34 @@ export default function BusinessesPage() {
 
   return (
     <main ref={containerRef} className="bg-[#f5f5f0] text-[#050505] selection:bg-[#0ea5a4] selection:text-white overflow-x-hidden">
+      <Helmet>
+        <title>Our Businesses | Meka Group — Marine, Dredging, Ports & Infrastructure</title>
+        <meta name="description" content="Explore Meka Group's five specialized business verticals: Marine Construction, Dredging & Reclamation, Port Development, Urban Infrastructure, and Real Estate." />
+      </Helmet>
 
       {/* ═══════════════════════════════════════
           1. HERO
           ═══════════════════════════════════════ */}
-      <section className="hero-section relative w-full pt-48 pb-20 px-6 md:px-16 overflow-hidden bg-[#f5f5f0] flex flex-col justify-end min-h-[70vh]">
+      <section className="hero-section relative w-full pt-28 sm:pt-36 md:pt-48 pb-16 md:pb-20 px-6 md:px-16 overflow-hidden bg-[#f5f5f0] flex flex-col justify-end min-h-[60vh] md:min-h-[70vh]">
 
         <div className="relative z-10 w-full max-w-[1600px] mx-auto">
           <span className="hero-subtitle block text-[#0ea5a4] text-xs font-sans tracking-[0.4em] uppercase font-bold mb-8">
-            Our Businesses
+            {t("business.ourBusinesses")}
           </span>
 
-          <h1 className="text-[16vw] lg:text-[11vw] font-serif uppercase tracking-tighter leading-[0.85] text-[#050505] mix-blend-multiply mb-10">
+          <h1 className="text-[16vw] lg:text-[11vw] 2xl:text-[10rem] font-serif uppercase tracking-tighter leading-[0.85] text-[#050505] mix-blend-multiply mb-10">
             <span className="block overflow-hidden py-5 -my-5">
-              <span className="hero-word block">Integrated</span>
+              <span className="hero-word block">{t("business.integrated")}</span>
             </span>
             <span className="block overflow-hidden py-5 -my-5 lg:ml-[8vw]">
-              <span className="hero-word block text-black/20">Solutions</span>
+              <span className="hero-word block text-black/20">{t("business.solutions")}</span>
             </span>
           </h1>
 
           <div className="w-full max-w-xl lg:ml-[8vw]">
             <div className="hero-line w-16 h-[2px] bg-[#0ea5a4] mb-8 origin-left" />
             <p className="hero-desc text-lg md:text-xl text-gray-600 font-sans leading-relaxed">
-              From marine construction and dredging to port development and urban infrastructure — five specialized verticals delivering end-to-end engineering solutions across India and the Middle East.
+              {t("business.heroDesc")}
             </p>
           </div>
         </div>
@@ -262,20 +200,23 @@ export default function BusinessesPage() {
                   {/* Image */}
                   <div className={`lg:col-span-7 ${isEven ? "" : "lg:[direction:ltr]"}`}>
                     <div className="biz-img-wrapper relative aspect-[16/10] overflow-hidden rounded-sm bg-zinc-200 shadow-2xl">
+                      {/* Removed grayscale and filter transition classes here */}
                       <img
                         src={biz.image}
                         alt={biz.title.replace("\n", " ")}
-                        className="biz-img absolute left-0 right-0 -top-[8%] w-full h-[116%] object-cover transition-[filter] duration-1000 grayscale hover:grayscale-0"
+                        loading="lazy"
+                        decoding="async"
+                        className="biz-img absolute left-0 right-0 -top-[8%] w-full h-[116%] object-cover"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
 
                       {/* Stat badge */}
-                      <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 bg-white/95 backdrop-blur-sm px-5 py-4 md:px-6 md:py-5 rounded-sm shadow-lg">
+                      <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 bg-white md:bg-white/95 md:backdrop-blur-sm px-5 py-4 md:px-6 md:py-5 rounded-sm shadow-lg">
                         <span className="block text-2xl md:text-3xl font-serif text-[#050505] leading-none mb-1">
-                          {biz.stat.value}
+                          {biz.stat}
                         </span>
                         <span className="block text-[9px] md:text-[10px] font-sans tracking-[0.2em] uppercase text-gray-500 font-bold">
-                          {biz.stat.label}
+                          {biz.statLabel}
                         </span>
                       </div>
                     </div>
@@ -328,30 +269,30 @@ export default function BusinessesPage() {
           3. CTA
           ═══════════════════════════════════════ */}
       <section className="cta-section relative py-40 md:py-56 px-6 md:px-12 overflow-hidden bg-[#f5f5f0] border-t border-black/[0.06]">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[30vw] font-serif text-black/[0.02] leading-none pointer-events-none select-none whitespace-nowrap">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[30vw] 2xl:text-[28rem] font-serif text-black/[0.02] leading-none pointer-events-none select-none whitespace-nowrap">
           MEKA
         </div>
 
         <div className="cta-text max-w-4xl mx-auto text-center relative z-10">
           <span className="text-[#0ea5a4] text-[11px] font-sans tracking-[0.4em] uppercase font-bold mb-8 block">
-            Get in Touch
+            {t("business.getInTouch")}
           </span>
           <h2 className="text-5xl md:text-7xl lg:text-8xl font-serif uppercase tracking-tighter text-[#050505] mb-6 leading-[0.9]">
-            Let's Build<br />
-            <span className="text-black/15">Together.</span>
+            {t("business.letsBuild")}<br />
+            <span className="text-black/15">{t("business.together")}</span>
           </h2>
           <p className="text-gray-500 text-base md:text-lg font-sans leading-relaxed max-w-xl mx-auto mb-14">
-            Whether it's a new marine EPC project, port development, or urban infrastructure — we'd love to hear from you.
+            {t("business.ctaDesc")}
           </p>
           <div className="flex flex-wrap justify-center gap-5">
             <Link to="/contact"
               className="group relative px-10 md:px-12 py-4 md:py-5 bg-[#050505] text-white text-[10px] md:text-[11px] tracking-[0.3em] uppercase font-bold overflow-hidden rounded-sm">
               <span className="absolute inset-0 bg-[#0ea5a4] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]" />
-              <span className="relative z-10">Contact Us</span>
+              <span className="relative z-10">{t("business.contactUs")}</span>
             </Link>
             <Link to="/projects"
               className="px-10 md:px-12 py-4 md:py-5 border border-black/15 text-[#050505] text-[10px] md:text-[11px] tracking-[0.3em] uppercase font-bold hover:border-[#0ea5a4] hover:text-[#0ea5a4] transition-all duration-500 rounded-sm">
-              View Projects
+              {t("business.viewProjects")}
             </Link>
           </div>
         </div>

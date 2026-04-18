@@ -1,42 +1,44 @@
 // src/components/MoreProjects.jsx
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useTranslation } from "react-i18next";
+import useIsMobile from "../../../hooks/useIsMobile";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Added an "img" property to each project (cycling through your images)
-const archiveProjects = [
-  { year: "1988", name: "Vallsons Nhava Sheva Port", category: "Port", location: "Mumbai, India", img: "/more_projects/nhava_sheva.jpg" },
-  { year: "1977", name: "Government of Gujrat Port", category: "Port", location: "Gujrat, India", img: "/more_projects/government_of_gujrat.jpg" },
-  { year: "2023", name: "Marg Limited", category: "Port", location: "Chennai, India", img: "/more_projects/marg_limited.jpg" },
-  // { year: "2022", name: "Hindustan Const. Co. Ltd.", category: "Port", location: "Chennai, India", img: "/more_projects/" },
-
-  // { year: "2021", name: "Grasim Industries Ltd. ", category: "Marine Construction", location: "Mumabi, India", img: "/more_projects/" },
-  { year: "1984", name: "Krishak Bharathi Co-operative Ltd.", category: "Marine Construction", location: "Mumabi, India", img: "/more_projects/krishak.jpg" },
-  { year: "1986", name: "Madras Port", category: "Marine Construction", location: "Madras, India", img: "/more_projects/madras_port.jpg" },
-  // { year: "2021", name: "Andhra Civil Construction Co, Chennai", category: "Marine Construction", location: "Andhra Pradesh, India", img: "/more_projects/" },
-  // { year: "2021", name: "Government of Tamil Nadu", category: "Marine Construction", location: "Tamil Nadu, India", img: "/more_projects/" },
-  { year: "1992", name: "Vikram Ispat Ltd.", category: "Marine Construction", location: "Tamil Nadu, India", img: "/more_projects/vikram_ispat.jpg" },
-
-  // { year: "2021", name: "Mazagaon Dock Ltd.", category: "Dredging and Reclamation Company in India", location: "Odisha, India", img: "/more_projects/" },
-  { year: "1990", name: "Jawaharlal Nehru Port Trust JNPT.", category: "Dredging and Reclamation Company in India", location: "Odisha, India", img: "/more_projects/jnpt.jpg" },
-  // { year: "2021", name: "Orrisa Construction Corporation Ltd.", category: "Dredging and Reclamation Company in India", location: "Odisha, India", img: "/more_projects/" },
-  { year: "2010", name: "Larsen & Tourbo Ltd.", category: "Dredging and Reclamation Company in India", location: "Odisha, India", img: "/more_projects/landt.jpg" },
-  // { year: "2021", name: "Dronagiri Prakalpagrast Jalvahatuk V Dredging Sahakari Sanstha Maryadit", category: "Dredging and Reclamation Company in India", location: "Odisha, India", img: "/more_projects/" },
-
-  { year: "1996", name: "B.M.C", category: "Urban Infrastructure", location: "Varanasi, India", img: "/more_projects/bmc.jpg" },
-  // { year: "2020", name: "Mumbai Muncipal Corp. of Greater Mumbai", category: "Urban Infrastructure", location: "Varanasi, India", img: "/more_projects/" },
-  // { year: "2020", name: "Bholasingh Jaiprakash Co Ltd. Baroda", category: "Urban Infrastructure", location: "Varanasi, India", img: "/more_projects/" },
-  { year: "1987", name: "Urmila & Company, Mumbai", category: "Urban Infrastructure", location: "Mumbai, India", img: "/more_projects/urmila.jpg" },
-  // { year: "2020", name: "Hindustani Const. Co. Ltd. Chennai", category: "Urban Infrastructure", location: "Varanasi, India", img: "/more_projects/" },
+// Client names stay Latin across locales. Category + location are resolved
+// via t() using the shared archive.categories / archive.locations dictionaries.
+const ARCHIVE_META = [
+  { year: "1988", name: "Vallsons Nhava Sheva Port",        category: "port",     location: "mumbai",    img: "/more_projects/nhava_sheva.jpg" },
+  { year: "1977", name: "Government of Gujarat Port",        category: "port",     location: "gujarat",   img: "/more_projects/government_of_gujrat.jpg" },
+  { year: "2023", name: "Marg Limited",                      category: "port",     location: "chennai",   img: "/more_projects/marg_limited.jpg" },
+  { year: "1984", name: "Krishak Bharathi Co-operative Ltd.", category: "marine",   location: "mumbai",    img: "/more_projects/krishak.jpg" },
+  { year: "1986", name: "Madras Port",                       category: "marine",   location: "madras",    img: "/more_projects/madras_port.jpg" },
+  { year: "1992", name: "Vikram Ispat Ltd.",                 category: "marine",   location: "tamilnadu", img: "/more_projects/vikram_ispat.jpg" },
+  { year: "1990", name: "Jawaharlal Nehru Port Trust JNPT.", category: "dredging", location: "odisha",    img: "/more_projects/jnpt.jpg" },
+  { year: "2010", name: "Larsen & Toubro Ltd.",              category: "dredging", location: "odisha",    img: "/more_projects/landt.jpg" },
+  { year: "1996", name: "B.M.C",                             category: "urban",    location: "varanasi",  img: "/more_projects/bmc.jpg" },
+  { year: "1987", name: "Urmila & Company, Mumbai",          category: "urban",    location: "mumbai",    img: "/more_projects/urmila.jpg" },
 ];
 
 const MoreProjects = () => {
+  const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const containerRef = useRef(null);
   const previewRef = useRef(null);
   const [hoveredIndex, setHoveredIndex] = useState(null);
+
+  const archiveProjects = useMemo(
+    () =>
+      ARCHIVE_META.map((p) => ({
+        ...p,
+        category: t(`archive.categories.${p.category}`),
+        location: t(`archive.locations.${p.location}`),
+      })),
+    [t]
+  );
 
   useGSAP(() => {
     // 1. HEADER ENTRANCE
@@ -85,28 +87,32 @@ const MoreProjects = () => {
       );
     });
 
-    // 3. CURSOR FOLLOWER LOGIC (Smooth quickTo setup)
+    // 3. CURSOR FOLLOWER LOGIC (desktop only — pure waste on touch devices)
+    if (isMobile || !previewRef.current) return;
+
     const xTo = gsap.quickTo(previewRef.current, "x", { duration: 0.4, ease: "power3" });
     const yTo = gsap.quickTo(previewRef.current, "y", { duration: 0.4, ease: "power3" });
 
     const handleMouseMove = (e) => {
       // Offset by half the width/height of the preview box to center it on the cursor
-      xTo(e.clientX - 150); 
+      xTo(e.clientX - 150);
       yTo(e.clientY - 100);
     };
 
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
 
-  }, { scope: containerRef });
+  }, { scope: containerRef, dependencies: [isMobile] });
 
-  // Handle Hover States for the Image Preview
+  // Handle Hover States for the Image Preview — desktop only
   const handleMouseEnter = (index) => {
+    if (isMobile) return;
     setHoveredIndex(index);
     gsap.to(previewRef.current, { scale: 1, autoAlpha: 1, duration: 0.3, ease: "back.out(1.5)" });
   };
 
   const handleMouseLeave = () => {
+    if (isMobile) return;
     setHoveredIndex(null);
     gsap.to(previewRef.current, { scale: 0.8, autoAlpha: 0, duration: 0.3, ease: "power2.in" });
   };
@@ -114,22 +120,26 @@ const MoreProjects = () => {
   return (
     <section ref={containerRef} className="w-full bg-[#f5f5f0] text-[#0a0a0a] py-24 md:py-40 px-6 md:px-12 lg:px-24 z-10 relative overflow-hidden">
       
-      {/* --- THE FLOATING IMAGE PREVIEW --- */}
-      <div 
-        ref={previewRef}
-        className="fixed top-0 left-0 w-75 h-50 pointer-events-none z-100 overflow-hidden opacity-0 invisible shadow-2xl scale-75"
-      >
-        <div className="w-full h-full bg-[#0a0a0a]/50 relative">
-          {archiveProjects.map((project, i) => (
-            <img 
-              key={i}
-              src={project.img} 
-              alt={project.name}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${hoveredIndex === i ? 'opacity-100' : 'opacity-0'}`}
-            />
-          ))}
+      {/* --- THE FLOATING IMAGE PREVIEW (desktop only — skips 10 image loads on mobile) --- */}
+      {!isMobile && (
+        <div
+          ref={previewRef}
+          className="fixed top-0 left-0 w-75 h-50 pointer-events-none z-100 overflow-hidden opacity-0 invisible shadow-2xl scale-75"
+        >
+          <div className="w-full h-full bg-[#0a0a0a]/50 relative">
+            {archiveProjects.map((project, i) => (
+              <img
+                key={i}
+                src={project.img}
+                alt={project.name}
+                loading="lazy"
+                decoding="async"
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${hoveredIndex === i ? 'opacity-100' : 'opacity-0'}`}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="max-w-7xl mx-auto">
         
@@ -137,14 +147,14 @@ const MoreProjects = () => {
         <div className="archive-header mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#0a0a0a]/15 pb-10">
           <div>
             <h2 className="text-sm md:text-base uppercase tracking-[0.4em] text-[#0ea5a4] mb-4 font-medium">
-              Archive
+              {t("archive.sectionLabel")}
             </h2>
             <h3 className="text-4xl md:text-6xl font-bold tracking-tight">
-              More Projects
+              {t("archive.sectionTitle")}
             </h3>
           </div>
           <button className="text-sm tracking-[0.2em] uppercase font-light text-[#0a0a0a]/40 hover:text-[#0a0a0a] transition-colors flex items-center gap-2 group">
-            View Full Archive
+            {t("archive.viewFullArchive")}
             <span className="transform transition-transform group-hover:translate-x-2">→</span>
           </button>
         </div>
@@ -181,13 +191,13 @@ const MoreProjects = () => {
                   <span className="text-xs md:text-sm tracking-[0.2em] uppercase text-[#0a0a0a]/35 w-32 group-hover:text-[#0a0a0a]/70 transition-colors">
                     {project.category}
                   </span>
-                  <span className="md:pl-20 text-sm md:text-base font-light text-[#0a0a0a]/50 group-hover:text-[#0a0a0a] transition-colors">
+                  <span className="md:ps-20 text-sm md:text-base font-light text-[#0a0a0a]/50 group-hover:text-[#0a0a0a] transition-colors">
                     {project.location}
                   </span>
                 </div>
-                
-                <div className="row-text overflow-hidden w-8 h-8 flex items-center justify-center opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 text-[#0ea5a4]">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+
+                <div className="row-text overflow-hidden w-8 h-8 flex items-center justify-center opacity-0 -translate-x-4 rtl:translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 text-[#0ea5a4]">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 rtl:-scale-x-100">
                     <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
                   </svg>
                 </div>

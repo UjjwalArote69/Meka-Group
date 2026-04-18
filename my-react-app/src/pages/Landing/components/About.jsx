@@ -3,53 +3,14 @@ import React, { useRef, useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { useTranslation } from "react-i18next";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const storyChapters = [
-  {
-    id: "1979",
-    title: "Establishment in Mumbai",
-    text: "Meka Group began its journey in Mumbai under the vision of Dr. Meka Vijay Papa Rao (PhD, UIUC), focusing on specialized civil and marine engineering solutions for India's growing coastline.",
-  },
-  {
-    id: "1982",
-    title: "Foundation of Amma Lines",
-    text: "The group established Amma Lines Ltd, which became a cornerstone of the organization, eventually building nearly 70% of the new jetties and ports across Maharashtra and Tamil Nadu.",
-  },
-  {
-    id: "1995",
-    title: "Leadership in Subsea Engineering",
-    text: "Meka Infrastructure was founded, establishing the group as a leader in subsea intake and outfall pipelines, providing critical infrastructure for desalination and industrial cooling systems.",
-  },
-  {
-    id: "2002",
-    title: "The Rewas Port Milestone",
-    text: "The Government of Maharashtra awarded the group a 50-year concession to develop the Rewas Port. This mega-project, later partnered with Reliance, aimed to create one of India's deepest ports.",
-  },
-  {
-    id: "2010",
-    title: "Deep-Water Port Innovation",
-    text: "Based on proprietary design patents, the group received approval to develop a ₹6,000 crore deep-water port in West Bengal, further diversifying its port development portfolio.",
-  },
-  {
-    id: "2013",
-    title: "Nemmelli Desalination Success",
-    text: "Successfully executed the landmark 100 MLD subsea intake outfall pipeline for the Nemmelli Desalination Plant, demonstrating world-class precision in subsea utility installations.",
-  },
-  {
-    id: "2018",
-    title: "International Expansion",
-    text: "Leveraging its diverse fleet of dredgers and marine equipment, the group expanded operations into the Middle East, notably securing infrastructure and environmental roles in Qatar.",
-  },
-  {
-    id: "2024",
-    title: "Global Marine EPC Leader",
-    text: "Today, Meka Group is recognized as a premier partner for Marine EPC, dredging, and offshore installations, serving government agencies and global energy corporations with a focus on innovation.",
-  },
-];
+const CHAPTER_IDS = ["1979", "1982", "1995", "2002", "2010", "2013", "2018", "2024"];
 
 const About = () => {
+  const { t } = useTranslation();
   const containerRef = useRef(null);
 
   // Robust layout recalculation to prevent premature triggering
@@ -163,61 +124,61 @@ const About = () => {
         {/* Section Header */}
         <div className="mb-32 md:mb-48 relative z-20">
           <h2 className="text-sm md:text-base uppercase tracking-[0.4em] text-[#0ea5a4] mb-4 font-medium">
-            About Us
+            {t("about.sectionLabel")}
           </h2>
           <h3 className="text-4xl md:text-7xl font-bold tracking-tight">
-            Our Legacy
+            {t("about.sectionTitle")}
           </h3>
         </div>
 
         {/* Chapters Wrapper */}
         <div className="chapters-wrapper flex flex-col gap-32 md:gap-48 relative">
-          
-          {/* Global Background Track */}
-          <div className="hidden md:block absolute left-[30%] top-4 bottom-12 w-px bg-white/10 z-0" />
-          
-          {/* Global Animated Progress Fill (Tailwind classes removed to let GSAP handle it) */}
-          <div className="hidden md:block absolute left-[30%] top-4 bottom-12 w-px z-10">
+
+          {/* Global Background Track — mirrored via start-* so RTL flips the rail to the right */}
+          <div className="hidden md:block absolute start-[30%] top-4 bottom-12 w-px bg-white/10 z-0" />
+
+          {/* Global Animated Progress Fill */}
+          <div className="hidden md:block absolute start-[30%] top-4 bottom-12 w-px z-10">
             <div className="scroll-progress-line w-full h-full bg-[#0ea5a4]" />
           </div>
 
-          {storyChapters.map((chapter) => (
-            <div 
-              key={chapter.id} 
+          {CHAPTER_IDS.map((id) => (
+            <div
+              key={id}
               className="story-chapter flex flex-col md:flex-row relative"
               style={{ perspective: "1000px" }}
             >
-              
+
               {/* Massive Background Watermark */}
-              <div className="chapter-watermark absolute -top-10 md:-top-20 left-0 md:left-[10%] text-8xl md:text-[180px] font-black text-white/5 select-none pointer-events-none z-0 tracking-tighter">
-                {chapter.id}
+              <div className="chapter-watermark absolute -top-10 md:-top-20 start-0 md:start-[10%] text-8xl md:text-[180px] font-black text-white/5 select-none pointer-events-none z-0 tracking-tighter">
+                {id}
               </div>
 
-              {/* Node Indicator */}
-              <div className="hidden md:block absolute left-[30%] top-3 -translate-x-1.5 z-20">
+              {/* Node Indicator — sits on the rail */}
+              <div className="hidden md:block absolute start-[30%] top-3 -translate-x-1.5 rtl:translate-x-1.5 z-20">
                 <div className="chapter-dot w-3 h-3 rounded-full bg-white transition-colors" />
               </div>
 
               {/* Wrapped content for 3D Reveal */}
               <div className="text-wrapper flex flex-col md:flex-row w-full transform-gpu origin-bottom z-10 relative">
-                
-                {/* Fixed Overlap: Left Side matches the 30% line position */}
-                <div className="md:w-[30%] pr-12 md:pr-20 mb-6 md:mb-0 mt-1">
+
+                {/* Left column (year + title) — uses logical end-padding so it flips in RTL */}
+                <div className="md:w-[30%] pe-12 md:pe-20 mb-6 md:mb-0 mt-1">
                   <span className="block text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
-                    {chapter.id}
+                    {id}
                   </span>
                   <h4 className="text-xl md:text-3xl font-semibold leading-snug text-gray-200">
-                    {chapter.title}
+                    {t(`about.chapters.${id}.title`)}
                   </h4>
                 </div>
 
-                {/* Right Side: Story Text */}
-                <div className="md:w-[70%] md:pl-24 pt-2 md:pt-4">
+                {/* Right column (story text) — logical start-padding clears the rail on both sides */}
+                <div className="md:w-[70%] md:ps-24 pt-2 md:pt-4">
                   <p className="text-base md:text-2xl leading-relaxed text-gray-400 font-light">
-                    {chapter.text}
+                    {t(`about.chapters.${id}.text`)}
                   </p>
                 </div>
-                
+
               </div>
 
             </div>

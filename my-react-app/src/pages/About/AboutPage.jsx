@@ -1,15 +1,18 @@
 import React, { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Footer from "../../components/layout/Footer";
+import { useTranslation } from "react-i18next";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function AboutPage() {
   const pageRef = useRef(null);
   const location = useLocation();
+  const { t } = useTranslation();
 
   // ── ROUTING: Scroll to Hash IDs (e.g., #values) ──
   useEffect(() => {
@@ -17,9 +20,9 @@ export default function AboutPage() {
       const id = location.hash.replace("#", "");
       const element = document.getElementById(id);
       if (element) {
-        setTimeout(() => {
+        requestAnimationFrame(() => {
           element.scrollIntoView({ behavior: "smooth" });
-        }, 100);
+        });
       }
     } else {
       window.scrollTo(0, 0);
@@ -117,6 +120,10 @@ export default function AboutPage() {
 
   return (
     <main ref={pageRef} className="bg-[#f5f5f0] min-h-screen text-[#050505] w-full overflow-x-hidden selection:bg-[#0ea5a4] selection:text-white">
+      <Helmet>
+        <title>About Us | Meka Group — 45+ Years of Maritime Excellence</title>
+        <meta name="description" content="Learn about Meka Group's 45+ year legacy in marine construction, our board of directors, and the core values driving engineering excellence across India." />
+      </Helmet>
 
       {/* --- 1. HERO SECTION --- */}
       <section id="about" className="hero-section relative w-full min-h-screen pt-32 md:pt-40 pb-20 px-6 md:px-12 flex items-center overflow-hidden bg-[#f5f5f0]">
@@ -136,45 +143,48 @@ export default function AboutPage() {
           <div className="lg:col-span-7 flex flex-col z-20">
             <div className="overflow-hidden mb-6 md:mb-8">
               <span className="hero-subtitle block text-[#0ea5a4] text-xs md:text-sm font-sans tracking-[0.4em] uppercase font-bold">
-                The Meka Group Story
+                {t("about.theMekaGroupStory")}
               </span>
             </div>
 
-<h1 className="text-[14vw] lg:text-[8.5vw] font-serif uppercase tracking-tighter leading-[0.85] text-[#050505] mix-blend-multiply">
-              <span className="overflow-hidden block py-5 -my-5">
-                <span className="hero-title-word block">Forging</span>
+            <h1 className="text-[14vw] lg:text-[8.5vw] 2xl:text-[9rem] font-serif uppercase tracking-tighter leading-[0.95] text-[#050505] mix-blend-multiply">
+              {/* em-based padding gives Devanagari matras & Arabic diacritics
+                  enough room inside the overflow-hidden reveal wrappers. */}
+              <span className="overflow-hidden block py-[0.2em] -my-[0.2em]">
+                <span className="hero-title-word block">{t("about.forging")}</span>
               </span>
-              <span className="overflow-hidden block py-5 -my-5 ml-[8vw] lg:ml-[4vw]">
-                <span className="hero-title-word block text-black/25">The</span>
+              {/* Logical margin-inline-start flips to the right edge in RTL */}
+              <span className="overflow-hidden block py-[0.2em] -my-[0.2em] ms-[8vw] lg:ms-[4vw]">
+                <span className="hero-title-word block text-black/25">{t("about.the")}</span>
               </span>
-              <span className="overflow-hidden block py-5 -my-5">
-                <span className="hero-title-word block">Future</span>
+              <span className="overflow-hidden block py-[0.2em] -my-[0.2em]">
+                <span className="hero-title-word block">{t("about.future")}</span>
               </span>
             </h1>
 
-            <div className="mt-12 md:mt-16 w-full max-w-md ml-0 lg:ml-[4vw]">
+            <div className="mt-12 md:mt-16 w-full max-w-md ms-0 lg:ms-[4vw]">
               <div className="w-12 h-[2px] bg-[#0ea5a4] mb-6 hero-line origin-left"></div>
               <p className="hero-desc text-base md:text-lg text-gray-700 font-sans leading-relaxed">
-                Decades of maritime engineering excellence. We reshape coastlines, build tomorrow's infrastructure, and engineer resilience into every project.
+                {t("about.heroDesc")}
               </p>
             </div>
           </div>
 
-          {/* Right: Layered Image Container */}
-          <div className="lg:col-span-5 relative mt-12 lg:mt-0 lg:-ml-12 z-10">
-            {/* FIX: ".jgp" → ".jpg" */}
+          {/* Right: Layered Image Container — logical offsets so in RTL the
+              image sits on the left and the accent box floats on the right. */}
+          <div className="lg:col-span-5 relative mt-12 lg:mt-0 lg:-ms-12 z-10">
             <div className="hero-img-wrapper w-full aspect-[4/5] md:aspect-square lg:aspect-[3/4] overflow-hidden rounded-sm shadow-[0_20px_60px_rgba(0,0,0,0.15)] relative bg-zinc-200">
-              <div 
+              <div
                 className="hero-bg-img absolute inset-0 w-full h-full bg-cover bg-center"
-                style={{ backgroundImage: "url('/about_page.jpg')" }} 
+                style={{ backgroundImage: "url('/about_page.jpg')" }}
               />
             </div>
 
-            {/* Floating Accent Box */}
-            <div className="hero-accent-box absolute -bottom-8 -left-8 md:-left-12 bg-white p-6 md:p-8 shadow-2xl rounded-sm border border-black/5 max-w-[200px] md:max-w-[240px] z-20 hidden sm:block">
+            {/* Floating Accent Box — start-based inset mirrors cleanly in RTL */}
+            <div className="hero-accent-box absolute -bottom-8 -start-8 md:-start-12 bg-white p-6 md:p-8 shadow-2xl rounded-sm border border-black/5 max-w-[200px] md:max-w-[240px] z-20 hidden sm:block">
               <span className="text-[#0ea5a4] text-4xl md:text-5xl font-serif block mb-2 leading-none">45+</span>
               <span className="text-[10px] md:text-xs font-sans tracking-[0.2em] uppercase text-gray-500 font-bold leading-relaxed block">
-                Years of Excellence
+                {t("about.yearsOfExcellence")}
               </span>
             </div>
           </div>
@@ -186,10 +196,10 @@ export default function AboutPage() {
       <section className="relative z-10 py-24 md:py-40 px-6 md:px-12 max-w-6xl mx-auto flex justify-start md:justify-end">
         <div className="w-full md:w-[85%]">
           <p className="text-3xl md:text-5xl lg:text-6xl font-serif leading-[1.3] md:leading-[1.2] tracking-tight">
-            <span className="reveal-text text-black/10">Since our inception, Meka Group has stood at the vanguard of maritime engineering. </span>
-            <span className="reveal-text text-black/10">We do not just build infrastructure; we engineer resilience. </span>
-            <span className="reveal-text text-black/10">From complex dredging operations to massive fleet logistics, </span>
-            <span className="reveal-text text-black/10">our legacy is written in the deep waters and towering ports across the subcontinent.</span>
+            <span className="reveal-text text-black/10">{t("about.textReveal1")}</span>
+            <span className="reveal-text text-black/10">{t("about.textReveal2")}</span>
+            <span className="reveal-text text-black/10">{t("about.textReveal3")}</span>
+            <span className="reveal-text text-black/10">{t("about.textReveal4")}</span>
           </p>
         </div>
       </section>
@@ -201,10 +211,10 @@ export default function AboutPage() {
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-y-16 gap-x-8 md:gap-x-6">
             {[
-              { label: "Years of Excellence", target: "45", suffix: "+" },
-              { label: "Vessels in Fleet", target: "25", suffix: "+" },
-              { label: "Major Projects", target: "25", suffix: "+" },
-              { label: "Global Partners", target: "10", suffix: "" }
+              { label: t("stats.yearsOfExcellence"), target: "45", suffix: "+" },
+              { label: t("stats.vesselsInFleet"),    target: "25", suffix: "+" },
+              { label: t("stats.majorProjects"),      target: "25", suffix: "+" },
+              { label: t("stats.globalPartners"),     target: "10", suffix: "" }
             ].map((stat, i) => (
               <div key={i} className="flex flex-col items-center md:items-start text-center md:text-left border-l-0 md:border-l border-black/10 md:pl-8 first:border-0 first:pl-0">
                 <div className="text-6xl md:text-7xl lg:text-8xl font-serif text-[#050505] mb-4 flex items-baseline">
@@ -224,26 +234,28 @@ export default function AboutPage() {
       <section id="board" className="py-32 md:py-48 px-6 md:px-12 max-w-[1600px] mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-20 md:mb-28 gap-8">
           <div className="max-w-3xl">
-            <span className="text-[#0ea5a4] text-xs font-sans tracking-[0.3em] uppercase mb-6 block font-bold">Leadership</span>
-            <h2 className="text-5xl md:text-7xl lg:text-8xl font-serif uppercase tracking-tighter text-[#050505]">Board of Directors</h2>
+            <span className="text-[#0ea5a4] text-xs font-sans tracking-[0.3em] uppercase mb-6 block font-bold">{t("about.leadership")}</span>
+            <h2 className="text-5xl md:text-7xl lg:text-8xl font-serif uppercase tracking-tighter text-[#050505]">{t("about.boardOfDirectors")}</h2>
           </div>
           <p className="max-w-sm text-gray-600 font-sans text-base leading-relaxed md:pb-3">
-            Guided by decades of experience, our leadership team steers Meka Group toward sustainable growth and engineering excellence.
+            {t("about.boardDesc")}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 lg:gap-12">
           {[
-            { name: "Dr. Meka Vijay Paparao", role: "Chairman and Managing Director", img: "/directors/drmekapaparao.jpeg" },
-            { name: "Hemanth Meka Rao", role: "Group CEO & Director", img: "/directors/hemantrao.png" },
-            { name: "M. Rajyalakshmi Rao", role: "Co-Founder & Director", img: "/directors/mrsrajyalaskhmirao.jpg" }
+            { name: "Dr. Meka Vijay Paparao", role: t("about.directors.chairman"), img: "/directors/drmekapaparao.jpeg" },
+            { name: "Hemanth Meka Rao",       role: t("about.directors.ceo"),       img: "/directors/hemantrao.png" },
+            { name: "M. Rajyalakshmi Rao",    role: t("about.directors.cofounder"), img: "/directors/mrsrajyalaskhmirao.jpg" }
           ].map((person, i) => (
             <div key={i} className="group cursor-pointer">
               <div className="relative w-full aspect-[4/5] overflow-hidden bg-zinc-200 mb-8 rounded-sm shadow-xl">
-                <img 
-                  src={person.img} 
-                  alt={person.name} 
-                  className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-[800ms] ease-out" 
+                <img
+                  src={person.img}
+                  alt={person.name}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-[800ms] ease-out"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-50 group-hover:opacity-20 transition-opacity duration-500"></div>
               </div>
@@ -264,28 +276,28 @@ export default function AboutPage() {
           
           <div className="lg:w-1/3">
             <div className="sticky top-40">
-              <span className="text-[#0ea5a4] text-xs font-sans tracking-[0.3em] uppercase mb-6 block font-bold">Core Principles</span>
+              <span className="text-[#0ea5a4] text-xs font-sans tracking-[0.3em] uppercase mb-6 block font-bold">{t("about.corePrinciples")}</span>
               <h2 className="text-5xl md:text-7xl lg:text-8xl font-serif uppercase tracking-tighter text-[#050505] mb-8 leading-[0.9]">
-                Our<br/>Values
+                {t("about.ourValues")}
               </h2>
               <div className="w-12 h-px bg-black/20 mb-8"></div>
               <p className="text-base text-gray-600 font-sans leading-relaxed max-w-sm">
-                These foundational pillars govern every project we undertake, every partnership we build, and every decision we make across our global operations.
+                {t("about.valuesDesc")}
               </p>
             </div>
           </div>
           
           <div className="lg:w-2/3 grid grid-cols-1 sm:grid-cols-2 gap-x-12 lg:gap-x-16 gap-y-16 md:gap-y-24">
             {[
-              { title: "Safety First", desc: "Uncompromising commitment to the health and safety of our workforce, partners, and the communities we operate in." },
-              { title: "Resilience", desc: "Engineering infrastructure that withstands the test of time and the harshest marine environments." },
-              { title: "Innovation", desc: "Leveraging cutting-edge technology and advanced engineering methods to solve complex maritime challenges." },
-              { title: "Integrity", desc: "Upholding the highest standards of transparency, honesty, and ethics in all global operations." },
-              { title: "Sustainability", desc: "Deeply committed to minimizing our environmental footprint and protecting delicate marine ecosystems." },
-              { title: "Excellence", desc: "Delivering superior quality, precision, and craftsmanship in every project, no matter the scale." },
-              { title: "Collaboration", desc: "Fostering strong partnerships and seamless teamwork to achieve extraordinary, large-scale outcomes." },
-              { title: "Accountability", desc: "Taking full ownership of our actions, decisions, and the long-term success of our infrastructure builds." },
-              { title: "Empowerment", desc: "Investing heavily in our people, nurturing talent, and encouraging decisive leadership at every organizational level." }
+              { title: t("about.values.safetyFirst"),     desc: t("about.values.safetyFirstDesc") },
+              { title: t("about.values.resilience"),      desc: t("about.values.resilienceDesc") },
+              { title: t("about.values.innovation"),      desc: t("about.values.innovationDesc") },
+              { title: t("about.values.integrity"),       desc: t("about.values.integrityDesc") },
+              { title: t("about.values.sustainability"),  desc: t("about.values.sustainabilityDesc") },
+              { title: t("about.values.excellence"),      desc: t("about.values.excellenceDesc") },
+              { title: t("about.values.collaboration"),   desc: t("about.values.collaborationDesc") },
+              { title: t("about.values.accountability"),  desc: t("about.values.accountabilityDesc") },
+              { title: t("about.values.empowerment"),     desc: t("about.values.empowermentDesc") }
             ].map((val, i) => (
               <div key={i} className="relative pt-8 border-t border-black/10 group transition-all duration-300 hover:border-[#0ea5a4]">
                 <span className="absolute -top-3.5 left-0 bg-white pr-4 text-[#0ea5a4] text-sm font-sans tracking-[0.2em] font-bold block transition-transform duration-300 group-hover:-translate-y-1">

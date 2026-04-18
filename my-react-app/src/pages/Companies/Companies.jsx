@@ -6,131 +6,49 @@
 //  Scrolling Marquees, Sticky Text, Parallax Image Reveals
 // ═══════════════════════════════════════════════════════════════
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
+import { Helmet } from "react-helmet-async";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link, useLocation } from "react-router-dom";
 import Footer from "../../components/layout/Footer";
+import { useTranslation } from "react-i18next";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const COMPANIES = [
-  {
-    slug: "ammalines",
-    name: "Amma Lines",
-    subtitle: "Marine & Coastal Construction",
-    founded: "1982",
-    description:
-      "The flagship marine construction arm of the Meka Group. With a 40-year legacy, Amma Lines has built most of India's major breakwaters — including the longest at Tuticorin Port — along with jetties, cofferdams, caissons, and coastal protection infrastructure.",
-    specialties: ["Breakwater Construction", "Pile & Block Jetties", "Sheet Piling", "Cofferdam & Caisson Works", "Soil Improvement"],
-    image: "/companies/meka_amma_lines.webp",
-    stat: { value: "70%", label: "Of Maharashtra's Jetties" },
-    website: "http://www.ammalines.com/",
-    layout: "landscape" // Ultra-wide cinematic image
-  },
-  {
-    slug: "mekadredging",
-    name: "Meka Dredging",
-    subtitle: "Capital Dredging & Reclamation",
-    founded: "1990",
-    description:
-      "One of India's leading capital dredging companies, operating an advanced fleet of cutter suction and trailing suction hopper dredgers. From deep-water channel maintenance to large-scale land reclamation, we reshape India's coastline.",
-    specialties: ["CSD & TSHD Operations", "Land Reclamation", "Rock Dredging", "Channel Deepening", "Beach Nourishment"],
-    image: "/companies/meka_dregding.webp",
-    stat: { value: "150+", label: "Dredging Projects" },
-    layout: "portrait-right" // Compact image right
-  },
-  {
-    slug: "mekainfra",
-    name: "Meka Infrastructure",
-    subtitle: "Subsea Pipelines & Outfalls",
-    founded: "1995",
-    description:
-      "A leader in subsea intake and outfall pipeline engineering. Meka Infrastructure provides critical infrastructure for desalination plants and industrial cooling systems — including the landmark 100 MLD Nemmelli Desalination Plant.",
-    specialties: ["Subsea Intake Pipelines", "Outfall Systems", "Desalination Infrastructure", "Trenching & Backfilling", "Pipeline Installation"],
-    image: "/companies/meka_infra.png",
-    stat: { value: "100 MLD", label: "Nemmelli Plant" },
-    layout: "portrait-left" // Compact image left
-  },
-  {
-    slug: "mekaheavy",
-    name: "Meka Heavy Engineering",
-    subtitle: "Offshore Fabrication & Shipbuilding",
-    founded: "2005",
-    description:
-      "A strategic arm dedicated to high-capacity fabrication, shipbuilding, and structural solutions for the offshore and energy sectors. Delivering heavy-lift platforms and marine structures built to the most demanding specifications.",
-    specialties: ["Heavy Fabrication", "Shipbuilding", "Offshore Structures", "Structural Steel Works", "Marine Equipment"],
-    image: "/companies/meka_heavy_engineering.webp",
-    stat: { value: "Heavy", label: "Lift Specialists" },
-    layout: "landscape"
-  },
-  {
-    slug: "indiaports",
-    name: "India Ports",
-    subtitle: "Port Development & Operations",
-    founded: "2002",
-    description:
-      "The port development division managing the landmark Rewas Port — a 50-year concession from the Government of Maharashtra. India Ports is creating one of India's deepest and most modern port facilities through a partnership with Reliance.",
-    specialties: ["Greenfield Port Development", "BOOST Model", "Terminal Operations", "Navigation Engineering", "Port Infrastructure"],
-    image: "/companies/india_port.jpg",
-    stat: { value: "50yr", label: "Rewas Concession" },
-    layout: "portrait-right"
-  },
-  {
-    slug: "virajce",
-    name: "Viraj Consulting Engineers",
-    subtitle: "Marine & Geotechnical Consulting",
-    founded: "1998",
-    description:
-      "End-to-end project management, hydrographic surveys, and technical consultancy for coastal and marine infrastructure. Viraj provides the engineering intelligence that underpins complex offshore and harbor projects.",
-    specialties: ["Hydrographic Surveys", "Geotechnical Investigations", "Project Management", "Marine Design Consulting", "Environmental Assessments"],
-    image: "/companies/meka_viraj.webp",
-    stat: { value: "PMC", label: "Marine Specialists" },
-    layout: "portrait-left"
-  },
-  {
-    slug: "mekaconsultants",
-    name: "Meka Consultants",
-    subtitle: "Strategic & Management Advisory",
-    founded: "2000",
-    description:
-      "A multidisciplinary consultancy offering strategic management, human capital services, and technical advisory. From IT solutions and manpower to financial consulting, Meka Consultants supports the group's diverse operations.",
-    specialties: ["Strategic Advisory", "Human Capital Services", "IT Solutions", "Financial Consulting", "Project Advisory"],
-    image: "/companies/meka_consultants.jpg",
-    stat: { value: "Multi", label: "Disciplinary" },
-    layout: "landscape"
-  },
-  {
-    slug: "meka-realty",
-    name: "Meka Realty",
-    subtitle: "Premium Urban Development",
-    founded: "2015",
-    description:
-      "Entering the real estate space with a vision to create sustainable, functional urban environments. Meka Realty brings the same engineering rigor from our marine heritage into premium residential and commercial developments in Mumbai.",
-    specialties: ["Residential Development", "Commercial Properties", "Sustainable Design", "Urban Regeneration", "Mixed-use Projects"],
-    image: "/companies/meka_realty.jpg",
-    stat: { value: "Mumbai", label: "Flagship Market" },
-    layout: "portrait-right"
-  },
-  {
-    slug: "meka-education",
-    name: "Meka Education",
-    subtitle: "Knowledge & Skill Development",
-    founded: "2022",
-    description:
-      "Foraying into the education sector with a commitment to building the next generation of engineering talent. Meka Education focuses on maritime studies, vocational training, and technical skill development programs.",
-    specialties: ["Maritime Studies", "Vocational Training", "Technical Education", "Skill Development", "Industry Partnerships"],
-    image: "/logo.png",
-    stat: { value: "Next", label: "Generation" },
-    layout: "portrait-left"
-  },
+// Structural data — brand names, dates, stat values, images and layout stay
+// constant across locales. Subtitle, description, specialties, stat label
+// come from the locale via companies.entities.<slug>.
+const COMPANY_META = [
+  { slug: "ammalines",        name: "Amma Lines",                founded: "1982", image: "/companies/meka_amma_lines.webp",        stat: "70%",     website: "http://www.ammalines.com/", layout: "landscape" },
+  { slug: "mekadredging",     name: "Meka Dredging",             founded: "1990", image: "/companies/meka_dregding.webp",          stat: "150+",                                       layout: "portrait-right" },
+  { slug: "mekainfra",        name: "Meka Infrastructure",       founded: "1995", image: "/companies/meka_infra.png",              stat: "100 MLD",                                    layout: "portrait-left" },
+  { slug: "mekaheavy",        name: "Meka Heavy Engineering",    founded: "2005", image: "/companies/meka_heavy_engineering.webp", stat: "Heavy",                                      layout: "landscape" },
+  { slug: "indiaports",       name: "India Ports",               founded: "2002", image: "/companies/india_port.jpg",              stat: "50yr",                                       layout: "portrait-right" },
+  { slug: "virajce",          name: "Viraj Consulting Engineers",founded: "1998", image: "/companies/meka_viraj.webp",             stat: "PMC",                                        layout: "portrait-left" },
+  { slug: "mekaconsultants",  name: "Meka Consultants",          founded: "2000", image: "/companies/meka_consultants.jpg",        stat: "Multi",                                      layout: "landscape" },
+  { slug: "meka-realty",      name: "Meka Realty",               founded: "2015", image: "/companies/meka_realty.jpg",             stat: "Mumbai",                                     layout: "portrait-right" },
+  { slug: "meka-education",   name: "Meka Education",            founded: "2022", image: "/logo.png",                              stat: "Next",                                       layout: "portrait-left" },
 ];
 
 export default function CompaniesPage() {
+  const { t } = useTranslation();
   const containerRef = useRef(null);
   const location = useLocation();
   const navBarRef = useRef(null);
+
+  const COMPANIES = useMemo(
+    () =>
+      COMPANY_META.map((c) => ({
+        ...c,
+        subtitle:    t(`companies.entities.${c.slug}.subtitle`),
+        description: t(`companies.entities.${c.slug}.description`),
+        specialties: t(`companies.entities.${c.slug}.specialties`, { returnObjects: true }),
+        statLabel:   t(`companies.entities.${c.slug}.statLabel`),
+      })),
+    [t]
+  );
 
   // ── Scroll to hash ──
   useEffect(() => {
@@ -138,11 +56,11 @@ export default function CompaniesPage() {
       const id = location.hash.replace("#", "");
       const element = document.getElementById(id);
       if (element) {
-        setTimeout(() => {
+        requestAnimationFrame(() => {
           const offset = navBarRef.current ? navBarRef.current.offsetHeight + 40 : 100;
           const elementPosition = element.getBoundingClientRect().top + window.scrollY;
           window.scrollTo({ top: elementPosition - offset, behavior: "smooth" });
-        }, 100);
+        });
       }
     } else {
       window.scrollTo(0, 0);
@@ -236,6 +154,10 @@ export default function CompaniesPage() {
 
   return (
     <>
+      <Helmet>
+        <title>Our Companies | Meka Group — Nine Specialized Entities</title>
+        <meta name="description" content="Discover the nine companies of Meka Group: Amma Lines, Meka Dredging, Meka Infrastructure, India Ports, Viraj Consulting, and more." />
+      </Helmet>
       <main ref={containerRef} className="bg-[#f5f5f0] text-[#050505] selection:bg-[#0ea5a4] selection:text-white overflow-x-hidden relative">
 
         {/* ── Architectural Structural Line ── */}
@@ -244,25 +166,25 @@ export default function CompaniesPage() {
         {/* ═══════════════════════════════════════
             1. HERO (Minimalist & Marquee)
             ═══════════════════════════════════════ */}
-        <section className="hero-section relative w-full pt-48 pb-12 px-6 md:px-16 overflow-hidden bg-[#f5f5f0] flex flex-col justify-between min-h-[85vh]">
+        <section className="hero-section relative w-full pt-28 sm:pt-36 md:pt-48 pb-12 px-6 md:px-16 overflow-hidden bg-[#f5f5f0] flex flex-col justify-between min-h-[70vh] md:min-h-[85vh]">
           
           <div className="relative z-10 w-full max-w-[1600px] mx-auto">
             <span className="hero-subtitle block text-[#0ea5a4] text-xs font-sans tracking-[0.4em] uppercase font-bold mb-8">
-              The Ecosystem
+              {t("companies.theEcosystem")}
             </span>
 
-            <h1 className="text-[16vw] lg:text-[11vw] font-serif uppercase tracking-tighter leading-[0.85] text-[#050505] mix-blend-multiply mb-12 lg:mb-16">
+            <h1 className="text-[16vw] lg:text-[11vw] 2xl:text-[10rem] font-serif uppercase tracking-tighter leading-[0.85] text-[#050505] mix-blend-multiply mb-12 lg:mb-16">
               <span className="block overflow-hidden py-5 -my-5">
-                <span className="hero-word block">Nine</span>
+                <span className="hero-word block">{t("companies.nine")}</span>
               </span>
               <span className="block overflow-hidden py-5 -my-5 lg:ml-[8vw]">
-                <span className="hero-word block text-black/20">Strengths</span>
+                <span className="hero-word block text-black/20">{t("companies.strengths")}</span>
               </span>
             </h1>
 
             <div className="w-full max-w-xl lg:ml-[8vw]">
               <p className="hero-desc text-lg md:text-xl text-gray-600 font-sans leading-relaxed">
-                A unified force of specialized entities operating across marine construction, dredging, port development, infrastructure, and consulting since 1978.
+                {t("companies.ecosystemDesc")}
               </p>
             </div>
           </div>
@@ -272,11 +194,11 @@ export default function CompaniesPage() {
         {/* ═══════════════════════════════════════
             2. QUICK NAV (Sticky jump links)
             ═══════════════════════════════════════ */}
-        <div ref={navBarRef} className="sticky top-0 z-50 bg-[#f5f5f0]/90 backdrop-blur-xl transition-all duration-300">
+        <div ref={navBarRef} className="sticky top-0 z-50 bg-[#f5f5f0] md:bg-[#f5f5f0]/90 md:backdrop-blur-xl transition-all duration-300">
           <div className="max-w-[1600px] mx-auto px-6 md:px-16 py-4 overflow-x-auto no-scrollbar border-b border-black/[0.05]">
             <div className="flex gap-3 md:gap-4 items-center min-w-max">
               <span className="text-[10px] font-sans font-bold tracking-[0.3em] uppercase text-black/30 mr-2 md:mr-6">
-                Index
+                {t("companies.index")}
               </span>
               {COMPANIES.map((co) => (
                 <a
@@ -307,7 +229,7 @@ export default function CompaniesPage() {
                       
                       <div className="lg:col-span-4 lg:sticky lg:top-36 flex flex-col pt-4">
                         <span className="text-[#0ea5a4] text-xl font-serif font-bold mb-4">
-                          {String(index + 1).padStart(2, "0")} / <span className="text-[11px] font-sans uppercase tracking-[0.2em] font-normal text-black/40">Est. {co.founded}</span>
+                          {String(index + 1).padStart(2, "0")} / <span className="text-[11px] font-sans uppercase tracking-[0.2em] font-normal text-black/40">{t("companies.est")} {co.founded}</span>
                         </span>
                         
                         <h2 className="text-reveal text-5xl md:text-6xl font-serif uppercase tracking-tighter leading-[0.9] text-[#050505] mb-4">
@@ -321,11 +243,11 @@ export default function CompaniesPage() {
                       <div className="lg:col-span-8">
                         {/* Shorter cinematic banner (aspect-[21/9]) */}
                         <div className="company-img-wrapper relative aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-sm bg-white shadow-xl group mb-10 border border-black/[0.06]">
-                          <img src={co.image} alt={co.name} className="company-img absolute -inset-[10%] w-[120%] h-[120%] object-contain p-12 md:p-20 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" />
+                          <img src={co.image} alt={co.name} loading="lazy" decoding="async" className="company-img absolute -inset-[10%] w-[120%] h-[120%] object-contain p-12 md:p-20 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" />
                           
-                          <div className="stat-badge absolute bottom-4 left-4 md:bottom-8 md:left-8 bg-[#f5f5f0]/95 backdrop-blur-xl px-6 py-5 md:px-8 md:py-6 rounded-sm shadow-2xl border border-white/20">
-                            <span className="block text-3xl md:text-5xl font-serif text-[#050505] leading-none mb-2 tracking-tight">{co.stat.value}</span>
-                            <span className="block text-[9px] md:text-[10px] font-sans tracking-[0.25em] uppercase text-[#0ea5a4] font-bold">{co.stat.label}</span>
+                          <div className="stat-badge absolute bottom-4 left-4 md:bottom-8 md:left-8 bg-[#f5f5f0] md:bg-[#f5f5f0]/95 md:backdrop-blur-xl px-6 py-5 md:px-8 md:py-6 rounded-sm shadow-2xl border border-white/20">
+                            <span className="block text-3xl md:text-5xl font-serif text-[#050505] leading-none mb-2 tracking-tight">{co.stat}</span>
+                            <span className="block text-[9px] md:text-[10px] font-sans tracking-[0.25em] uppercase text-[#0ea5a4] font-bold">{co.statLabel}</span>
                           </div>
                         </div>
 
@@ -339,7 +261,7 @@ export default function CompaniesPage() {
                             </div>
                             {co.website && (
                               <a href={co.website} target="_blank" rel="noopener noreferrer" className="text-reveal group/link inline-flex items-center gap-4 text-[10px] md:text-[11px] font-sans font-bold tracking-[0.3em] uppercase text-[#050505] hover:text-[#0ea5a4] transition-colors duration-300">
-                                Visit Website
+                                {t("companies.visitWebsite")}
                                 <span className="relative flex items-center justify-center w-8 h-8 rounded-full border border-black/10 group-hover/link:border-[#0ea5a4] transition-colors duration-300">
                                   <svg className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" /></svg>
                                 </span>
@@ -364,11 +286,11 @@ export default function CompaniesPage() {
                     {/* Compact Image (aspect-[4/3] instead of extremely tall) */}
                     <div className={`lg:col-span-5 ${!isImageRight ? "lg:[direction:ltr]" : ""}`}>
                       <div className="company-img-wrapper relative aspect-[4/3] overflow-hidden rounded-sm bg-white shadow-xl group border border-black/[0.06]">
-                        <img src={co.image} alt={co.name} className="company-img absolute -inset-[10%] w-[120%] h-[120%] object-contain p-12 md:p-20 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" />
+                        <img src={co.image} alt={co.name} loading="lazy" decoding="async" className="company-img absolute -inset-[10%] w-[120%] h-[120%] object-contain p-12 md:p-20 grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" />
                         
-                        <div className="stat-badge absolute bottom-4 right-4 md:bottom-6 md:right-6 bg-[#f5f5f0]/95 backdrop-blur-xl px-5 py-4 md:px-6 md:py-5 rounded-sm shadow-2xl border border-white/20 text-right">
-                          <span className="block text-2xl md:text-4xl font-serif text-[#050505] leading-none mb-1 md:mb-2 tracking-tight">{co.stat.value}</span>
-                          <span className="block text-[8px] md:text-[9px] font-sans tracking-[0.25em] uppercase text-[#0ea5a4] font-bold">{co.stat.label}</span>
+                        <div className="stat-badge absolute bottom-4 right-4 md:bottom-6 md:right-6 bg-[#f5f5f0] md:bg-[#f5f5f0]/95 md:backdrop-blur-xl px-5 py-4 md:px-6 md:py-5 rounded-sm shadow-2xl border border-white/20 text-right">
+                          <span className="block text-2xl md:text-4xl font-serif text-[#050505] leading-none mb-1 md:mb-2 tracking-tight">{co.stat}</span>
+                          <span className="block text-[8px] md:text-[9px] font-sans tracking-[0.25em] uppercase text-[#0ea5a4] font-bold">{co.statLabel}</span>
                         </div>
                       </div>
                     </div>
@@ -377,7 +299,7 @@ export default function CompaniesPage() {
                       <div className="flex items-center gap-4 mb-6">
                         <span className="text-[#0ea5a4] text-xl font-serif font-bold">{String(index + 1).padStart(2, "0")}</span>
                         <div className="w-10 h-px bg-black/20" />
-                        <span className="text-[10px] font-sans tracking-[0.3em] uppercase text-black/40 font-bold">Est. {co.founded}</span>
+                        <span className="text-[10px] font-sans tracking-[0.3em] uppercase text-black/40 font-bold">{t("companies.est")} {co.founded}</span>
                       </div>
 
                       <h2 className="text-reveal text-4xl md:text-6xl font-serif uppercase tracking-tighter leading-[0.9] text-[#050505] mb-4">
@@ -399,7 +321,7 @@ export default function CompaniesPage() {
                       {co.website && (
                         <div className="text-reveal">
                           <a href={co.website} target="_blank" rel="noopener noreferrer" className="group/link inline-flex items-center gap-4 text-[10px] md:text-[11px] font-sans font-bold tracking-[0.3em] uppercase text-[#050505] hover:text-[#0ea5a4] transition-colors duration-300">
-                            Visit Website
+                            {t("companies.visitWebsite")}
                             <span className="relative flex items-center justify-center w-8 h-8 rounded-full border border-black/10 group-hover/link:border-[#0ea5a4] transition-colors duration-300">
                               <svg className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" /></svg>
                             </span>
@@ -421,30 +343,30 @@ export default function CompaniesPage() {
             4. CTA
             ═══════════════════════════════════════ */}
         <section className="cta-section relative py-32 md:py-48 px-6 md:px-16 overflow-hidden bg-[#f5f5f0] border-t border-black/[0.06]">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[32vw] font-serif text-black/[0.02] leading-none pointer-events-none select-none whitespace-nowrap">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[32vw] 2xl:text-[30rem] font-serif text-black/[0.02] leading-none pointer-events-none select-none whitespace-nowrap">
             MEKA
           </div>
 
           <div className="cta-text max-w-4xl mx-auto text-center relative z-10">
             <span className="text-[#0ea5a4] text-[11px] font-sans tracking-[0.4em] uppercase font-bold mb-6 block">
-              Work With Us
+              {t("companies.workWithUs")}
             </span>
             <h2 className="text-5xl md:text-7xl lg:text-8xl font-serif uppercase tracking-tighter text-[#050505] mb-6 leading-[0.85]">
-              One Group,<br />
-              <span className="text-black/15">Nine Strengths.</span>
+              {t("companies.oneGroup")}<br />
+              <span className="text-black/15">{t("companies.nineStrengths")}</span>
             </h2>
             <p className="text-gray-600 text-base md:text-lg font-sans leading-relaxed max-w-2xl mx-auto mb-12">
-              Each company brings specialized expertise. Together, they deliver integrated solutions for the world's most demanding maritime and infrastructure projects.
+              {t("companies.ctaDesc")}
             </p>
             <div className="flex flex-wrap justify-center gap-5">
               <Link to="/contact"
                 className="group relative px-10 md:px-12 py-4 bg-[#050505] text-white text-[10px] tracking-[0.3em] uppercase font-bold overflow-hidden rounded-sm shadow-xl hover:shadow-2xl transition-shadow">
                 <span className="absolute inset-0 bg-[#0ea5a4] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]" />
-                <span className="relative z-10">Get in Touch</span>
+                <span className="relative z-10">{t("companies.getInTouch")}</span>
               </Link>
               <Link to="/projects"
                 className="px-10 md:px-12 py-4 border border-black/15 text-[#050505] text-[10px] tracking-[0.3em] uppercase font-bold hover:border-[#0ea5a4] hover:text-[#0ea5a4] transition-all duration-500 rounded-sm">
-                View Projects
+                {t("companies.viewProjects")}
               </Link>
             </div>
           </div>

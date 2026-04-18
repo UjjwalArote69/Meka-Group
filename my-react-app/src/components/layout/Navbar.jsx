@@ -2,43 +2,45 @@
 // src/components/Navbar.jsx
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import LanguageSwitcher from "../LanguageSwitcher";
 
 gsap.registerPlugin(ScrollTrigger);
 
 // ════════════════════════════════════════
 // 1. UPDATED DATA WITH DROPDOWN CHILDREN
 // ════════════════════════════════════════
-const leftLinks = [
-  { name: "Home", path: "/" },
+const getLeftLinks = (t) => [
+  { name: t("nav.home"), path: "/" },
   {
-    name: "Our Legacy",
+    name: t("nav.ourLegacy"),
     path: "/about",
     children: [
-      { name: "About Us", path: "/about" },
-      { name: "Board of Directors", path: "/about#board" },
-      { name: "Our Values", path: "/about#values" },
+      { name: t("nav.aboutUs"), path: "/about" },
+      { name: t("nav.boardOfDirectors"), path: "/about#board" },
+      { name: t("nav.ourValues"), path: "/about#values" },
     ]
   },
   {
-    name: 'Business',
+    name: t("nav.business"),
     path: "/business",
     children: [
-      { name: "Marine Construction", path: "/business#marine" },
-      { name: "Dredging & Reclamation", path: "/business#dredging" },
-      { name: "Port", path: "/business#port" },
-      { name: "Urban Infrastructure", path: "/business#infrastructure" },
-      { name: "Real Estate", path: "/business#estate" },
+      { name: t("nav.marineConstruction"), path: "/business#marine" },
+      { name: t("nav.dredgingReclamation"), path: "/business#dredging" },
+      { name: t("nav.port"), path: "/business#port" },
+      { name: t("nav.urbanInfrastructure"), path: "/business#infrastructure" },
+      { name: t("nav.realEstate"), path: "/business#estate" },
     ]
   },
-  { name: "Projects", path: "/projects" },
+  { name: t("nav.projects"), path: "/projects" },
 ];
 
-const rightLinks = [
+const getRightLinks = (t) => [
   {
-    name: "Companies",
+    name: t("nav.companies"),
     path: "/companies",
     children: [
       { name: "Amma Lines", path: "/companies#ammalines" },
@@ -52,11 +54,9 @@ const rightLinks = [
       { name: "Meka Consultants", path: "/companies#mekaconsultants" },
     ]
   },
-  { name: "Careers", path: "/careers" },
-  { name: "Contact", path: "/contact" },
+  { name: t("nav.careers"), path: "/careers" },
+  { name: t("nav.contact"), path: "/contact" },
 ];
-
-const allLinks = [...leftLinks, ...rightLinks];
 
 const menuImages = {
   "/": "/frames/frame_0001.webp",
@@ -111,8 +111,17 @@ function DesktopNavItem({ link, isActive }) {
   };
 
   const handleMouseLeave = () => {
-    // Add a small delay before closing so the mouse can easily move into the dropdown
     timeoutRef.current = setTimeout(() => setIsOpen(false), 150);
+  };
+
+  const handleKeyDown = (e) => {
+    if (!hasChildren) return;
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      setIsOpen((prev) => !prev);
+    } else if (e.key === "Escape") {
+      setIsOpen(false);
+    }
   };
 
   useGSAP(() => {
@@ -140,19 +149,21 @@ function DesktopNavItem({ link, isActive }) {
   }, [isOpen]);
 
   return (
-    <div 
-      className="relative flex items-center h-full py-4" 
-      onMouseEnter={handleMouseEnter} 
+    <div
+      className="relative flex items-center h-full py-4"
+      onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onKeyDown={handleKeyDown}
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setIsOpen(false); }}
     >
-      <FlipLink to={link.path} isActive={isActive}>
-        {link.name} 
+      <FlipLink to={link.path} isActive={isActive} aria-haspopup={hasChildren} aria-expanded={hasChildren ? isOpen : undefined}>
+        {link.name}
       </FlipLink>
 
       {hasChildren && (
         <div
           ref={dropdownRef}
-          className="absolute top-full left-0 pt-4 hidden opacity-0 translate-y-2 md:text-black z-50 min-w-[260px]"
+          className="absolute top-full start-0 pt-4 hidden opacity-0 translate-y-2 md:text-black z-50 min-w-[260px]"
         >
           {/* Dropdown Panel Design */}
           <div className="bg-[#0c0c0c] border border-white/[0.08] p-3 shadow-[0_20px_40px_rgba(0,0,0,0.5)] rounded-sm">
@@ -180,6 +191,7 @@ function DesktopNavItem({ link, isActive }) {
 // MAIN NAVBAR
 // ════════════════════════════════════════
 export default function Navbar() {
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredMenuIndex, setHoveredMenuIndex] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -190,6 +202,10 @@ export default function Navbar() {
   const menuImageRef = useRef(null);
   const tl = useRef(null);
   const location = useLocation();
+
+  const leftLinks = getLeftLinks(t);
+  const rightLinks = getRightLinks(t);
+  const allLinks = [...leftLinks, ...rightLinks];
 
   const isActive = useCallback((path) => location.pathname === path, [location.pathname]);
 
@@ -311,10 +327,10 @@ export default function Navbar() {
   useEffect(() => {
     if (isMenuOpen) {
       tl.current.play();
-      document.body.style.overflow = "hidden";
+      document.body.classList.add("overflow-hidden");
     } else {
       tl.current.reverse();
-      document.body.style.overflow = "auto";
+      document.body.classList.remove("overflow-hidden");
       setHoveredMenuIndex(null);
     }
   }, [isMenuOpen]);
@@ -325,6 +341,7 @@ export default function Navbar() {
   useEffect(() => {
     if (hoveredMenuIndex === null || !menuImageRef.current) return;
     const img = menuImageRef.current;
+    gsap.killTweensOf(img);
     gsap.to(img, {
       opacity: 0,
       scale: 1.05,
@@ -385,14 +402,14 @@ export default function Navbar() {
           <div className="flex items-center gap-7 xl:gap-9 flex-1 justify-end">
             <nav className="hidden lg:flex md:text-2xl items-center gap-7 xl:gap-9 h-full">
               {rightLinks.map((link) => {
-                if (link.name === "Contact") {
+                if (link.path === "/contact") {
                   return (
                     <Link
                       key={link.name}
                       to={link.path}
-                      className="nav-cta relative text-[35px] xl:text-xs font-sans font-semibold uppercase tracking-[0.18em] px-7 py-2.5 overflow-hidden group border-2 text-black border-black/20 hover:border-[#0ea5a4] transition-colors duration-500 ml-2"
+                      className="nav-cta relative text-[35px] xl:text-xs font-sans font-semibold uppercase tracking-[0.18em] px-7 py-2.5 overflow-hidden group border-2 text-black border-black/20 hover:border-[#0ea5a4] transition-colors duration-500 ms-2"
                     >
-                      <span className="absolute  inset-0 bg-[#0ea5a4] translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]" />
+                      <span className="absolute inset-0 bg-[#0ea5a4] translate-x-[-101%] rtl:translate-x-[101%] group-hover:translate-x-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]" />
                       <span className="relative z-10 group-hover:text-[#050505] transition-colors duration-300">
                         {link.name}
                       </span>
@@ -405,16 +422,23 @@ export default function Navbar() {
               })}
             </nav>
 
+            {/* ── LANGUAGE SWITCHER (desktop) ── */}
+            <div className="hidden lg:block">
+              <LanguageSwitcher variant={isScrolled ? "light" : "light"} />
+            </div>
+
             {/* ── HAMBURGER ── */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-              aria-expanded={isMenuOpen}
-              className="nav-hamburger relative z-[160] flex items-center gap-3 lg:hidden group cursor-pointer"
-            >
-              <span className="text-[9px] font-sans font-semibold tracking-[0.25em] uppercase text-white/50 group-hover:text-white transition-colors hidden sm:block">
-                {isMenuOpen ? "Close" : "Menu"}
-              </span>
+            <div className="flex items-center gap-3 lg:hidden">
+              <LanguageSwitcher variant={isMenuOpen ? "dark" : "light"} />
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={isMenuOpen}
+                className="nav-hamburger relative z-[160] flex items-center gap-3 group cursor-pointer"
+              >
+                <span className="text-[9px] font-sans font-semibold tracking-[0.25em] uppercase text-white/50 group-hover:text-white transition-colors hidden sm:block">
+                  {isMenuOpen ? t("nav.close") : t("nav.menu")}
+                </span>
               <div className="w-7 h-[14px] flex flex-col justify-between items-end relative">
                 {/* Top Bar */}
                 <span
@@ -441,7 +465,8 @@ export default function Navbar() {
                   }`}
                 />
               </div>
-            </button>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -453,7 +478,7 @@ export default function Navbar() {
         ref={menuRef}
         className="fixed inset-0 z-[140] bg-[#050505] text-white overflow-hidden"
       >
-        <div className="menu-bg-text absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[24vw] font-sans font-black text-white pointer-events-none select-none z-0 whitespace-nowrap">
+        <div className="menu-bg-text absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[24vw] 2xl:text-[22rem] font-sans font-black text-white pointer-events-none select-none z-0 whitespace-nowrap">
           MEKA
         </div>
 
@@ -482,13 +507,13 @@ export default function Navbar() {
                       <span className="block text-4xl sm:text-5xl md:text-[5.5rem] font-serif uppercase tracking-tighter transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full leading-[1.1]">
                         {link.name}
                       </span>
-                      <span className="block text-4xl sm:text-5xl md:text-[5.5rem] font-serif uppercase tracking-tighter text-[#0ea5a4] absolute top-full left-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full leading-[1.1]">
+                      <span className="block text-4xl sm:text-5xl md:text-[5.5rem] font-serif uppercase tracking-tighter text-[#0ea5a4] absolute top-full start-0 transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] group-hover:-translate-y-full leading-[1.1]">
                         {link.name}
                       </span>
                     </span>
 
                     <svg
-                      className="w-5 h-5 md:w-7 md:h-7 text-[#0ea5a4] opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 shrink-0"
+                      className="w-5 h-5 md:w-7 md:h-7 text-[#0ea5a4] opacity-0 -translate-x-4 rtl:translate-x-4 rtl:-scale-x-100 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 shrink-0"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"

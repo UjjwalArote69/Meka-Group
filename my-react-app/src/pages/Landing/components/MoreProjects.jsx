@@ -60,7 +60,7 @@ const MoreProjects = () => {
 
     // 2. STAGGERED ROW REVEALS (Masked Text & Drawing Borders)
     const rows = gsap.utils.toArray(".archive-row");
-    
+
     rows.forEach((row) => {
       const textWrap = row.querySelector(".row-text");
       const borderLine = row.querySelector(".row-border");
@@ -73,19 +73,33 @@ const MoreProjects = () => {
         }
       });
 
-      // Draw the border line
-      tl.fromTo(
-        borderLine, 
-        { scaleX: 0 }, 
-        { scaleX: 1, duration: 0.8, ease: "power3.inOut", transformOrigin: "left" }
-      )
-      // Mask reveal the text upwards
-      .fromTo(
-        textWrap,
-        { yPercent: 100, rotationZ: 3, opacity: 0 },
-        { yPercent: 0, rotationZ: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
-        "-=0.5"
-      );
+      if (isMobile) {
+        // Lighter reveal on mobile — no rotationZ / large yPercent (expensive on low-power GPUs)
+        tl.fromTo(
+          borderLine,
+          { scaleX: 0 },
+          { scaleX: 1, duration: 0.5, ease: "power2.out", transformOrigin: "left" }
+        ).fromTo(
+          textWrap,
+          { y: 12, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" },
+          "-=0.3"
+        );
+      } else {
+        // Draw the border line
+        tl.fromTo(
+          borderLine,
+          { scaleX: 0 },
+          { scaleX: 1, duration: 0.8, ease: "power3.inOut", transformOrigin: "left" }
+        )
+        // Mask reveal the text upwards
+        .fromTo(
+          textWrap,
+          { yPercent: 100, rotationZ: 3, opacity: 0 },
+          { yPercent: 0, rotationZ: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
+          "-=0.5"
+        );
+      }
     });
 
     // 3. CURSOR FOLLOWER LOGIC (desktop only — pure waste on touch devices)

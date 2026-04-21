@@ -33,6 +33,10 @@ const Projects = () => {
     const track = trackRef.current;
     const panels = gsap.utils.toArray(".project-panel");
     const getScrollAmount = () => -(track.scrollWidth - window.innerWidth);
+    // Total vertical scroll distance — ensure each panel gets at least ~1 viewport
+    // of scroll so mobile doesn't fly through in one flick.
+    const getEndDistance = () =>
+      Math.max(track.scrollWidth, panels.length * window.innerHeight);
 
     // 1. MASTER HORIZONTAL SCROLL TIMELINE
     const scrollTween = gsap.to(track, {
@@ -42,7 +46,7 @@ const Projects = () => {
         trigger: containerRef.current,
         pin: true,
         start: "top top",
-        end: () => `+=${track.scrollWidth}`,
+        end: () => `+=${getEndDistance()}`,
         scrub: 1,
         invalidateOnRefresh: true,
       },
@@ -50,12 +54,12 @@ const Projects = () => {
 
     // 2. MASSIVE BACKGROUND PARALLAX
     gsap.to(".bg-marquee", {
-      xPercent: -20, 
+      xPercent: -20,
       ease: "none",
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: () => `+=${track.scrollWidth}`,
+        end: () => `+=${getEndDistance()}`,
         scrub: 1,
       },
     });
@@ -68,7 +72,7 @@ const Projects = () => {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: () => `+=${track.scrollWidth}`,
+        end: () => `+=${getEndDistance()}`,
         scrub: true,
       },
     });

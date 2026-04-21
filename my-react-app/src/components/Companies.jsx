@@ -65,17 +65,15 @@ const Companies = () => {
   };
 
   return (
-    <section ref={containerRef} className="w-full bg-[#f5f5f0] text-[#111] py-32 overflow-hidden relative z-10">
+    <section ref={containerRef} className="companies w-full bg-[#f5f5f0] text-[#111] py-32 overflow-hidden relative z-10">
       <style>
         {`
-          .custom-scrollbar::-webkit-scrollbar { height: 6px; }
-          .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 10px; margin: 0 24px; }
-          .custom-scrollbar::-webkit-scrollbar-thumb { background: #0ea5a4; border-radius: 10px; }
-          .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #0c8a89; }
+          .hide-scrollbar::-webkit-scrollbar { display: none; }
+          .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         `}
       </style>
 
-      <div className="max-w-360 mx-auto">
+<div className="max-w-360 mx-auto">
         {/* Light Theme Header */}
         <div className="company-header mb-12 md:mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8 px-6 md:px-12 lg:px-24">
           <div>
@@ -103,7 +101,7 @@ const Companies = () => {
           onMouseLeave={handleMouseLeave}
           onMouseUp={handleMouseUp}
           onMouseMove={handleMouseMove}
-          className={`company-track flex overflow-x-auto gap-8 px-6 md:px-12 lg:px-24 pb-12 select-none custom-scrollbar transition-all ${isDragging ? "cursor-grabbing snap-none" : "cursor-grab snap-x snap-mandatory"}`}
+          className={`company-track flex overflow-x-auto gap-8 px-6 md:px-12 lg:px-24 pb-12 select-none hide-scrollbar transition-all ${isDragging ? "cursor-grabbing snap-none" : "cursor-grab snap-x snap-mandatory"}`}
         >
           {companyData.map((company) => (
             <div

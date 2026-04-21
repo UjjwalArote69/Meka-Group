@@ -452,7 +452,10 @@
       "drink":            "هل تشرب؟",
       "yes":              "نعم",
       "no":               "لا",
-      "resumeText":       "الصق نص سيرتك الذاتية هنا"
+      "resumeLink":            "رابط السيرة الذاتية أو ملف الأعمال",
+      "resumeLinkHint":        "رابط لسيرتك الذاتية أو ملف أعمالك — Google Drive، Dropbox، LinkedIn، موقع شخصي، إلخ.",
+      "resumeLinkPlaceholder": "https://drive.google.com/... أو https://linkedin.com/in/...",
+      "resumeLinkInvalid":     "يرجى إدخال رابط صحيح يبدأ بـ http:// أو https://"
     },
     "nav": {
       "back":      "رجوع",

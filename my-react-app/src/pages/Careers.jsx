@@ -69,8 +69,12 @@ const INITIAL = {
   position: "", positionOther: "", yearsOfExperience: "", availability: "",
   presentCity: "", presentState: "", hometown: "", homeState: "", distanceFromWorli: "",
   presentSalary: "", expectedSalary: "", currentCompany: "", smoke: "", drink: "",
-  resumeText: "",
+  resumeLink: "",
 };
+
+// Permissive URL check — requires http(s):// and at least a dotted host,
+// which covers Google Drive, Dropbox, LinkedIn, personal sites, etc.
+const URL_PATTERN = /^https?:\/\/\S+\.\S+/i;
 
 // ── HELPERS ──
 const Label = ({ htmlFor, children, required }) => (
@@ -170,7 +174,9 @@ export default function CareersPage() {
       if (!form.smoke) errs.smoke = true;
       if (!form.drink) errs.drink = true;
     } else if (step === 5) {
-      if (!form.resumeText.trim()) errs.resumeText = true;
+      const link = form.resumeLink.trim();
+      if (!link) errs.resumeLink = "required";
+      else if (!URL_PATTERN.test(link)) errs.resumeLink = "invalid";
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -211,7 +217,7 @@ export default function CareersPage() {
         distanceFromWorli: form.distanceFromWorli,
         smoke: form.smoke,
         drink: form.drink,
-        resumeText: form.resumeText,
+        resumeLink: form.resumeLink,
       });
       setStatus("success");
       setForm(INITIAL);
@@ -568,15 +574,26 @@ export default function CareersPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="resumeText" required>{t("careers.fields.resumeText")}</Label>
-                    <div className={`border-2 rounded-sm transition-all duration-300 ${errors.resumeText ? "border-red-400" : "border-black/[0.06] focus-within:border-[#0ea5a4]"}`}>
-                      <textarea id="resumeText" rows="12" required value={form.resumeText}
-                        placeholder={t("careers.fields.resumeText")}
-                        className="w-full bg-transparent p-4 outline-none text-sm font-sans text-[#050505] placeholder:text-black/20 resize-y min-h-[250px]"
-                        onChange={(e) => set("resumeText", e.target.value)}
-                      ></textarea>
+                    <Label htmlFor="resumeLink" required>{t("careers.fields.resumeLink")}</Label>
+                    <p className="text-[10px] text-black/30 font-sans mb-3">{t("careers.fields.resumeLinkHint")}</p>
+                    <div className={`border-b-2 transition-all duration-300 ${errors.resumeLink ? "border-red-400" : "border-black/10 focus-within:border-[#0ea5a4]"}`}>
+                      <input
+                        id="resumeLink"
+                        type="url"
+                        required
+                        inputMode="url"
+                        value={form.resumeLink}
+                        placeholder={t("careers.fields.resumeLinkPlaceholder")}
+                        className="w-full bg-transparent py-3 outline-none text-sm md:text-[15px] font-sans text-[#050505] placeholder:text-black/20"
+                        onChange={(e) => set("resumeLink", e.target.value)}
+                      />
                     </div>
-                    {errors.resumeText && <p className="text-red-400 text-[10px] mt-1">{t("careers.fields.required")}</p>}
+                    {errors.resumeLink === "required" && (
+                      <p className="text-red-400 text-[10px] mt-1">{t("careers.fields.required")}</p>
+                    )}
+                    {errors.resumeLink === "invalid" && (
+                      <p className="text-red-400 text-[10px] mt-1">{t("careers.fields.resumeLinkInvalid")}</p>
+                    )}
                   </div>
 
                   {/* Summary */}

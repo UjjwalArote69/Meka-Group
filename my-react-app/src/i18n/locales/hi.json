@@ -452,7 +452,10 @@
       "drink":            "क्या आप शराब पीते हैं?",
       "yes":              "हाँ",
       "no":               "नहीं",
-      "resumeText":       "अपना रिज्यूमे टेक्स्ट यहाँ चिपकाएँ"
+      "resumeLink":            "रिज्यूमे या पोर्टफोलियो लिंक",
+      "resumeLinkHint":        "अपने CV या पोर्टफोलियो का लिंक — Google Drive, Dropbox, LinkedIn, व्यक्तिगत वेबसाइट आदि।",
+      "resumeLinkPlaceholder": "https://drive.google.com/... या https://linkedin.com/in/...",
+      "resumeLinkInvalid":     "कृपया http:// या https:// से शुरू होने वाला वैध URL दर्ज करें"
     },
     "nav": {
       "back":      "वापस",

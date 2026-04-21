@@ -56,12 +56,19 @@ function doPost(e) {
           "Distance from Worli HQ",
           "Smoke",
           "Drink",
-          "Resume / CV Text",
+          "Resume / Portfolio Link",
           "Status"
         ]);
         sheet.getRange(1, 1, 1, 21).setFontWeight("bold").setBackground("#050505").setFontColor("#ffffff");
         sheet.setFrozenRows(1);
-        sheet.setColumnWidth(20, 600);
+        sheet.setColumnWidth(20, 400);
+      } else {
+        // Rename the column header if this sheet was created before the
+        // field was migrated from pasted CV text to a shareable URL.
+        var headerCell = sheet.getRange(1, 20);
+        if (headerCell.getValue() === "Resume / CV Text") {
+          headerCell.setValue("Resume / Portfolio Link");
+        }
       }
       sheet.appendRow([
         new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
@@ -83,7 +90,9 @@ function doPost(e) {
         data.distanceFromWorli || "—",
         data.smoke || "—",
         data.drink || "—",
-        data.resumeText || "—",
+        // Fall back to the legacy resumeText field if any older client still
+        // sends it, so nothing is lost in transit during the rollout.
+        data.resumeLink || data.resumeText || "—",
         "New"
       ]);
     }
@@ -114,8 +123,9 @@ function setup() {
     "Position", "Years of Experience", "Availability", "Present City", "Present State",
     "Hometown", "Home State", "Present Salary (Lacs)", "Expected Salary (Lacs)",
     "Current Company / Designation", "Distance from Worli HQ", "Smoke", "Drink",
-    "Resume / CV Text", "Status"
+    "Resume / Portfolio Link", "Status"
   ]);
   career.getRange(1, 1, 1, 21).setFontWeight("bold").setBackground("#050505").setFontColor("#ffffff");
   career.setFrozenRows(1);
+  career.setColumnWidth(20, 400);
 }

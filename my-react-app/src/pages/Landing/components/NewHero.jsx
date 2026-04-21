@@ -3,7 +3,6 @@ import React, {
   useRef,
   useEffect,
   useState,
-  useCallback,
   useMemo,
 } from "react";
 import gsap from "gsap";
@@ -16,7 +15,7 @@ import useIsMobile from "../../../hooks/useIsMobile";
 gsap.registerPlugin(ScrollTrigger);
 
 // ──────────────────────────────────────────────────────────────
-//  STRUCTURAL DATA — label/copy resolved via t() inside the component
+//  STRUCTURAL DATA
 // ──────────────────────────────────────────────────────────────
 const STAT_IDS = [
   { value: 45, key: "stats.yearsExperience",     suffix: "+" },
@@ -25,7 +24,6 @@ const STAT_IDS = [
   { value: 10, key: "stats.globalReach",          suffix: "" },
 ];
 
-// Client list is proper-noun brand marks — kept as Latin script across locales.
 const CLIENTS = [
   "Reliance Industries",
   "L&T",
@@ -62,48 +60,33 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
       })),
     [t]
   );
+  
   const containerRef      = useRef(null);
-  const videoContainerRef = useRef(null);
   const heroVideoRef      = useRef(null);
-  const ctaRef            = useRef(null);
   const hasCalledReady    = useRef(false);
 
   const [deployIndex, setDeployIndex] = useState(0);
-
-  // SSR-safe environment detection
   const [isTouch] = useState(() =>
     typeof window !== "undefined" &&
     ("ontouchstart" in window || navigator.maxTouchPoints > 0)
   );
 
-  // Pointer-coarse devices only (phones/tablets) — used to skip the 41MB hero
-  // video. Distinct from isTouch, which also matches desktops with a touchscreen.
   const isMobile = useIsMobile();
-  
-  // Reduced-motion is intentionally NOT honoured here — Windows 11 defaults
-  // "Animation effects" off, which previously made the hero reveal snap to
-  // final state for those users. The animation is core to the brand feel,
-  // so we always play it.
   const prefersReducedMotion = false;
 
   // ── LOADER HANDOFF ──
   useEffect(() => {
     if (hasCalledReady.current) return;
-
     const markReady = () => {
       if (hasCalledReady.current) return;
       hasCalledReady.current = true;
       onLoadProgress(100);
       onReady();
     };
-
     const timeout = setTimeout(markReady, 2500);
-    
-    // Check if the hero video is ready
     if (heroVideoRef.current && heroVideoRef.current.readyState >= 3) {
       markReady();
     }
-
     return () => clearTimeout(timeout);
   }, [onLoadProgress, onReady]);
 
@@ -121,96 +104,83 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
       id = null;
     };
     const onVisibility = () => (document.hidden ? stop() : start());
-
     start();
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
       stop();
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, []);
+  }, [DEPLOYMENTS.length]);
 
   // ── GSAP ANIMATIONS ──
   useGSAP(
     () => {
       if (prefersReducedMotion) {
         gsap.set(
-          [
-            ".hero-bg-media",
-            ".hero-eyebrow",
-            ".reveal-line-1",
-            ".reveal-line-2",
-            ".accent-line",
-            ".hero-right-col > *",
-            ".hero-bottom-bar > *",
-            ".hero-cta",
-            ".video-wrapper",
-          ],
-          { clearProps: "all", opacity: 1, x: 0, y: 0, scale: 1, yPercent: 0, scaleX: 1 }
+          [".hero-bg-media", ".reveal-text", ".hero-fade-in", ".hero-stack-card", ".hero-stack-bg-1", ".hero-stack-bg-2"],
+          { clearProps: "all", opacity: 1, x: 0, y: 0, scale: 1, yPercent: 0 }
         );
-        gsap.utils.toArray(".stat-val").forEach((el) => {
-          el.innerText = el.getAttribute("data-target");
-        });
         return;
       }
 
       const tl = gsap.timeline({ delay: 0.1 });
-      tl.fromTo(".hero-bg-media",
-          { scale: 1.1, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 2.2, ease: "power3.out" })
-        .fromTo(".hero-eyebrow",
+      
+      // Cinematic Entrance sequence
+      tl.fromTo(".hero-stack-bg-1",
+          { y: 60, opacity: 0 },
+          { y: isMobile ? 24 : 32, opacity: 1, duration: 1.8, ease: "expo.out" }, 0)
+        .fromTo(".hero-stack-bg-2",
+          { y: 40, opacity: 0 },
+          { y: isMobile ? 12 : 16, opacity: 1, duration: 1.8, ease: "expo.out" }, 0.1)
+        .fromTo(".hero-stack-card",
           { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.9, ease: "power3.out" }, "-=1.6")
-        .fromTo(".reveal-line-1",
-          { yPercent: 115 },
-          { yPercent: 0, duration: 1.2, ease: "expo.out" }, "-=0.9")
-        .fromTo(".reveal-line-2",
-          { yPercent: 115 },
-          { yPercent: 0, duration: 1.2, ease: "expo.out" }, "-=1.0")
-        .fromTo(".accent-line",
-          { scaleX: 0 },
-          { scaleX: 1, duration: 1, ease: "expo.out" }, "-=1.0")
-        .fromTo(".hero-right-col > *",
-          { opacity: 0, x: 20 },
-          { opacity: 1, x: 0, duration: 0.9, stagger: 0.1, ease: "power3.out" }, "-=1.0")
-        .fromTo(".hero-bottom-bar > *",
+          { y: 0, opacity: 1, duration: 1.8, ease: "expo.out" }, 0.2)
+        .fromTo(".hero-bg-media",
+          { scale: 1.1 },
+          { scale: 1, duration: 2.5, ease: "power3.out" }, 0)
+        .fromTo(".reveal-text",
+          { yPercent: 120, rotate: 2, opacity: 0 },
+          { yPercent: 0, rotate: 0, opacity: 1, duration: 1.4, stagger: 0.1, ease: "expo.out" }, 0.6)
+        .fromTo(".hero-fade-in",
           { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.9, stagger: 0.08, ease: "power3.out" }, "-=0.9")
-        .fromTo(".hero-cta",
-          { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 1, ease: "elastic.out(1, 0.7)" }, "-=0.7");
+          { opacity: 1, y: 0, duration: 1.2, stagger: 0.1, ease: "power3.out" }, 0.8);
 
+      // Scroll Interactions
       if (!isTouch) {
-        gsap.to(".hero-bg-media", {
-          yPercent: 8,
+        gsap.to(".hero-stack-bg-1", {
+          y: 0, scale: 0.96, opacity: 0,
           ease: "none",
-          scrollTrigger: {
-            trigger: ".hero-viewport",
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-          },
+          scrollTrigger: { trigger: ".hero-viewport", start: "top top", end: "50% top", scrub: true },
         });
+        gsap.to(".hero-stack-bg-2", {
+          y: 0, scale: 0.98, opacity: 0,
+          ease: "none",
+          scrollTrigger: { trigger: ".hero-viewport", start: "top top", end: "50% top", scrub: true },
+        });
+
         gsap.to(".hero-content-layer", {
-          y: -40,
-          opacity: 0.1,
-          scrollTrigger: {
-            trigger: ".hero-viewport",
-            start: "top top",
-            end: "75% top",
-            scrub: true,
-          },
+          y: -60,
+          opacity: 0,
+          ease: "none",
+          scrollTrigger: { trigger: ".hero-viewport", start: "top top", end: "70% top", scrub: true },
+        });
+        
+        gsap.to(".hero-bg-media", {
+          yPercent: 15,
+          ease: "none",
+          scrollTrigger: { trigger: ".hero-viewport", start: "top top", end: "bottom top", scrub: true },
         });
       }
 
+      // Stats counters
       gsap.utils.toArray(".stat-val").forEach((el) => {
         const target = parseInt(el.getAttribute("data-target"), 10);
         gsap.fromTo(el,
           { innerText: 0 },
           {
             innerText: target,
-            duration: 2,
-            ease: "power3.out",
+            duration: 2.5,
+            ease: "expo.out",
             snap: { innerText: 1 },
             scrollTrigger: { trigger: ".stats-section", start: "top 85%" },
             onUpdate() {
@@ -220,281 +190,185 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
         );
       });
 
-      if (isTouch) {
-        gsap.fromTo(".video-wrapper",
-          { opacity: 0, y: 40 },
-          {
-            opacity: 1, y: 0, ease: "power2.out",
-            scrollTrigger: {
-              trigger: videoContainerRef.current,
-              start: "top 85%", end: "top 50%", scrub: true,
-            },
-          });
-      } else {
-        gsap.fromTo(".video-wrapper",
-          { scale: 0.8, opacity: 0, y: 50, clipPath: "inset(4% round 32px)" },
-          {
-            scale: 1, opacity: 1, y: 0, clipPath: "inset(0% round 0px)",
-            ease: "power2.inOut",
-            scrollTrigger: {
-              trigger: videoContainerRef.current,
-              start: "top 90%", end: "top 30%", scrub: true,
-            },
-          });
-      }
-
+      // Marquee
       gsap.to(".marquee-track", {
         xPercent: -50, ease: "none", duration: 40, repeat: -1,
       });
     },
-    { scope: containerRef, dependencies: [prefersReducedMotion, isTouch] }
+    { scope: containerRef, dependencies: [prefersReducedMotion, isTouch, isMobile] }
   );
-
-  // ── MAGNETIC CTA ──
-  const handleMouseMove = useCallback((e) => {
-    if (isTouch || prefersReducedMotion || !ctaRef.current) return;
-    const { left, top, width, height } = ctaRef.current.getBoundingClientRect();
-    const x = (e.clientX - left - width / 2) * 0.35;
-    const y = (e.clientY - top - height / 2) * 0.35;
-    gsap.to(ctaRef.current, { x, y, duration: 0.5, ease: "power3.out" });
-  }, [isTouch, prefersReducedMotion]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (isTouch || prefersReducedMotion || !ctaRef.current) return;
-    gsap.to(ctaRef.current, {
-      x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)",
-    });
-  }, [isTouch, prefersReducedMotion]);
-
-
 
   return (
     <div ref={containerRef} className="w-full relative z-0">
+      
       {/* ══════════════════════════════════════════════════════
-          SECTION 1 — EDITORIAL HERO
+          SECTION 1 — HERO 
           ══════════════════════════════════════════════════════ */}
-      <section className="hero-viewport relative w-full min-h-screen min-h-[100svh] overflow-hidden bg-[#f5f5f0] flex flex-col justify-between">
+      <section className="hero-viewport relative w-full h-screen h-[100svh] max-h-screen overflow-hidden bg-[#f5f5f0] flex flex-col pt-24 md:pt-28 lg:pt-28 pb-4 md:pb-6 px-4 md:px-6 lg:px-8">
+        <style>{`
+          @keyframes scrollCue {
+            0% { transform: translateY(-100%); }
+            50% { transform: translateY(0%); }
+            100% { transform: translateY(100%); }
+          }
+        `}</style>
 
-        {/* Blueprint grid with radial fade mask */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 z-[1] opacity-[0.05] pointer-events-none"
-          style={{
-            backgroundImage:
-              "linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)",
-            backgroundSize: "4rem 4rem",
-            WebkitMaskImage: "radial-gradient(ellipse at center 40%, black 25%, transparent 75%)",
-            maskImage: "radial-gradient(ellipse at center 40%, black 25%, transparent 75%)",
-          }}
-        />
+        {/* RELATIVE WRAPPER FOR PERFECT STACKING */}
+        <div className="relative flex-1 w-full max-w-[1800px] mx-auto flex flex-col">
+          
+          <div className="hero-stack-bg-1 absolute inset-0 bg-black/[0.04] rounded-2xl lg:rounded-3xl scale-[0.93] z-0 origin-bottom" />
+          <div className="hero-stack-bg-2 absolute inset-0 bg-black/[0.06] rounded-2xl lg:rounded-3xl scale-[0.96] z-0 origin-bottom" />
 
-        {/* ── CONTENT LAYER ── */}
-        <div className="hero-content-layer relative z-30 flex-1 w-full flex flex-col px-6 md:px-20 pt-24 md:pt-28 pb-8 md:pb-12 pointer-events-none">
-
-
-          {/* ═══ MAIN SPREAD ═══ */}
-          <div className="flex-1 w-full max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-
-            {/* LEFT — Typography */}
-            <div className="lg:col-span-7 flex flex-col relative z-10 order-2 lg:order-1 lg:pr-10">
-              <h1 className="mix-blend-multiply m-0">
-                {/* Wrapper padding is em-based so it scales with font-size; this
-                    gives Devanagari matras and Arabic diacritics enough room
-                    inside the overflow-hidden reveal mask. */}
-                <span className="block overflow-hidden py-[0.18em] -my-[0.18em]">
-                  <span className="reveal-line-1 block font-sans font-medium text-[16vw] md:text-[8.5rem] lg:text-[10rem] 2xl:text-[11rem] leading-[0.9] tracking-[-0.04em] uppercase text-[#050505]">
-                    {t("hero.marine")}
-                  </span>
-                </span>
-                <span className="flex items-end gap-3 md:gap-5 mt-2 lg:mt-4">
-                  <span
-                    aria-hidden="true"
-                    className="accent-line hidden md:block w-12 lg:w-20 h-[3px] bg-[#0ea5a4] origin-left rtl:origin-right shrink-0 mb-4 lg:mb-6"
-                  />
-                  <span className="block overflow-hidden py-[0.18em] -my-[0.18em]">
-                    <span className="reveal-line-2 block font-serif italic text-[13vw] md:text-[6.5rem] lg:text-[7.5rem] 2xl:text-[8rem] leading-[0.95] tracking-tight lowercase text-[#0ea5a4]">
-                      {t("hero.engineering")}
-                    </span>
-                  </span>
-                </span>
-              </h1>
-
-              <p className="mt-8 lg:mt-12 max-w-lg font-sans text-sm md:text-[15px] leading-relaxed text-black/60 font-medium">
-                {t("hero.description")}
-              </p>
+          {/* MAIN VIDEO CARD */}
+          <div className="hero-stack-card relative z-10 flex-1 w-full h-full rounded-2xl lg:rounded-3xl overflow-hidden bg-[#050505] flex flex-col ring-1 ring-white/10">
+            
+            {/* BACKGROUND VIDEO LAYER */}
+            <div className="absolute inset-0 z-0 overflow-hidden">
+              {isMobile ? (
+                <img
+                  src="/new_hero_image.jpg"
+                  alt={t("hero.videoAlt")}
+                  className="hero-bg-media absolute inset-0 w-full h-full object-cover origin-center"
+                />
+              ) : (
+                <video
+                  ref={heroVideoRef}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                  poster="/new_hero_image.jpg"
+                  className="hero-bg-media absolute inset-0 w-full h-full object-cover origin-center scale-105"
+                >
+                  <source src="/videos/hero.mp4" type="video/mp4" />
+                  <source src="/videos/hero-reel.mp4" type="video/mp4" />
+                </video>
+              )}
+              <div className="absolute inset-0 bg-black/25 z-10 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-black/50 z-10 pointer-events-none mix-blend-multiply" />
+              <div className="absolute inset-0 z-10 pointer-events-none" style={{ background: "radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%)" }} />
+              <div className="absolute inset-0 z-10 pointer-events-none opacity-[0.08] mix-blend-overlay" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
             </div>
 
-            {/* RIGHT — Unconditional Video Asset */}
-            <div className="lg:col-span-5 relative order-1 lg:order-2 lg:pl-6 w-full max-w-[500px] mx-auto pointer-events-auto">
-              <div className="relative w-full aspect-[4/5] lg:aspect-[3/4] overflow-hidden rounded-md bg-zinc-900 shadow-[0_30px_60px_rgba(0,0,0,0.12)]">
+            {/* CINEMATIC CORNER BRACKETS */}
+            <div className="hero-fade-in pointer-events-none absolute top-5 left-5 md:top-7 md:left-7 w-6 h-6 md:w-8 md:h-8 border-l border-t border-white/40 z-30" />
+            <div className="hero-fade-in pointer-events-none absolute top-5 right-5 md:top-7 md:right-7 w-6 h-6 md:w-8 md:h-8 border-r border-t border-white/40 z-30" />
+            <div className="hero-fade-in pointer-events-none absolute bottom-5 left-5 md:bottom-7 md:left-7 w-6 h-6 md:w-8 md:h-8 border-l border-b border-white/40 z-30" />
+            <div className="hero-fade-in pointer-events-none absolute bottom-5 right-5 md:bottom-7 md:right-7 w-6 h-6 md:w-8 md:h-8 border-r border-b border-white/40 z-30" />
+
+            {/* ──────────────────────────────────────────────────────────────
+                INTERNAL LAYOUT
+                ────────────────────────────────────────────────────────────── */}
+            <div className="hero-content-layer relative z-20 flex-1 w-full h-full flex flex-col justify-between px-6 md:px-12 lg:px-16 pt-8 md:pt-12 pb-8 md:pb-12 pointer-events-none">
+
+              {/* TOP ROW */}
+              <div className="w-full flex justify-between items-start">
                 
-                {/* On true mobile devices (pointer: coarse) we skip the 40MB
-                    loop and serve a still image — saves data, CPU and battery
-                    on phones/tablets. Desktops (including touchscreen laptops
-                    with a mouse) get the full video with preload="auto". */}
-                {isMobile ? (
-                  <img
-                    src="/new_hero_image.jpg"
-                    alt={t("hero.videoAlt")}
-                    loading="eager"
-                    decoding="async"
-                    className="hero-bg-media w-full h-full object-cover origin-center"
-                  />
-                ) : (
-                  <video
-                    ref={heroVideoRef}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="auto"
-                    poster="/new_hero_image.jpg"
-                    aria-label={t("hero.videoAriaLabel")}
-                    className="hero-bg-media w-full h-full object-cover origin-center"
-                  >
-                    <source src="/videos/hero.mp4" type="video/mp4" />
-                    <source src="/videos/hero-reel.mp4" type="video/mp4" />
-                  </video>
-                )}
+                {/* TOP LEFT: Main Typography */}
+                <div className="flex flex-col mt-2 md:mt-4">
+                  <div className="hero-fade-in flex items-center gap-3 mb-4 md:mb-6">
+                    <span className="font-sans text-[10px] md:text-[11px] uppercase tracking-[0.4em] text-white/60 font-bold">
+                      01 / {String(DEPLOYMENTS.length).padStart(2, "0")}
+                    </span>
+                    <span className="w-8 h-px bg-white/30" />
+                    <span className="font-sans text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-[#0ea5a4] font-bold">
+                      {t("hero.live")} REEL
+                    </span>
+                  </div>
 
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"
-                />
+                  <h1 className="m-0 drop-shadow-2xl flex flex-col">
+                    <div className="overflow-hidden pb-2">
+                      <span className="reveal-text block font-sans font-medium text-[13vw] md:text-[7rem] lg:text-[7.5rem] 2xl:text-[9rem] leading-[0.85] tracking-[-0.03em] uppercase text-white">
+                        {t("hero.marine")}
+                      </span>
+                    </div>
+                    <div className="overflow-hidden flex items-center gap-4 md:gap-6 lg:gap-8 mt-1 lg:mt-3 pb-2">
+                      <span className="reveal-text block font-serif italic text-[11.5vw] md:text-[6rem] lg:text-[6.5rem] 2xl:text-[8rem] leading-[0.85] tracking-tight lowercase text-[#0ea5a4]">
+                        {t("hero.engineering")}
+                      </span>
+                      <span className="hidden lg:block w-16 xl:w-32 h-[2px] bg-[#0ea5a4] shrink-0 hero-fade-in rounded-full" />
+                    </div>
+                  </h1>
+                </div>
 
-                {/* Live Indicator overlay on video */}
-                <div
-                  aria-hidden="true"
-                  className="absolute top-5 right-5 flex items-center gap-2 bg-black/30 backdrop-blur-md px-4 py-2 rounded-full pointer-events-none"
-                >
-                  <span className="relative flex h-1.5 w-1.5">
+                {/* TOP RIGHT: Live Status Indicator */}
+                <div className="flex items-center gap-3 bg-white/5 backdrop-blur-md border border-white/10 px-4 py-2.5 rounded-full shadow-2xl hero-fade-in mt-2 md:mt-4">
+                  <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0ea5a4] opacity-75" />
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#0ea5a4]" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0ea5a4]" />
                   </span>
-                  <span className="font-sans text-[9px] uppercase tracking-[0.25em] text-white font-bold">
+                  <span className="font-sans text-[9px] uppercase tracking-[0.3em] text-white font-bold">
                     {t("hero.live")}
+                  </span>
+                  <span className="hidden md:inline-block w-px h-3 bg-white/20" />
+                  <span className="hidden md:inline-block font-sans text-[9px] uppercase tracking-[0.2em] text-white/60 font-semibold tabular-nums">
+                    EST. 1980
                   </span>
                 </div>
               </div>
 
-              {/* Offset Accent Frame */}
-              <div
-                aria-hidden="true"
-                className="absolute -bottom-6 -right-6 md:-bottom-8 md:-right-8 w-24 md:w-36 aspect-square border-2 border-[#0ea5a4]/30 -z-10 hidden md:block"
-              />
-            </div>
-          </div>
-
-          {/* ═══ BOTTOM BAR ═══ */}
-          <div className="hero-bottom-bar w-full max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-3 items-end gap-8 mt-16 lg:mt-auto pt-8 border-t border-black/[0.04]">
-
-            {/* Live deployment ticker (Left aligned on desktop) */}
-            <div
-              role="status"
-              aria-live="polite"
-              aria-atomic="true"
-              className="hidden md:flex flex-col items-start gap-2 text-left justify-end pb-4"
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0ea5a4] opacity-75" />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#0ea5a4]" />
-                </span>
-                <span className="font-sans text-[9px] uppercase tracking-[0.3em] text-black/40 font-bold">
-                  {t("hero.activeDeployment")}
-                </span>
-              </div>
-              <div className="relative h-10 overflow-hidden w-full max-w-[300px]">
-                {DEPLOYMENTS.map((d, i) => (
-                  <div
-                    key={d.code}
-                    aria-hidden={i !== deployIndex}
-                    className="absolute inset-x-0 top-0 transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)]"
-                    style={{
-                      opacity: i === deployIndex ? 1 : 0,
-                      transform:
-                        i === deployIndex
-                          ? "translateY(0)"
-                          : i < deployIndex
-                          ? "translateY(-120%)"
-                          : "translateY(120%)",
-                    }}
-                  >
-                    <p className="font-sans text-[13px] text-[#050505] font-semibold whitespace-nowrap">
-                      {d.code} <span className="text-black/30 font-normal mx-2">/</span> {d.site}
-                    </p>
-                    <p className="font-sans text-[9px] uppercase tracking-[0.25em] text-[#0ea5a4] font-bold mt-1">
-                      {d.coord}
-                    </p>
+              {/* BOTTOM ROW */}
+              <div className="w-full flex flex-col lg:flex-row justify-between items-end gap-8 mt-auto pb-1 lg:pb-4">
+                
+                {/* BOTTOM LEFT: Deployment Ticker */}
+                <div className="hidden md:flex items-center gap-4 hero-fade-in w-full lg:w-auto">
+                  <span className="mt-1 w-2 h-2 rounded-full bg-[#0ea5a4] shadow-[0_0_12px_rgba(14,165,164,0.8)]" />
+                  <div className="relative w-[300px] h-12 overflow-hidden">
+                    {DEPLOYMENTS.map((d, i) => (
+                      <div
+                        key={d.code}
+                        className="absolute inset-0 flex flex-col justify-start lg:items-start transition-transform duration-700 ease-[cubic-bezier(0.76,0,0.24,1)]"
+                        style={{
+                          opacity: i === deployIndex ? 1 : 0,
+                          transform: i === deployIndex ? "translateY(0)" : i < deployIndex ? "translateY(-100%)" : "translateY(100%)",
+                        }}
+                      >
+                        <span className="font-sans text-[9px] uppercase tracking-[0.25em] text-white/50 font-bold mb-1.5 flex items-center gap-2">
+                          <span>{t("hero.activeDeployment")}</span>
+                          <span className="text-white/30">// {d.coord}</span>
+                        </span>
+                        <p className="font-sans text-sm text-white font-medium tracking-wide">
+                          {d.code} <span className="text-[#0ea5a4] mx-2 opacity-50">|</span> {d.site}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+
+                {/* BOTTOM RIGHT: Description */}
+                <div className="flex flex-col lg:items-end text-left lg:text-right max-w-sm lg:max-w-md">
+                  <p className="hero-fade-in font-sans text-sm md:text-base leading-relaxed text-white/75 font-medium drop-shadow-md">
+                    {t("hero.description")}
+                  </p>
+                </div>
+
               </div>
             </div>
 
-            {/* Scroll indicator (Centered on desktop) */}
-            <div className="hidden md:flex flex-col items-center justify-end gap-4 pb-4" aria-hidden="true">
-              <span className="font-sans text-[9px] uppercase tracking-[0.3em] text-black/40 font-bold">
-                {t("hero.scroll")}
+            {/* SCROLL INDICATOR */}
+            <div className="hero-fade-in pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 z-30 hidden md:flex flex-col items-center gap-2">
+              <span className="font-sans text-[9px] uppercase tracking-[0.4em] text-white/50 font-bold">
+                {t("hero.scroll", "Scroll")}
               </span>
-              <div className="relative w-px h-16 bg-black/10 overflow-hidden">
-                <div className="absolute inset-0 bg-[#0ea5a4] animate-[slideDown_2s_ease-in-out_infinite]" />
-              </div>
-            </div>
-
-            {/* CTA (Right aligned on desktop) */}
-            <div className="pointer-events-auto flex justify-end">
-              <a
-                href="#projects"
-                ref={ctaRef}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-                className="hero-cta group relative flex items-center justify-center w-28 h-28 md:w-32 md:h-32 rounded-full bg-[#050505] hover:bg-[#0ea5a4] transition-colors duration-500 overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0ea5a4] focus-visible:ring-offset-4 focus-visible:ring-offset-[#f5f5f0]"
-              >
-                <span className="relative z-10 font-sans text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-white font-bold text-center leading-relaxed">
-                  {t("hero.viewProjects")}
-                </span>
-                <svg
-                  aria-hidden="true"
-                  className="absolute inset-0 w-full h-full animate-[spin_20s_linear_infinite] pointer-events-none motion-reduce:animate-none"
-                  viewBox="0 0 100 100"
-                >
-                  <defs>
-                    <path
-                      id="cta-circle"
-                      d="M 50, 50 m -40, 0 a 40,40 0 1,1 80,0 a 40,40 0 1,1 -80,0"
-                    />
-                  </defs>
-                  <text className="fill-white/40 text-[7px] tracking-[0.3em] font-bold uppercase">
-                    <textPath href="#cta-circle">
-                      {t("hero.ctaCircle")}
-                    </textPath>
-                  </text>
-                </svg>
-              </a>
+              <span className="relative w-px h-10 bg-white/20 overflow-hidden">
+                <span className="absolute top-0 left-0 w-full h-1/2 bg-white/80 animate-[scrollCue_2s_ease-in-out_infinite]" />
+              </span>
             </div>
           </div>
         </div>
       </section>
 
       {/* ══════════════════════════════════════════════════════
-          SECTION 2 — STATS
+          SECTION 2 — STATS 
           ══════════════════════════════════════════════════════ */}
       <section className="stats-section relative z-10 bg-[#f5f5f0] py-16 md:py-24 border-t border-b border-black/[0.06]">
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-2 md:grid-cols-4 gap-y-12 md:gap-0 divide-x-0 md:divide-x divide-black/[0.06]">
           {STATS.map((stat, i) => (
             <div key={i} className="flex flex-col items-start md:items-center px-4 md:px-8">
               <div className="flex items-baseline mb-2">
-                <span
-                  className="stat-val font-serif text-5xl md:text-7xl text-[#050505] tracking-tighter"
-                  data-target={stat.value}
-                >
-                  0
-                </span>
-                {stat.suffix && (
-                  <span className="text-[#0ea5a4] font-serif text-4xl md:text-6xl ml-1">
-                    {stat.suffix}
-                  </span>
-                )}
+                <span className="stat-val font-serif text-5xl md:text-7xl text-[#050505] tracking-tighter" data-target={stat.value}>0</span>
+                {stat.suffix && <span className="text-[#0ea5a4] font-serif text-4xl md:text-6xl ml-1">{stat.suffix}</span>}
               </div>
               <span className="font-sans text-[10px] md:text-xs uppercase tracking-[0.2em] text-black/40 font-bold">
                 {stat.label}
@@ -506,33 +380,19 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
 
       <Companies />
 
-
       {/* ══════════════════════════════════════════════════════
-          SECTION 4 — MARQUEE
+          SECTION 4 — MARQUEE 
           ══════════════════════════════════════════════════════ */}
-      <section
-        aria-label="Trusted by"
-        className="relative z-10 bg-[#f5f5f0] py-12 md:py-20 overflow-hidden border-t border-black/[0.05]"
-      >
+      <section aria-label="Trusted by" className="relative z-10 bg-[#f5f5f0] py-12 md:py-20 overflow-hidden border-t border-black/[0.05]">
         <p className="font-sans text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-black/40 text-center mb-12 font-bold">
           {t("trustedGlobally")}
         </p>
         <div className="flex overflow-hidden whitespace-nowrap relative">
-          <div
-            aria-hidden="true"
-            className="absolute left-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-r from-[#f5f5f0] to-transparent z-10"
-          />
-          <div
-            aria-hidden="true"
-            className="absolute right-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-l from-[#f5f5f0] to-transparent z-10"
-          />
+          <div aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-r from-[#f5f5f0] to-transparent z-10" />
+          <div aria-hidden="true" className="absolute right-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-l from-[#f5f5f0] to-transparent z-10" />
           <div className="marquee-track flex items-center gap-12 md:gap-32 px-8 md:px-12 w-max">
             {[...CLIENTS, ...CLIENTS].map((client, index) => (
-              <span
-                key={index}
-                aria-hidden={index >= CLIENTS.length}
-                className="font-sans text-xs md:text-xl font-bold uppercase tracking-[0.15em] text-black/30"
-              >
+              <span key={index} aria-hidden={index >= CLIENTS.length} className="font-sans text-xs md:text-xl font-bold uppercase tracking-[0.15em] text-black/30">
                 {client}
               </span>
             ))}
@@ -544,28 +404,11 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
           CURVE 
           ══════════════════════════════════════════════════════ */}
       <div className="relative z-10 w-full bg-[#f5f5f0]">
-        <svg
-          aria-hidden="true"
-          viewBox="0 0 1440 120"
-          className="w-full block -mb-px"
-          preserveAspectRatio="none"
-        >
+        <svg aria-hidden="true" viewBox="0 0 1440 120" className="w-full block -mb-px" preserveAspectRatio="none">
           <path d="M0,40 Q720,120 1440,40 L1440,120 L0,120 Z" fill="#0a0a0a" />
         </svg>
       </div>
 
-      <style>{`
-        @keyframes slideDown {
-          0%   { transform: translateY(-100%); }
-          100% { transform: translateY(100%); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .animate-\\[slideDown_2s_ease-in-out_infinite\\],
-          .animate-ping {
-            animation: none !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };

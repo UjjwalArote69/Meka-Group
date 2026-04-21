@@ -15,7 +15,8 @@
       "Bash(ls -lhS public/*.jpg public/*.png public/*.webp)",
       "Bash(npx eslint *)",
       "Bash(npm uninstall *)",
-      "Bash(node -e \"const en = require\\('./src/i18n/locales/en.json'\\); const hi = require\\('./src/i18n/locales/hi.json'\\); const ar = require\\('./src/i18n/locales/ar.json'\\); console.log\\('JSON OK'\\); console.log\\('en top-keys:', Object.keys\\(en\\).length\\); console.log\\('hi top-keys:', Object.keys\\(hi\\).length\\); console.log\\('ar top-keys:', Object.keys\\(ar\\).length\\);\")"
+      "Bash(node -e \"const en = require\\('./src/i18n/locales/en.json'\\); const hi = require\\('./src/i18n/locales/hi.json'\\); const ar = require\\('./src/i18n/locales/ar.json'\\); console.log\\('JSON OK'\\); console.log\\('en top-keys:', Object.keys\\(en\\).length\\); console.log\\('hi top-keys:', Object.keys\\(hi\\).length\\); console.log\\('ar top-keys:', Object.keys\\(ar\\).length\\);\")",
+      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('src/i18n/locales/en.json'\\)\\); JSON.parse\\(require\\('fs'\\).readFileSync\\('src/i18n/locales/hi.json'\\)\\); JSON.parse\\(require\\('fs'\\).readFileSync\\('src/i18n/locales/ar.json'\\)\\); console.log\\('JSON OK'\\);\")"
     ]
   }
 }

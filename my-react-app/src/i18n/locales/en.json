@@ -452,7 +452,10 @@
       "drink":            "Do you drink?",
       "yes":              "Yes",
       "no":               "No",
-      "resumeText":       "Paste your resume text here"
+      "resumeLink":            "Resume or Portfolio Link",
+      "resumeLinkHint":        "A link to your CV or portfolio — Google Drive, Dropbox, LinkedIn, personal site, etc.",
+      "resumeLinkPlaceholder": "https://drive.google.com/... or https://linkedin.com/in/...",
+      "resumeLinkInvalid":     "Please enter a valid URL starting with http:// or https://"
     },
     "nav": {
       "back":      "Back",

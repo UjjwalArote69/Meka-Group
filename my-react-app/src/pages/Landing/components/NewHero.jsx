@@ -92,6 +92,7 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
 
   // ── LIVE DEPLOYMENT TICKER ──
   useEffect(() => {
+    if (isMobile) return;
     let id;
     const start = () => {
       id = setInterval(
@@ -110,7 +111,7 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
       stop();
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [DEPLOYMENTS.length]);
+  }, [DEPLOYMENTS.length, isMobile]);
 
   // ── GSAP ANIMATIONS ──
   useGSAP(
@@ -190,9 +191,18 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
         );
       });
 
-      // Marquee
-      gsap.to(".marquee-track", {
-        xPercent: -50, ease: "none", duration: 40, repeat: -1,
+      // Marquee — pause when off-screen
+      const marqueeTween = gsap.to(".marquee-track", {
+        xPercent: -50, ease: "none", duration: 40, repeat: -1, paused: true,
+      });
+      ScrollTrigger.create({
+        trigger: ".marquee-track",
+        start: "top bottom",
+        end: "bottom top",
+        onEnter: () => marqueeTween.play(),
+        onEnterBack: () => marqueeTween.play(),
+        onLeave: () => marqueeTween.pause(),
+        onLeaveBack: () => marqueeTween.pause(),
       });
     },
     { scope: containerRef, dependencies: [prefersReducedMotion, isTouch, isMobile] }
@@ -238,12 +248,11 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
                   loop
                   playsInline
                   preload="auto"
+                  fetchpriority="high"
                   poster="/new_hero_image.jpg"
+                  src="/videos/hero.mp4"
                   className="hero-bg-media absolute inset-0 w-full h-full object-cover origin-center scale-105"
-                >
-                  <source src="/videos/hero.mp4" type="video/mp4" />
-                  <source src="/videos/hero-reel.mp4" type="video/mp4" />
-                </video>
+                />
               )}
               <div className="absolute inset-0 bg-black/25 z-10 pointer-events-none" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-black/50 z-10 pointer-events-none mix-blend-multiply" />

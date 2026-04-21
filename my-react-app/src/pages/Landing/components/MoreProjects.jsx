@@ -29,6 +29,7 @@ const MoreProjects = () => {
   const containerRef = useRef(null);
   const previewRef = useRef(null);
   const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [expandedIndex, setExpandedIndex] = useState(null);
 
   const archiveProjects = useMemo(
     () =>
@@ -117,6 +118,12 @@ const MoreProjects = () => {
     gsap.to(previewRef.current, { scale: 0.8, autoAlpha: 0, duration: 0.3, ease: "power2.in" });
   };
 
+  // Mobile tap-to-expand
+  const handleRowTap = (index) => {
+    if (!isMobile) return;
+    setExpandedIndex((current) => (current === index ? null : index));
+  };
+
   return (
     <section ref={containerRef} className="w-full bg-[#f5f5f0] text-[#0a0a0a] py-24 md:py-40 px-6 md:px-12 lg:px-24 z-10 relative overflow-hidden">
       
@@ -127,16 +134,16 @@ const MoreProjects = () => {
           className="fixed top-0 left-0 w-75 h-50 pointer-events-none z-100 overflow-hidden opacity-0 invisible shadow-2xl scale-75"
         >
           <div className="w-full h-full bg-[#0a0a0a]/50 relative">
-            {archiveProjects.map((project, i) => (
+            {hoveredIndex !== null && (
               <img
-                key={i}
-                src={project.img}
-                alt={project.name}
+                key={hoveredIndex}
+                src={archiveProjects[hoveredIndex].img}
+                alt={archiveProjects[hoveredIndex].name}
                 loading="lazy"
                 decoding="async"
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${hoveredIndex === i ? 'opacity-100' : 'opacity-0'}`}
+                className="absolute inset-0 w-full h-full object-cover"
               />
-            ))}
+            )}
           </div>
         </div>
       )}
@@ -161,25 +168,30 @@ const MoreProjects = () => {
 
         {/* Project List */}
         <div className="flex flex-col relative z-10">
-          {archiveProjects.map((project, index) => (
-            <div 
-              key={index}
-              onMouseEnter={() => handleMouseEnter(index)}
-              onMouseLeave={handleMouseLeave}
-              className="archive-row group relative flex flex-col md:flex-row md:items-center justify-between py-6 md:py-8 transition-colors cursor-pointer"
-            >
-              
+          {archiveProjects.map((project, index) => {
+            const isExpanded = isMobile && expandedIndex === index;
+            return (
+            <div key={index} className="archive-row-wrap">
+              <div
+                onMouseEnter={() => handleMouseEnter(index)}
+                onMouseLeave={handleMouseLeave}
+                onClick={() => handleRowTap(index)}
+                role={isMobile ? "button" : undefined}
+                aria-expanded={isMobile ? isExpanded : undefined}
+                className="archive-row group relative flex flex-col md:flex-row md:items-center justify-between py-6 md:py-8 transition-colors cursor-pointer"
+              >
+
               {/* Animated Border Line */}
               <div className="row-border absolute bottom-0 left-0 w-full h-px bg-[#0a0a0a]/10 group-hover:bg-[#0a0a0a]/30 transition-colors duration-500" />
 
               {/* Left Side: Year & Title (Wrapped for Masking) */}
               <div className="flex items-center gap-6 md:gap-12 md:w-1/2 overflow-hidden py-2">
                 <div className="row-text flex items-center gap-6 md:gap-12 w-full transform-gpu origin-bottom-left">
-                  <span className="text-sm md:text-lg text-[#0a0a0a]/30 font-mono tracking-widest group-hover:text-[#0ea5a4] transition-colors duration-300">
+                  <span className={`text-sm md:text-lg font-mono tracking-widest transition-colors duration-300 ${isExpanded ? 'text-[#0ea5a4]' : 'text-[#0a0a0a]/30 group-hover:text-[#0ea5a4]'}`}>
                     {project.year}
                   </span>
-                  
-                  <h4 className="text-2xl md:text-4xl font-serif tracking-tight text-[#0a0a0a]/70 group-hover:text-[#0a0a0a] transform transition-all duration-500 group-hover:translate-x-4">
+
+                  <h4 className={`text-2xl md:text-4xl font-serif tracking-tight transform transition-all duration-500 ${isExpanded ? 'text-[#0a0a0a] translate-x-2' : 'text-[#0a0a0a]/70 group-hover:text-[#0a0a0a] group-hover:translate-x-4'}`}>
                     {project.name}
                   </h4>
                 </div>
@@ -196,15 +208,60 @@ const MoreProjects = () => {
                   </span>
                 </div>
 
-                <div className="row-text overflow-hidden w-8 h-8 flex items-center justify-center opacity-0 -translate-x-4 rtl:translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 text-[#0ea5a4]">
+                {/* Mobile: plus-to-cross toggle; Desktop: hover arrow */}
+                <div className="md:hidden shrink-0 w-8 h-8 flex items-center justify-center text-[#0ea5a4]">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`w-5 h-5 transition-transform duration-500 ${isExpanded ? 'rotate-45' : 'rotate-0'}`}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                </div>
+                <div className="hidden md:flex row-text overflow-hidden w-8 h-8 items-center justify-center opacity-0 -translate-x-4 rtl:translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 text-[#0ea5a4]">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 rtl:-scale-x-100">
                     <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
                   </svg>
                 </div>
               </div>
 
+              </div>
+
+              {/* Mobile: expandable image panel */}
+              {isMobile && (
+                <div
+                  className={`md:hidden grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+                  aria-hidden={!isExpanded}
+                >
+                  <div className="overflow-hidden">
+                    <div className="pt-2 pb-6">
+                      <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-[#0a0a0a]/5">
+                        {isExpanded && (
+                          <img
+                            src={project.img}
+                            alt={project.name}
+                            loading="lazy"
+                            decoding="async"
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        )}
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-4 flex items-end justify-between">
+                          <div>
+                            <p className="text-[10px] uppercase tracking-[0.25em] text-white/70 font-medium">
+                              {project.category}
+                            </p>
+                            <p className="text-sm text-white font-light mt-1">
+                              {project.location}
+                            </p>
+                          </div>
+                          <span className="text-[10px] font-mono tracking-widest text-[#0ea5a4]">
+                            {project.year}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          ))}
+            );
+          })}
         </div>
 
       </div>

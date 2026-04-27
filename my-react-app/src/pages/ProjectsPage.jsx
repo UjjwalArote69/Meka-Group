@@ -1275,12 +1275,16 @@
 // Requires: npm install react-leaflet leaflet
 // (react-leaflet v4 for React 18 • v5 for React 19)
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Helmet } from "react-helmet-async";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Footer from "../components/layout/Footer";
+import { useArchive } from "../hooks/useArchive";
+import { useProjectsPage } from "../hooks/useProjectsPage";
+import { loc } from "../lib/locale";
 
 // Map
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
@@ -1292,21 +1296,21 @@ const INK    = "#050505";
 const CREAM  = "#f5f5f0";
 const ACCENT = "#0ea5a4";
 
-// ──────────────────────────────────────────────────────────────
-//  DATA
-// ──────────────────────────────────────────────────────────────
-const PROJECTS_DATA = [
-  { id: 1,  year: "1988", client: "Vallsons Nhava Sheva Port",         title: "Port Construction Works at Nhava Sheva", company: "Port",                     location: "Mumbai, India",     lat: 18.9493, lng: 72.9510, image: "/more_projects/nhava_sheva.jpg",         desc: "Port engineering and construction works at Nhava Sheva contributing to the early JNPT development programme (1988)." },
-  { id: 2,  year: "1977", client: "Government of Gujarat Port",         title: "Porbandar Deepwater Berth & Breakwater", company: "Port",                     location: "Gujarat, India",    lat: 21.6417, lng: 69.6293, image: "/more_projects/government_of_gujrat.jpg", desc: "Deepwater berth and breakwater works for Gujarat's state port programme along the Porbandar coast (1977)." },
-  { id: 3,  year: "2023", client: "Marg Limited",                       title: "Karaikal Port Breakwaters",              company: "Port",                     location: "Chennai, India",    lat: 10.9255, lng: 79.8387, image: "/more_projects/marg_limited.jpg",        desc: "Construction of breakwaters and port infrastructure at Karaikal Port for Marg Limited (2023)." },
-  { id: 4,  year: "1984", client: "Krishak Bharathi Co-operative Ltd.", title: "KRIBHCO Wharf & Jetty, Hazira",          company: "Marine Construction",      location: "Mumbai, India",     lat: 21.1204, lng: 72.6295, image: "/more_projects/krishak.jpg",             desc: "Wharf and jetty construction at KRIBHCO's Hazira facility in Surat, Gujarat (1984)." },
-  { id: 5,  year: "1986", client: "Madras Port",                        title: "Outer Protection Arm & Breakwater",      company: "Marine Construction",      location: "Madras, India",     lat: 13.1020, lng: 80.2985, image: "/more_projects/madras_port.jpg",         desc: "Construction of the outer protection arm and breakwater at Madras Harbour (1986)." },
-  { id: 6,  year: "1992", client: "Vikram Ispat Ltd.",                  title: "Approach Bund, Caisson Bridge & Jetty",  company: "Marine Construction",      location: "Tamil Nadu, India", lat: 18.5432, lng: 72.9295, image: "/more_projects/vikram_ispat.jpg",        desc: "Approach bund, caisson bridge and jetty works at Revdanda for Vikram Ispat (1992)." },
-  { id: 7,  year: "1990", client: "Jawaharlal Nehru Port Trust (JNPT)", title: "Lagoon Dredging & Reclamation",          company: "Dredging & Reclamation",   location: "Odisha, India",     lat: 18.9640, lng: 72.9550, image: "/more_projects/jnpt.jpg",                desc: "Dredging and reclamation works in the lagoon behind the bulk berth at JNPT (1990)." },
-  { id: 8,  year: "2010", client: "Larsen & Toubro Ltd.",               title: "Dredging & Reclamation, Hazira",         company: "Dredging & Reclamation",   location: "Odisha, India",     lat: 21.0995, lng: 72.6450, image: "/more_projects/landt.jpg",               desc: "Dredging and reclamation across L&T's Hazira West Plot, Surat — Phase I–III (2010)." },
-  { id: 9,  year: "1996", client: "Brihanmumbai Municipal Corporation", title: "Urban Water Main Replacement",           company: "Urban Infrastructure",     location: "Varanasi, India",   lat: 19.0760, lng: 72.8777, image: "/more_projects/bmc.jpg",                 desc: "Replacement and laying of standard-diameter distributary water mains across BMC's City North Area (1996)." },
-  { id: 10, year: "1987", client: "Urmila & Company, Mumbai",           title: "Sardar Sarovar Canal Earthwork",         company: "Urban Infrastructure",     location: "Mumbai, India",     lat: 21.8314, lng: 73.7483, image: "/more_projects/urmila.jpg",              desc: "Earthwork for the main canal of the Sardar Sarovar Narmada Nigam project (1987)." },
-];
+// Image paths stay in code, keyed by archive entry slug. Mirrors
+// MoreProjects.jsx's ARCHIVE_IMAGES — adding a new slug in Sanity needs a
+// matching entry here + a file under /public/more_projects/.
+const ARCHIVE_IMAGES = {
+  nhava_sheva:         "/more_projects/nhava_sheva.jpg",
+  government_of_gujrat: "/more_projects/government_of_gujrat.jpg",
+  marg_limited:        "/more_projects/marg_limited.jpg",
+  krishak:             "/more_projects/krishak.jpg",
+  madras_port:         "/more_projects/madras_port.jpg",
+  vikram_ispat:        "/more_projects/vikram_ispat.jpg",
+  jnpt:                "/more_projects/jnpt.jpg",
+  landt:               "/more_projects/landt.jpg",
+  bmc:                 "/more_projects/bmc.jpg",
+  urmila:              "/more_projects/urmila.jpg",
+};
 
 const REGION_BOUNDS = [
   [4.0, 45.0],   // SW
@@ -1388,6 +1392,34 @@ function MapController({ selectedProject, isMobile }) {
 //  MAIN
 // ──────────────────────────────────────────────────────────────
 export default function ProjectsMapPage() {
+  const { i18n } = useTranslation();
+  const lang = i18n.language?.slice(0, 2) || "en";
+  const archive = useArchive();
+  const page = useProjectsPage();
+
+  // Resolve archive entries into the shape the map needs, dropping any
+  // entry without lat/lng (those exist only in the home Archive list and
+  // shouldn't get a marker).
+  const projects = useMemo(
+    () =>
+      archive.entries
+        .filter((e) => typeof e.lat === "number" && typeof e.lng === "number")
+        .map((e, i) => ({
+          id: e.slug || String(i),
+          slug: e.slug,
+          year: e.year,
+          client: e.name,
+          title: loc(e.title, lang) || e.name,
+          company: loc(e.category, lang),
+          location: loc(e.location, lang),
+          lat: e.lat,
+          lng: e.lng,
+          image: ARCHIVE_IMAGES[e.slug] || "",
+          desc: loc(e.description, lang),
+        })),
+    [archive.entries, lang]
+  );
+
   const [selectedProject, setSelectedProject] = useState(null);
   const [mounted, setMounted]   = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -1463,17 +1495,15 @@ export default function ProjectsMapPage() {
         {/* HEADER */}
         <div className="w-full max-w-[1600px] mx-auto mb-8 md:mb-14">
           <span className="block text-[#0ea5a4] text-[10px] font-sans tracking-[0.4em] uppercase font-bold mb-4">
-            The Archive
+            {loc(page.eyebrow, lang)}
           </span>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif uppercase tracking-tighter leading-[0.85] text-[#050505]">
-            Project Locations
+            {loc(page.title, lang)}
           </h1>
           <div className="mt-6 md:mt-10 flex items-start gap-5">
             <div className="w-10 h-px bg-black/20 mt-3 shrink-0" aria-hidden="true" />
             <p className="text-sm md:text-base text-black/60 font-sans leading-relaxed max-w-lg font-medium">
-              Interact with the map to explore our historical and active
-              deployments across marine construction, dredging, and urban
-              infrastructure.
+              {loc(page.description, lang)}
             </p>
           </div>
         </div>
@@ -1514,7 +1544,7 @@ export default function ProjectsMapPage() {
                 <MapResizeHandler />
                 <MapController selectedProject={selectedProject} isMobile={isMobile} />
 
-                {PROJECTS_DATA.map((project) => (
+                {projects.map((project) => (
                   <Marker
                     key={project.id}
                     position={[project.lat, project.lng]}
@@ -1530,7 +1560,7 @@ export default function ProjectsMapPage() {
             ) : (
               <div className="absolute inset-0 flex items-center justify-center bg-[#eaeae3]">
                 <span className="font-sans text-[10px] uppercase tracking-[0.3em] text-black/40 font-bold">
-                  Loading atlas…
+                  {loc(page.loadingLabel, lang)}
                 </span>
               </div>
             )}
@@ -1542,7 +1572,7 @@ export default function ProjectsMapPage() {
             >
               <span className="w-2 h-2 rounded-full bg-[#0ea5a4]" />
               <span className="font-sans text-[9px] uppercase tracking-[0.25em] text-black/60 font-bold">
-                {PROJECTS_DATA.length} deployments
+                {projects.length} {loc(page.deploymentsLabel, lang)}
               </span>
             </div>
 
@@ -1552,7 +1582,7 @@ export default function ProjectsMapPage() {
                 onClick={() => setSelectedProject(null)}
                 className="absolute top-4 right-4 z-[400] bg-white px-5 py-2.5 rounded-full text-[9px] uppercase tracking-[0.25em] font-bold text-black/55 shadow-md border border-black/5 hover:text-[#0ea5a4] transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0ea5a4]"
               >
-                Reset Map
+                {loc(page.resetMapLabel, lang)}
               </button>
             )}
           </div>
@@ -1579,7 +1609,7 @@ export default function ProjectsMapPage() {
 
                 <div className="flex items-center gap-4 mb-6 pb-6 border-b border-black/[0.06]">
                   <span className="text-[9px] font-sans font-bold uppercase tracking-[0.25em] text-black/40 shrink-0">
-                    Client
+                    {loc(page.clientLabel, lang)}
                   </span>
                   <span className="text-[11px] font-sans font-bold tracking-[0.1em] text-[#050505] min-w-0 truncate">
                     {selectedProject.client}
@@ -1611,7 +1641,7 @@ export default function ProjectsMapPage() {
                     className="group flex items-center justify-between w-full py-2 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0ea5a4]"
                   >
                     <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#050505] group-hover:text-[#0ea5a4] transition-colors">
-                      Discuss a Similar Project
+                      {loc(page.ctaLabel, lang)}
                     </span>
                     <svg
                       aria-hidden="true"
@@ -1651,11 +1681,10 @@ export default function ProjectsMapPage() {
                   </div>
                 </div>
                 <h3 className="text-2xl font-serif text-[#050505] mb-3 tracking-tight">
-                  Select a Deployment
+                  {loc(page.emptyTitle, lang)}
                 </h3>
                 <p className="text-[13px] font-sans text-black/50 max-w-[260px] leading-relaxed font-medium">
-                  Select any marker on the map to view detailed specifications
-                  about our historical marine and infrastructure projects.
+                  {loc(page.emptyDescription, lang)}
                 </p>
               </div>
             )}

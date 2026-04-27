@@ -5,26 +5,31 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { useTranslation } from "react-i18next";
 import useIsMobile from "../../../hooks/useIsMobile";
+import { useArchive } from "../../../hooks/useArchive";
+import { loc } from "../../../lib/locale";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Client names stay Latin across locales. Category + location are resolved
-// via t() using the shared archive.categories / archive.locations dictionaries.
-const ARCHIVE_META = [
-  { year: "1988", name: "Vallsons Nhava Sheva Port",        category: "port",     location: "mumbai",    img: "/more_projects/nhava_sheva.jpg" },
-  { year: "1977", name: "Government of Gujarat Port",        category: "port",     location: "gujarat",   img: "/more_projects/government_of_gujrat.jpg" },
-  { year: "2023", name: "Marg Limited",                      category: "port",     location: "chennai",   img: "/more_projects/marg_limited.jpg" },
-  { year: "1984", name: "Krishak Bharathi Co-operative Ltd.", category: "marine",   location: "mumbai",    img: "/more_projects/krishak.jpg" },
-  { year: "1986", name: "Madras Port",                       category: "marine",   location: "madras",    img: "/more_projects/madras_port.jpg" },
-  { year: "1992", name: "Vikram Ispat Ltd.",                 category: "marine",   location: "tamilnadu", img: "/more_projects/vikram_ispat.jpg" },
-  { year: "1990", name: "Jawaharlal Nehru Port Trust JNPT.", category: "dredging", location: "odisha",    img: "/more_projects/jnpt.jpg" },
-  { year: "2010", name: "Larsen & Toubro Ltd.",              category: "dredging", location: "odisha",    img: "/more_projects/landt.jpg" },
-  { year: "1996", name: "B.M.C",                             category: "urban",    location: "varanasi",  img: "/more_projects/bmc.jpg" },
-  { year: "1987", name: "Urmila & Company, Mumbai",          category: "urban",    location: "mumbai",    img: "/more_projects/urmila.jpg" },
-];
+// Image paths stay in code, keyed by entry slug. Adding a new archive
+// entry in Sanity requires a matching slug entry here + a file under
+// /public/more_projects/.
+const ARCHIVE_IMAGES = {
+  nhava_sheva:         "/more_projects/nhava_sheva.jpg",
+  government_of_gujrat: "/more_projects/government_of_gujrat.jpg",
+  marg_limited:        "/more_projects/marg_limited.jpg",
+  krishak:             "/more_projects/krishak.jpg",
+  madras_port:         "/more_projects/madras_port.jpg",
+  vikram_ispat:        "/more_projects/vikram_ispat.jpg",
+  jnpt:                "/more_projects/jnpt.jpg",
+  landt:               "/more_projects/landt.jpg",
+  bmc:                 "/more_projects/bmc.jpg",
+  urmila:              "/more_projects/urmila.jpg",
+};
 
 const MoreProjects = () => {
-  const { t } = useTranslation();
+  const { i18n } = useTranslation();
+  const lang = i18n.language?.slice(0, 2) || "en";
+  const archive = useArchive();
   const isMobile = useIsMobile();
   const containerRef = useRef(null);
   const previewRef = useRef(null);
@@ -33,12 +38,15 @@ const MoreProjects = () => {
 
   const archiveProjects = useMemo(
     () =>
-      ARCHIVE_META.map((p) => ({
-        ...p,
-        category: t(`archive.categories.${p.category}`),
-        location: t(`archive.locations.${p.location}`),
+      archive.entries.map((p) => ({
+        slug: p.slug,
+        year: p.year,
+        name: p.name,
+        img: ARCHIVE_IMAGES[p.slug] || "",
+        category: loc(p.category, lang),
+        location: loc(p.location, lang),
       })),
-    [t]
+    [archive.entries, lang]
   );
 
   useGSAP(() => {
@@ -117,7 +125,7 @@ const MoreProjects = () => {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
 
-  }, { scope: containerRef, dependencies: [isMobile] });
+  }, { scope: containerRef, dependencies: [isMobile, archive.entries] });
 
   // Handle Hover States for the Image Preview — desktop only
   const handleMouseEnter = (index) => {
@@ -140,7 +148,7 @@ const MoreProjects = () => {
 
   return (
     <section ref={containerRef} className="w-full bg-[#f5f5f0] text-[#0a0a0a] py-24 md:py-40 px-6 md:px-12 lg:px-24 z-10 relative overflow-hidden">
-      
+
       {/* --- THE FLOATING IMAGE PREVIEW (desktop only — skips 10 image loads on mobile) --- */}
       {!isMobile && (
         <div
@@ -163,19 +171,19 @@ const MoreProjects = () => {
       )}
 
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Header */}
         <div className="archive-header mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#0a0a0a]/15 pb-10">
           <div>
             <h2 className="text-sm md:text-base uppercase tracking-[0.4em] text-[#0ea5a4] mb-4 font-medium">
-              {t("archive.sectionLabel")}
+              {loc(archive.sectionLabel, lang)}
             </h2>
             <h3 className="text-4xl md:text-6xl font-bold tracking-tight">
-              {t("archive.sectionTitle")}
+              {loc(archive.sectionTitle, lang)}
             </h3>
           </div>
           <button className="text-sm tracking-[0.2em] uppercase font-light text-[#0a0a0a]/40 hover:text-[#0a0a0a] transition-colors flex items-center gap-2 group">
-            {t("archive.viewFullArchive")}
+            {loc(archive.viewFullArchiveLabel, lang)}
             <span className="transform transition-transform group-hover:translate-x-2">→</span>
           </button>
         </div>
@@ -185,7 +193,7 @@ const MoreProjects = () => {
           {archiveProjects.map((project, index) => {
             const isExpanded = isMobile && expandedIndex === index;
             return (
-            <div key={index} className="archive-row-wrap">
+            <div key={project.slug || index} className="archive-row-wrap">
               <div
                 onMouseEnter={() => handleMouseEnter(index)}
                 onMouseLeave={handleMouseLeave}

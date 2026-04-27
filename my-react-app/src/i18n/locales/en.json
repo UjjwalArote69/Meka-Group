@@ -16,7 +16,13 @@
     "careers": "Careers",
     "contact": "Contact",
     "menu": "Menu",
-    "close": "Close"
+    "close": "Close",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+
+  "a11y": {
+    "skipToContent": "Skip to main content"
   },
 
   "hero": {
@@ -383,6 +389,8 @@
     "joinTheLegacy": "Join the Legacy",
     "build": "Build",
     "withUs": "With Us",
+    "applyNow": "Apply Now",
+    "formDesc": "Diversified group with interests in Civil & Marine Construction, Dredging, Subsea Pipelines, and Port Development.",
     "heroDesc": "Four decades of engineering excellence. Join a team that reshapes coastlines, builds tomorrow's infrastructure, and engineers resilience into every project.",
     "whyMekaGroup": "Why Meka Group",
     "legacyOfExcellence": "Legacy of Excellence",
@@ -455,7 +463,42 @@
       "resumeLink":            "Resume or Portfolio Link",
       "resumeLinkHint":        "A link to your CV or portfolio — Google Drive, Dropbox, LinkedIn, personal site, etc.",
       "resumeLinkPlaceholder": "https://drive.google.com/... or https://linkedin.com/in/...",
-      "resumeLinkInvalid":     "Please enter a valid URL starting with http:// or https://"
+      "resumeLinkInvalid":     "Please enter a valid URL starting with http:// or https://",
+      "examples": {
+        "name":       "John Doe",
+        "email":      "your@email.com",
+        "phone":      "+91 XXXXX XXXXX",
+        "years":      "e.g. 5",
+        "city":       "e.g. Mumbai",
+        "state":      "e.g. Maharashtra",
+        "distance":   "e.g. 15 km / 45 min",
+        "salaryLow":  "e.g. 5",
+        "salaryHigh": "e.g. 8",
+        "company":    "e.g. L&T, Mumbai — Project Engineer"
+      }
+    },
+    "availability": {
+      "immediately": "Immediately",
+      "fifteenDays": "15 days",
+      "oneMonth":    "One month"
+    },
+    "sources": {
+      "linkedin":       "LinkedIn",
+      "indeed":         "Indeed",
+      "apna":           "Apna",
+      "companyWebsite": "Company Website",
+      "referral":       "Referral",
+      "other":          "Other"
+    },
+    "summary": {
+      "title":       "Application Summary",
+      "name":        "Name",
+      "position":    "Position",
+      "experience":  "Experience",
+      "city":        "City",
+      "expectedCTC": "Expected CTC",
+      "availability":"Availability",
+      "yearsValue":  "{{n}} years"
     },
     "nav": {
       "back":      "Back",
@@ -485,6 +528,7 @@
     "messageError": "Transmission Interrupted: Please try again.",
     "phonePlaceholder": "Phone (optional)",
     "phoneSrLabel": "Phone",
+    "sending": "Sending...",
     "categories": {
       "Marine EPC":         "Marine EPC",
       "Dredging":           "Dredging",
@@ -502,6 +546,20 @@
     "copyright": "© 2026 Meka Group. Precise Engineering.",
     "addressLine1": "Shiv Sagar Estate, Worli,",
     "addressLine2": "Mumbai, MH 400018"
+  },
+
+  "loader": {
+    "company": "Company",
+    "tagline": "Preparing your experience",
+    "logoAlt": "Brand logo"
+  },
+
+  "errorBoundary": {
+    "label": "Something went wrong",
+    "title": "Unexpected Error",
+    "description": "We're sorry — something broke on our end. Please try refreshing the page.",
+    "refresh": "Refresh Page",
+    "goHome": "Go Home"
   },
 
   "notFound": {

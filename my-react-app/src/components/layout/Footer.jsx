@@ -6,11 +6,15 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useIsMobile from "../../hooks/useIsMobile";
+import { useFooter } from "../../hooks/useFooter";
+import { loc } from "../../lib/locale";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const Footer = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.slice(0, 2) || "en";
+  const footer = useFooter();
   const isMobile = useIsMobile();
   const footerRef = useRef(null);
 
@@ -64,24 +68,24 @@ const Footer = () => {
         link.removeEventListener("mouseleave", onLeave);
       });
     };
-  }, { scope: footerRef, dependencies: [isMobile] });
+  }, { scope: footerRef, dependencies: [isMobile, footer.socialLinks] });
 
   return (
     <footer ref={footerRef} className="w-full bg-[#050505] text-white pt-32 pb-12 overflow-hidden relative border-t border-white/5">
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-32">
-          
+
           <div className="footer-reveal">
             <h2 className="text-3xl font-serif uppercase tracking-tighter mb-8">
               Meka<span className="text-[#0ea5a4]">.</span>
             </h2>
             <p className="text-white/40 text-sm leading-relaxed max-w-xs font-light uppercase tracking-tight">
-              {t("footer.tagline")}
+              {loc(footer.tagline, lang)}
             </p>
           </div>
 
           <div className="footer-reveal">
-            <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#0ea5a4] font-bold mb-10">{t("footer.directory")}</h4>
+            <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#0ea5a4] font-bold mb-10">{loc(footer.directoryLabel, lang)}</h4>
             <ul className="space-y-4">
               {[
                 { name: t("nav.home"), path: "/" },
@@ -106,25 +110,31 @@ const Footer = () => {
           </div>
 
           <div className="footer-reveal">
-            <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#0ea5a4] font-bold mb-10">{t("footer.headquarters")}</h4>
+            <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#0ea5a4] font-bold mb-10">{loc(footer.headquartersLabel, lang)}</h4>
             <div className="space-y-6 text-sm">
               <p className="text-white/40 leading-relaxed font-light uppercase tracking-tight">
-                {t("footer.addressLine1")}<br />
-                {t("footer.addressLine2")}
+                {loc(footer.addressLine1, lang)}<br />
+                {loc(footer.addressLine2, lang)}
               </p>
               <div className="space-y-2 font-serif uppercase tracking-wider">
-                <p className="text-white">info@mekagroup.in</p>
-                <p className="text-white">+91 22 4089 0000</p>
+                <p className="text-white">{footer.email}</p>
+                <p className="text-white">{footer.phone}</p>
               </div>
             </div>
           </div>
 
           <div className="footer-reveal">
-            <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#0ea5a4] font-bold mb-10">{t("footer.presence")}</h4>
+            <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#0ea5a4] font-bold mb-10">{loc(footer.presenceLabel, lang)}</h4>
             <div className="flex flex-wrap gap-3">
-              {["LinkedIn", "Twitter"].map((social) => (
-                <a key={social} href="#" className="social-link px-5 py-2 border border-white/10 rounded-full text-[10px] uppercase tracking-widest hover:bg-[#0ea5a4] hover:text-black hover:border-[#0ea5a4] transition-all duration-300">
-                  {social}
+              {footer.socialLinks.map((social) => (
+                <a
+                  key={social.name}
+                  href={social.url || "#"}
+                  target={social.url ? "_blank" : undefined}
+                  rel={social.url ? "noopener noreferrer" : undefined}
+                  className="social-link px-5 py-2 border border-white/10 rounded-full text-[10px] uppercase tracking-widest hover:bg-[#0ea5a4] hover:text-black hover:border-[#0ea5a4] transition-all duration-300"
+                >
+                  {social.name}
                 </a>
               ))}
             </div>
@@ -133,7 +143,7 @@ const Footer = () => {
 
         <div className="footer-reveal border-t border-white/5 pt-12">
           <p className="text-[10px] uppercase tracking-[0.2em] text-white/20 text-center md:text-left">
-            {t("footer.copyright")}
+            {loc(footer.copyright, lang)}
           </p>
         </div>
       </div>

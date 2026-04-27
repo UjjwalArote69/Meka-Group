@@ -2,8 +2,10 @@
 import React, { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { useTranslation } from "react-i18next";
 
 export default function Loader({ visible = true, progress = 0, brandLogo }) {
+  const { t } = useTranslation();
   const containerRef = useRef(null);
   const progressObj = useRef({ val: 0 });
   const progressTextRef = useRef(null);
@@ -109,12 +111,12 @@ export default function Loader({ visible = true, progress = 0, brandLogo }) {
             {brandLogo ? (
               <img
                 src={brandLogo}
-                alt="brand logo"
+                alt={t("loader.logoAlt")}
                 className="w-40 md:w-56 h-auto object-contain block"
               />
             ) : (
               <h1 className="text-black text-6xl md:text-8xl font-bold tracking-tighter">
-                Company
+                {t("loader.company")}
               </h1>
             )}
           </div>
@@ -122,7 +124,7 @@ export default function Loader({ visible = true, progress = 0, brandLogo }) {
 
         {/* Subtle Tagline */}
         <p className="tagline-reveal text-black/50 text-xs md:text-sm uppercase font-medium mb-12">
-          Preparing your experience
+          {t("loader.tagline")}
         </p>
 
         {/* Minimal Progress Bar Track */}

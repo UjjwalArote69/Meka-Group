@@ -1,6 +1,7 @@
 // src/App.jsx
 import React, { useState, useCallback, useEffect, lazy, Suspense } from "react";
 import { Route, useLocation, Routes } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Loader from "./components/Loader";
 import Navbar from "./components/layout/Navbar";
 import Home from "./pages/Landing/Home";
@@ -20,6 +21,7 @@ const NotFound             = lazy(() => import("./pages/NotFound"));
 const CapabilityCalculator = lazy(() => import("./components/CapabilityCalculator"));
 
 export default function App() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [loadStartTime] = useState(() => Date.now());
@@ -59,7 +61,7 @@ export default function App() {
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[999] focus:bg-[#0ea5a4] focus:text-white focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:uppercase focus:tracking-widest focus:rounded-sm"
         >
-          Skip to main content
+          {t("a11y.skipToContent")}
         </a>
 
         <Navbar />

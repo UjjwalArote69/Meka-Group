@@ -16,7 +16,13 @@
     "careers": "الوظائف",
     "contact": "اتصل بنا",
     "menu": "القائمة",
-    "close": "إغلاق"
+    "close": "إغلاق",
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة"
+  },
+
+  "a11y": {
+    "skipToContent": "تخطّي إلى المحتوى الرئيسي"
   },
 
   "hero": {
@@ -383,6 +389,8 @@
     "joinTheLegacy": "انضم إلى الإرث",
     "build": "ابنِ",
     "withUs": "معنا",
+    "applyNow": "تقدّم الآن",
+    "formDesc": "مجموعة متنوعة لها اهتمامات في البناء المدني والبحري، التجريف، خطوط الأنابيب تحت البحر، وتطوير الموانئ.",
     "heroDesc": "أربعة عقود من التميز الهندسي. انضم إلى فريق يعيد تشكيل السواحل، ويبني البنية التحتية للغد، ويهندس المرونة في كل مشروع.",
     "whyMekaGroup": "لماذا مجموعة ميكا",
     "legacyOfExcellence": "إرث من التميز",
@@ -455,7 +463,42 @@
       "resumeLink":            "رابط السيرة الذاتية أو ملف الأعمال",
       "resumeLinkHint":        "رابط لسيرتك الذاتية أو ملف أعمالك — Google Drive، Dropbox، LinkedIn، موقع شخصي، إلخ.",
       "resumeLinkPlaceholder": "https://drive.google.com/... أو https://linkedin.com/in/...",
-      "resumeLinkInvalid":     "يرجى إدخال رابط صحيح يبدأ بـ http:// أو https://"
+      "resumeLinkInvalid":     "يرجى إدخال رابط صحيح يبدأ بـ http:// أو https://",
+      "examples": {
+        "name":       "محمد علي",
+        "email":      "your@email.com",
+        "phone":      "+91 XXXXX XXXXX",
+        "years":      "مثال: 5",
+        "city":       "مثال: مومباي",
+        "state":      "مثال: مهاراشترا",
+        "distance":   "مثال: 15 كم / 45 دقيقة",
+        "salaryLow":  "مثال: 5",
+        "salaryHigh": "مثال: 8",
+        "company":    "مثال: L&T، مومباي — مهندس مشاريع"
+      }
+    },
+    "availability": {
+      "immediately": "فوراً",
+      "fifteenDays": "15 يوماً",
+      "oneMonth":    "شهر واحد"
+    },
+    "sources": {
+      "linkedin":       "LinkedIn",
+      "indeed":         "Indeed",
+      "apna":           "Apna",
+      "companyWebsite": "موقع الشركة",
+      "referral":       "إحالة",
+      "other":          "أخرى"
+    },
+    "summary": {
+      "title":       "ملخص الطلب",
+      "name":        "الاسم",
+      "position":    "المنصب",
+      "experience":  "الخبرة",
+      "city":        "المدينة",
+      "expectedCTC": "الراتب المتوقع",
+      "availability":"التوفر",
+      "yearsValue":  "{{n}} سنوات"
     },
     "nav": {
       "back":      "رجوع",
@@ -485,6 +528,7 @@
     "messageError": "انقطع الإرسال: يرجى المحاولة مرة أخرى.",
     "phonePlaceholder": "الهاتف (اختياري)",
     "phoneSrLabel": "الهاتف",
+    "sending": "جارٍ الإرسال...",
     "categories": {
       "Marine EPC":         "EPC بحري",
       "Dredging":           "تجريف",
@@ -502,6 +546,20 @@
     "copyright": "© 2026 مجموعة ميكا. هندسة دقيقة.",
     "addressLine1": "شيف ساغار إستيت، ورلي،",
     "addressLine2": "مومباي، MH 400018"
+  },
+
+  "loader": {
+    "company": "شركة",
+    "tagline": "جارٍ إعداد تجربتك",
+    "logoAlt": "شعار العلامة التجارية"
+  },
+
+  "errorBoundary": {
+    "label": "حدث خطأ ما",
+    "title": "خطأ غير متوقع",
+    "description": "نأسف — حدث خلل من جانبنا. يرجى محاولة تحديث الصفحة.",
+    "refresh": "تحديث الصفحة",
+    "goHome": "العودة للرئيسية"
   },
 
   "notFound": {

@@ -4,30 +4,41 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { useTranslation } from "react-i18next";
+import { useProjects } from "../../../hooks/useProjects";
+import { loc } from "../../../lib/locale";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Project titles are proper-noun client names — kept as Latin script.
-// Subtitles (category labels) are resolved via t() inside the component.
-const PROJECT_META = [
-  { id: "01", title: "Madras\nPort",            img: "/projects/image2.png" },
-  { id: "02", title: "Hyundai\nHeavy\nIndustries", img: "/projects/image1.png" },
-  { id: "03", title: "Mitsui &\nCompany",        img: "/projects/image3.png" },
-];
+// Image paths stay in code, keyed by project id. Admin can edit copy in
+// Sanity but adding a new project id requires a matching entry here +
+// a file under /public/projects/.
+const PROJECT_IMAGES = {
+  "01": "/projects/image2.png",
+  "02": "/projects/image1.png",
+  "03": "/projects/image3.png",
+};
 
 const Projects = () => {
-  const { t } = useTranslation();
+  const { i18n } = useTranslation();
+  const lang = i18n.language?.slice(0, 2) || "en";
+  const projects = useProjects();
   const containerRef = useRef(null);
   const trackRef = useRef(null);
 
   const projectData = useMemo(
     () =>
-      PROJECT_META.map((p) => ({
-        ...p,
-        subtitle: t(`projects.carousel.${p.id}.subtitle`),
+      projects.projects.map((p) => ({
+        id: p.id,
+        title: p.title || "",
+        img: PROJECT_IMAGES[p.id] || "",
+        subtitle: loc(p.subtitle, lang),
       })),
-    [t]
+    [projects.projects, lang]
   );
+
+  // Total panels = 1 intro + N projects. Track width scales accordingly so
+  // the GSAP x-translation math still maps to the full scrollable distance.
+  const totalPanels = projectData.length + 1;
 
   useGSAP(() => {
     const track = trackRef.current;
@@ -95,7 +106,7 @@ const Projects = () => {
           scrollTrigger: {
             trigger: panel,
             containerAnimation: scrollTween,
-            start: "left 75%", 
+            start: "left 75%",
             end: "left 25%",
             scrub: true,
           }
@@ -131,7 +142,7 @@ const Projects = () => {
           scrollTrigger: {
             trigger: panel,
             containerAnimation: scrollTween,
-            start: "left 50%", 
+            start: "left 50%",
             toggleActions: "play none none reverse",
           }
         }
@@ -148,7 +159,7 @@ const Projects = () => {
       repeat: -1,
     });
 
-  }, { scope: containerRef });
+  }, { scope: containerRef, dependencies: [projects.projects] });
 
   return (
     // Solid, clean off-white background
@@ -156,7 +167,7 @@ const Projects = () => {
     // even when the document is RTL (Arabic). The GSAP x-translation math
     // assumes LTR; flipping the container would scroll the wrong way.
     <section ref={containerRef} dir="ltr" className="w-full h-screen bg-[#F4F4F4] text-[#111] overflow-hidden relative z-10">
-      
+
       {/* MASSIVE BACKGROUND TEXT (Parallax Layer) */}
       <div className="absolute top-1/2 -translate-y-1/2 left-0 w-[200vw] pointer-events-none z-0">
         <h1
@@ -173,19 +184,23 @@ const Projects = () => {
       </div>
 
       {/* SCROLLING TRACK */}
-      <div ref={trackRef} className="flex h-full w-[400vw] relative z-10">
-        
+      <div
+        ref={trackRef}
+        className="flex h-full relative z-10"
+        style={{ width: `${totalPanels * 100}vw` }}
+      >
+
         {/* PANEL 0: INTRO */}
         <div className="project-panel w-screen h-full flex flex-col justify-center relative shrink-0 px-6 md:px-24 pb-16 md:pb-0">
           <div className="w-full max-w-350 mx-auto flex flex-col md:flex-row items-center justify-between">
             <div className="z-20 md:w-1/2">
               <p className="text-sm md:text-lg tracking-[0.4em] font-sans font-medium text-black/40 mb-6 uppercase">
-                {t("projects.ourPortfolio")}
+                {loc(projects.introLabel, lang)}
               </p>
               <h2 className="text-5xl sm:text-6xl md:text-[8rem] 2xl:text-[9rem] leading-[0.85] tracking-tighter text-[#111] uppercase">
-                <span className="font-sans font-black">{t("projects.engineering")}</span> <br />
-                <span className="font-serif italic text-[#0ea5a4] lowercase pr-4">{t("projects.the")}</span>
-                <span className="font-sans font-black">{t("projects.future")}</span>
+                <span className="font-sans font-black">{loc(projects.titleWord1, lang)}</span> <br />
+                <span className="font-serif italic text-[#0ea5a4] lowercase pr-4">{loc(projects.titleConnector, lang)}</span>
+                <span className="font-sans font-black">{loc(projects.titleWord2, lang)}</span>
               </h2>
             </div>
             <div className="z-20 md:w-1/2 relative h-[40vh] md:h-[60vh] flex items-center justify-center mt-12 md:mt-0">
@@ -199,25 +214,25 @@ const Projects = () => {
           </div>
         </div>
 
-        {/* PANELS 1-3: PROJECTS */}
+        {/* PANELS 1-N: PROJECTS */}
         {projectData.map((project) => (
-          <div 
-            key={project.id} 
+          <div
+            key={project.id}
             className="project-panel w-screen h-full flex items-center justify-center relative shrink-0 px-6 md:px-24 pb-16 md:pb-0"
           >
             <div className="w-full h-full max-h-200 max-w-350 mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-10 md:gap-20">
-              
+
               {/* Left Column: Typography */}
               <div className="text-wrap w-full md:w-[45%] flex flex-col justify-center z-20">
                 <span className="text-xl md:text-3xl font-sans font-light text-black/30 mb-4 md:mb-8 block">
-                  {t("projects.no")} {project.id}
+                  {loc(projects.noLabel, lang)} {project.id}
                 </span>
-                
+
                 {/* Clean, readable Rich Black text */}
                 <h3 className="text-4xl sm:text-5xl md:text-[6rem] lg:text-[7rem] 2xl:text-[8rem] font-serif uppercase leading-[0.85] tracking-tighter text-[#111] mb-8 md:mb-12">
                   {project.title}
                 </h3>
-                
+
                 {/* Solid pill badge for category */}
                 <div className="bg-[#111] px-6 py-3 md:py-4 rounded-full flex items-center gap-4 w-max shadow-xl">
                   <span className="w-2 h-2 rounded-full bg-[#0ea5a4] animate-pulse"></span>

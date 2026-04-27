@@ -9,13 +9,17 @@ import Footer from "../components/layout/Footer";
 import { useTranslation } from "react-i18next";
 import { Helmet } from "react-helmet-async";
 import { submitToGoogleSheet } from "../hooks/useGoogleSheet";
+import { useContactPage } from "../hooks/useContactPage";
+import { loc } from "../lib/locale";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const VALID_SUBJECTS = ["Marine EPC", "Dredging", "Subsea", "Heavy Engineering", "Other"];
 
 const Contact = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.slice(0, 2) || "en";
+  const data = useContactPage();
   const containerRef = useRef(null);
   const location = useLocation();
   const prefill = location.state?.prefill;
@@ -133,15 +137,15 @@ const Contact = () => {
 
           <div className="relative z-10 w-full max-w-[1600px] mx-auto">
             <span className="hero-subtitle block text-[#0ea5a4] text-[10px] md:text-xs font-sans tracking-[0.4em] uppercase font-bold mb-6 md:mb-8">
-              {t("contact.globalPartnerships")}
+              {loc(data.heroEyebrow, lang)}
             </span>
 
             <h1 className="text-[18vw] md:text-[16vw] lg:text-[11vw] 2xl:text-[10rem] font-serif uppercase tracking-tighter leading-[0.85] text-[#050505] mix-blend-multiply mb-8 md:mb-10">
               <span className="block overflow-hidden py-5 -my-5">
-                <span className="hero-word block">{t("contact.connect")}</span>
+                <span className="hero-word block">{loc(data.heroTitleWord1, lang)}</span>
               </span>
               <span className="block overflow-hidden py-5 -my-5 lg:ml-[8vw]">
-                <span className="hero-word block text-black/20">{t("contact.intelligence")}</span>
+                <span className="hero-word block text-black/20">{loc(data.heroTitleWord2, lang)}</span>
               </span>
             </h1>
           </div>
@@ -154,56 +158,53 @@ const Contact = () => {
 
               <div className="sidebar-item group">
                 <h2 className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-[#0ea5a4] font-bold mb-6">
-                  {t("contact.headquarters")}
+                  {loc(data.hqLabel, lang)}
                 </h2>
                 <div className="flex gap-5">
                   <MapPin size={22} className="text-black/30 mt-1 shrink-0" aria-hidden="true" />
                   <address className="text-base md:text-lg text-gray-700 font-sans leading-relaxed uppercase font-medium not-italic">
-                    2nd, Madhuli, Dr Annie Besant Rd,
-                    <br />
-                    Shiv Sagar Estate, Worli,
-                    <br />
-                    Mumbai 400018
+                    {data.addressLines.map((line, i, arr) => (
+                      <React.Fragment key={i}>
+                        {loc(line, lang)}
+                        {i < arr.length - 1 && <br />}
+                      </React.Fragment>
+                    ))}
                   </address>
                 </div>
               </div>
 
               <div className="sidebar-item space-y-8">
                 <h2 className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-[#0ea5a4] font-bold mb-6">
-                  {t("contact.directChannels")}
+                  {loc(data.directChannelsLabel, lang)}
                 </h2>
-                <a href="mailto:info@mekagroup.in" className="flex items-center gap-5 group" aria-label="Email info@mekagroup.in">
+                <a href={`mailto:${data.email}`} className="flex items-center gap-5 group" aria-label={`Email ${data.email}`}>
                   <div className="w-12 h-12 rounded-full border border-black/10 flex items-center justify-center group-hover:border-[#0ea5a4] group-hover:bg-[#0ea5a4] group-hover:text-white transition-all duration-500">
                     <Mail size={18} aria-hidden="true" />
                   </div>
                   <span className="text-lg md:text-xl font-serif uppercase group-hover:text-[#0ea5a4] transition-colors">
-                    info@mekagroup.in
+                    {data.email}
                   </span>
                 </a>
-                <a href="tel:+9102240890000" className="flex items-center gap-5 group" aria-label="Call +91 22 4089 0000">
+                <a href={`tel:${(data.phone || "").replace(/\s+/g, "")}`} className="flex items-center gap-5 group" aria-label={`Call ${data.phone}`}>
                   <div className="w-12 h-12 rounded-full border border-black/10 flex items-center justify-center group-hover:border-[#0ea5a4] group-hover:bg-[#0ea5a4] group-hover:text-white transition-all duration-500">
                     <Phone size={18} aria-hidden="true" />
                   </div>
                   <span className="text-lg md:text-xl font-serif uppercase group-hover:text-[#0ea5a4] transition-colors">
-                    +91 22 4089 0000
+                    {data.phone}
                   </span>
                 </a>
               </div>
 
               <div className="sidebar-item p-8 bg-white border border-black/[0.05] shadow-sm rounded-sm">
                 <h3 className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-[#0ea5a4] font-bold mb-8 flex items-center gap-3">
-                  <Globe size={16} aria-hidden="true" /> {t("contact.regionalHubs")}
+                  <Globe size={16} aria-hidden="true" /> {loc(data.regionalHubsLabel, lang)}
                 </h3>
                 <ul className="space-y-5 text-xs font-sans tracking-widest uppercase text-black/50 font-semibold">
-                  <li className="flex justify-between border-b border-black/[0.05] pb-3">
-                    <span>Chennai, India</span> <span className="text-[#050505]">{t("contact.operations")}</span>
-                  </li>
-                  <li className="flex justify-between border-b border-black/[0.05] pb-3">
-                    <span>Doha, Qatar</span> <span className="text-[#050505]">{t("contact.meHub")}</span>
-                  </li>
-                  <li className="flex justify-between border-b border-black/[0.05] pb-3">
-                    <span>Singapore</span> <span className="text-[#050505]">{t("contact.apacHub")}</span>
-                  </li>
+                  {data.regionalHubs.map((hub, i) => (
+                    <li key={i} className="flex justify-between border-b border-black/[0.05] pb-3">
+                      <span>{hub.city}</span> <span className="text-[#050505]">{loc(hub.role, lang)}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -211,7 +212,7 @@ const Contact = () => {
             <div className="lg:col-span-8">
               <div className="form-container bg-white border border-black/[0.05] shadow-xl p-8 md:p-16 rounded-sm">
                 <h2 className="text-4xl md:text-5xl font-serif uppercase tracking-tighter mb-12 md:mb-16">
-                  {t("contact.theProjectBrief")}
+                  {loc(data.formTitle, lang)}
                 </h2>
 
                 {/* Success/Error Banners */}
@@ -325,7 +326,7 @@ const Contact = () => {
                       {status === "sending" ? (
                         <>
                           <Loader2 size={14} className="animate-spin" />
-                          Sending...
+                          {t("contact.sending")}
                         </>
                       ) : (
                         t("contact.initiateDiscussion")

@@ -5,24 +5,29 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { useTranslation } from "react-i18next";
 import useIsMobile from "../../../hooks/useIsMobile";
+import { useFleet } from "../../../hooks/useFleet";
+import { loc } from "../../../lib/locale";
+import { imgSrc, imgSrcSet } from "../../../lib/imageUrl";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Vessel names are proper nouns — kept as Latin script across locales.
-// Type and function copy is resolved via t() inside the component.
-const FLEET_META = [
-  { id: "01", name: "Aero Star",       img: "/fleet/Aero Star.webp" },
-  { id: "02", name: "Amma Boat",       img: "/fleet/Amma Boat.webp" },
-  { id: "03", name: "CB 04",           img: "/fleet/Cb 04.webp" },
-  { id: "04", name: "Essar Dredge IV", img: "/fleet/Essar Dredge IV.webp" },
-  { id: "05", name: "FT3",             img: "/fleet/FT3.webp" },
-  { id: "06", name: "Hansita III",     img: "/fleet/Hansita III.webp" },
-  { id: "07", name: "Meka 2",          img: "/fleet/Meka 2.webp" },
-  { id: "08", name: "Meka 3",          img: "/fleet/Meka 3.webp" },
-];
+// Fallback image paths keyed by vessel id. The vessel's `photo` field in
+// Sanity takes precedence; this map only kicks in when no asset is uploaded.
+const FLEET_IMAGES = {
+  "01": "/fleet/Aero Star.webp",
+  "02": "/fleet/Amma Boat.webp",
+  "03": "/fleet/Cb 04.webp",
+  "04": "/fleet/Essar Dredge IV.webp",
+  "05": "/fleet/FT3.webp",
+  "06": "/fleet/Hansita III.webp",
+  "07": "/fleet/Meka 2.webp",
+  "08": "/fleet/Meka 3.webp",
+};
 
 const Fleet = () => {
-  const { t } = useTranslation();
+  const { i18n } = useTranslation();
+  const lang = i18n.language?.slice(0, 2) || "en";
+  const fleet = useFleet();
   const isMobile = useIsMobile();
   const containerRef = useRef(null);
   const trackRef = useRef(null);
@@ -30,12 +35,16 @@ const Fleet = () => {
 
   const fleetData = useMemo(
     () =>
-      FLEET_META.map((v) => ({
-        ...v,
-        type: t(`fleet.vessels.${v.id}.type`),
-        function: t(`fleet.vessels.${v.id}.function`),
+      fleet.vessels.map((v) => ({
+        id: v.id,
+        name: v.name,
+        photo: v.photo,
+        img: imgSrc(v.photo, FLEET_IMAGES[v.id] || "", { width: 1200 }),
+        srcSet: imgSrcSet(v.photo, [600, 900, 1200, 1800]),
+        type: loc(v.type, lang),
+        function: loc(v.function, lang),
       })),
-    [t]
+    [fleet.vessels, lang]
   );
 
   const [isDragging, setIsDragging] = useState(false);
@@ -88,7 +97,7 @@ const Fleet = () => {
 
     window.addEventListener("mousemove", moveCursor);
     return () => window.removeEventListener("mousemove", moveCursor);
-  }, { scope: containerRef, dependencies: [isMobile] });
+  }, { scope: containerRef, dependencies: [isMobile, fleet.vessels] });
 
   const handleMouseDown = (e) => {
     setIsDragging(true);
@@ -123,24 +132,24 @@ const Fleet = () => {
     <section ref={containerRef} className="w-full bg-[#f5f5f0] text-[#0a0a0a] py-24 md:py-32 relative z-10 overflow-hidden">
 
       {/* CUSTOM CURSOR — dark on light */}
-      
+
 
       {/* HEADER */}
       <div className="fleet-header max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24 mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div>
           <p className="font-sans text-[#0ea5a4] text-xs md:text-sm font-semibold tracking-[0.4em] uppercase mb-4">
-            {t("fleet.sectionLabel")}
+            {loc(fleet.sectionLabel, lang)}
           </p>
           <h2 className="font-sans font-black text-4xl sm:text-5xl md:text-7xl 2xl:text-8xl uppercase tracking-tighter leading-none text-[#0a0a0a]">
-            {t("fleet.our")}{" "}
+            {loc(fleet.ourLabel, lang)}{" "}
             <span className="font-serif italic text-[#0a0a0a]/50 font-light lowercase tracking-tight">
-              {t("fleet.fleet")}
+              {loc(fleet.fleetLabel, lang)}
             </span>
           </h2>
         </div>
         <div className="md:max-w-sm">
           <p className="font-sans font-light text-[#0a0a0a]/50 text-sm md:text-base leading-relaxed">
-            {t("fleet.desc")}
+            {loc(fleet.description, lang)}
           </p>
         </div>
       </div>
@@ -166,9 +175,14 @@ const Fleet = () => {
             <div className="w-full h-[50vh] md:h-[65vh] overflow-hidden rounded-xl bg-[#e8e8e3] relative">
               <img
                 src={vessel.img}
+                srcSet={vessel.srcSet || undefined}
+                sizes="(min-width: 1024px) 45vw, (min-width: 768px) 60vw, 85vw"
+                width="1200"
+                height="800"
                 alt={`${vessel.name} - ${vessel.type}`}
                 draggable="false"
                 loading={i > 1 ? "lazy" : "eager"}
+                fetchpriority={i === 0 ? "high" : "auto"}
                 decoding="async"
                 className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 pointer-events-none"
               />
@@ -197,7 +211,7 @@ const Fleet = () => {
           </div>
         ))}
 
-        <div className="w-[10vw] shrink-0 pointer-events-none" />
+        <div className="w-2 shrink-0 pointer-events-none" />
       </div>
     </section>
   );

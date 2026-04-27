@@ -432,7 +432,7 @@ export default function Navbar() {
               <LanguageSwitcher variant={isMenuOpen ? "dark" : "light"} />
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                aria-label={isMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
                 aria-expanded={isMenuOpen}
                 className="nav-hamburger relative z-[160] flex items-center gap-3 group cursor-pointer"
               >

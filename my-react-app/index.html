@@ -54,6 +54,10 @@
     }
     </script>
 
+    <!-- Preconnect to Sanity's CDN — shaves ~100ms off the first image fetch -->
+    <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.sanity.io" />
+
     <!-- Preload critical assets -->
     <link rel="preload" as="font" href="/fonts/Montserrat-VariableFont_wght.woff2" type="font/woff2" crossorigin />
     <link rel="preload" as="font" href="/fonts/Editorial-Old.woff2" type="font/woff2" crossorigin />

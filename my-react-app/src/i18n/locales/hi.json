@@ -16,7 +16,13 @@
     "careers": "करियर",
     "contact": "संपर्क",
     "menu": "मेनू",
-    "close": "बंद"
+    "close": "बंद",
+    "openMenu": "मेनू खोलें",
+    "closeMenu": "मेनू बंद करें"
+  },
+
+  "a11y": {
+    "skipToContent": "मुख्य सामग्री पर जाएं"
   },
 
   "hero": {
@@ -383,6 +389,8 @@
     "joinTheLegacy": "विरासत से जुड़ें",
     "build": "बनाएं",
     "withUs": "हमारे साथ",
+    "applyNow": "अभी आवेदन करें",
+    "formDesc": "सिविल और समुद्री निर्माण, ड्रेजिंग, सबसी पाइपलाइन और बंदरगाह विकास में रुचि रखने वाला विविध समूह।",
     "heroDesc": "इंजीनियरिंग उत्कृष्टता के चार दशक। एक ऐसी टीम से जुड़ें जो तटरेखाओं को नया आकार देती है, कल का बुनियादी ढांचा बनाती है, और हर परियोजना में लचीलापन इंजीनियर करती है।",
     "whyMekaGroup": "मेका ग्रुप क्यों",
     "legacyOfExcellence": "उत्कृष्टता की विरासत",
@@ -455,7 +463,42 @@
       "resumeLink":            "रिज्यूमे या पोर्टफोलियो लिंक",
       "resumeLinkHint":        "अपने CV या पोर्टफोलियो का लिंक — Google Drive, Dropbox, LinkedIn, व्यक्तिगत वेबसाइट आदि।",
       "resumeLinkPlaceholder": "https://drive.google.com/... या https://linkedin.com/in/...",
-      "resumeLinkInvalid":     "कृपया http:// या https:// से शुरू होने वाला वैध URL दर्ज करें"
+      "resumeLinkInvalid":     "कृपया http:// या https:// से शुरू होने वाला वैध URL दर्ज करें",
+      "examples": {
+        "name":       "राम कुमार",
+        "email":      "your@email.com",
+        "phone":      "+91 XXXXX XXXXX",
+        "years":      "उदा. 5",
+        "city":       "उदा. मुंबई",
+        "state":      "उदा. महाराष्ट्र",
+        "distance":   "उदा. 15 किमी / 45 मिनट",
+        "salaryLow":  "उदा. 5",
+        "salaryHigh": "उदा. 8",
+        "company":    "उदा. L&T, मुंबई — परियोजना इंजीनियर"
+      }
+    },
+    "availability": {
+      "immediately": "तुरंत",
+      "fifteenDays": "15 दिन",
+      "oneMonth":    "एक माह"
+    },
+    "sources": {
+      "linkedin":       "LinkedIn",
+      "indeed":         "Indeed",
+      "apna":           "Apna",
+      "companyWebsite": "कंपनी की वेबसाइट",
+      "referral":       "संदर्भ",
+      "other":          "अन्य"
+    },
+    "summary": {
+      "title":       "आवेदन सारांश",
+      "name":        "नाम",
+      "position":    "पद",
+      "experience":  "अनुभव",
+      "city":        "शहर",
+      "expectedCTC": "अपेक्षित CTC",
+      "availability":"उपलब्धता",
+      "yearsValue":  "{{n}} वर्ष"
     },
     "nav": {
       "back":      "वापस",
@@ -485,6 +528,7 @@
     "messageError": "प्रसारण बाधित: कृपया पुनः प्रयास करें।",
     "phonePlaceholder": "फ़ोन (वैकल्पिक)",
     "phoneSrLabel": "फ़ोन",
+    "sending": "भेज रहे हैं...",
     "categories": {
       "Marine EPC":         "समुद्री EPC",
       "Dredging":           "ड्रेजिंग",
@@ -502,6 +546,20 @@
     "copyright": "© 2026 मेका ग्रुप। सटीक इंजीनियरिंग।",
     "addressLine1": "शिव सागर एस्टेट, वर्ली,",
     "addressLine2": "मुंबई, MH 400018"
+  },
+
+  "loader": {
+    "company": "कंपनी",
+    "tagline": "आपका अनुभव तैयार किया जा रहा है",
+    "logoAlt": "ब्रांड लोगो"
+  },
+
+  "errorBoundary": {
+    "label": "कुछ गलत हो गया",
+    "title": "अनपेक्षित त्रुटि",
+    "description": "क्षमा करें — हमारी ओर से कुछ गड़बड़ हो गई। कृपया पृष्ठ को रिफ्रेश करने का प्रयास करें।",
+    "refresh": "पृष्ठ रिफ्रेश करें",
+    "goHome": "होम पर जाएं"
   },
 
   "notFound": {

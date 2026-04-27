@@ -4,20 +4,23 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { useTranslation } from "react-i18next";
+import { useAbout } from "../../../hooks/useAbout";
+import { loc } from "../../../lib/locale";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const CHAPTER_IDS = ["1979", "1982", "1995", "2002", "2010", "2013", "2018", "2024"];
-
 const About = () => {
-  const { t } = useTranslation();
+  const { i18n } = useTranslation();
+  const lang = i18n.language?.slice(0, 2) || "en";
+  const about = useAbout();
+  const chapters = about.chapters;
   const containerRef = useRef(null);
 
   // Robust layout recalculation to prevent premature triggering
   useEffect(() => {
     const handleRefresh = () => ScrollTrigger.refresh();
     window.addEventListener("resize", handleRefresh);
-    
+
     // Multiple refreshes to catch lazy-loaded assets and fonts above this section
     const t1 = setTimeout(handleRefresh, 100);
     const t2 = setTimeout(handleRefresh, 500);
@@ -34,9 +37,9 @@ const About = () => {
   useGSAP(() => {
     // 0. RESET INITIAL STATES VIA GSAP (Removes Tailwind conflicts)
     gsap.set(".scroll-progress-line", { scaleY: 0, transformOrigin: "top" });
-    
-    const chapters = gsap.utils.toArray(".story-chapter");
-    chapters.forEach((chapter) => {
+
+    const chapterEls = gsap.utils.toArray(".story-chapter");
+    chapterEls.forEach((chapter) => {
       gsap.set(chapter, { opacity: 0.15 });
       gsap.set(chapter.querySelector(".text-wrapper"), { y: 50, rotationX: -20, opacity: 0, filter: "blur(10px)" });
       gsap.set(chapter.querySelector(".chapter-dot"), { scale: 0.5, backgroundColor: "#ffffff" });
@@ -48,21 +51,21 @@ const About = () => {
       ease: "none",
       scrollTrigger: {
         trigger: ".chapters-wrapper",
-        start: "top 50%",    
-        end: "bottom 50%",   
+        start: "top 50%",
+        end: "bottom 50%",
         scrub: true,
         invalidateOnRefresh: true,
       }
     });
 
-    chapters.forEach((chapter) => {
+    chapterEls.forEach((chapter) => {
       const watermark = chapter.querySelector(".chapter-watermark");
       const dot = chapter.querySelector(".chapter-dot");
       const textWrap = chapter.querySelector(".text-wrapper");
 
       // Parallax for the giant year watermark
       gsap.to(watermark, {
-        y: -100, 
+        y: -100,
         ease: "none",
         scrollTrigger: {
           trigger: chapter,
@@ -85,14 +88,14 @@ const About = () => {
       });
 
       tlIn.to(chapter, { opacity: 1, ease: "none" }, 0)
-          .to(dot, { 
-            scale: 1.5, 
-            backgroundColor: "#0ea5a4", 
-            boxShadow: "0 0 20px rgba(14,165,164,0.8)", 
-            ease: "none" 
+          .to(dot, {
+            scale: 1.5,
+            backgroundColor: "#0ea5a4",
+            boxShadow: "0 0 20px rgba(14,165,164,0.8)",
+            ease: "none"
           }, 0)
-          .to(textWrap, 
-            { y: 0, rotationX: 0, opacity: 1, filter: "blur(0px)", ease: "power2.out" }, 
+          .to(textWrap,
+            { y: 0, rotationX: 0, opacity: 1, filter: "blur(0px)", ease: "power2.out" },
             0
           );
 
@@ -108,26 +111,26 @@ const About = () => {
       });
 
       tlOut.to(chapter, { opacity: 0.15, ease: "none" }, 0)
-           .to(dot, { 
-             scale: 0.5, 
-             backgroundColor: "#ffffff", 
-             boxShadow: "0 0 0px rgba(255,255,255,0)", 
-             ease: "none" 
+           .to(dot, {
+             scale: 0.5,
+             backgroundColor: "#ffffff",
+             boxShadow: "0 0 0px rgba(255,255,255,0)",
+             ease: "none"
            }, 0);
     });
-  }, { scope: containerRef });
+  }, { scope: containerRef, dependencies: [chapters] });
 
   return (
     <section ref={containerRef} className="w-full bg-[#0a0a0a] text-white py-32 px-6 md:px-12 lg:px-24 overflow-hidden z-10 relative">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Section Header */}
         <div className="mb-32 md:mb-48 relative z-20">
           <h2 className="text-sm md:text-base uppercase tracking-[0.4em] text-[#0ea5a4] mb-4 font-medium">
-            {t("about.sectionLabel")}
+            {loc(about.sectionLabel, lang)}
           </h2>
           <h3 className="text-4xl md:text-7xl font-bold tracking-tight">
-            {t("about.sectionTitle")}
+            {loc(about.sectionTitle, lang)}
           </h3>
         </div>
 
@@ -142,16 +145,16 @@ const About = () => {
             <div className="scroll-progress-line w-full h-full bg-[#0ea5a4]" />
           </div>
 
-          {CHAPTER_IDS.map((id) => (
+          {chapters.map((chapter) => (
             <div
-              key={id}
+              key={chapter.year}
               className="story-chapter flex flex-col md:flex-row relative"
               style={{ perspective: "1000px" }}
             >
 
               {/* Massive Background Watermark */}
               <div className="chapter-watermark absolute -top-10 md:-top-20 start-0 md:start-[10%] text-8xl md:text-[180px] font-black text-white/5 select-none pointer-events-none z-0 tracking-tighter">
-                {id}
+                {chapter.year}
               </div>
 
               {/* Node Indicator — sits on the rail */}
@@ -165,17 +168,17 @@ const About = () => {
                 {/* Left column (year + title) — uses logical end-padding so it flips in RTL */}
                 <div className="md:w-[30%] pe-12 md:pe-20 mb-6 md:mb-0 mt-1">
                   <span className="block text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">
-                    {id}
+                    {chapter.year}
                   </span>
                   <h4 className="text-xl md:text-3xl font-semibold leading-snug text-gray-200">
-                    {t(`about.chapters.${id}.title`)}
+                    {loc(chapter.title, lang)}
                   </h4>
                 </div>
 
                 {/* Right column (story text) — logical start-padding clears the rail on both sides */}
                 <div className="md:w-[70%] md:ps-24 pt-2 md:pt-4">
                   <p className="text-base md:text-2xl leading-relaxed text-gray-400 font-light">
-                    {t(`about.chapters.${id}.text`)}
+                    {loc(chapter.text, lang)}
                   </p>
                 </div>
 

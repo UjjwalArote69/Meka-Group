@@ -6,60 +6,29 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Footer from "../components/layout/Footer";
 import { useTranslation } from "react-i18next";
 import { submitToGoogleSheet } from "../hooks/useGoogleSheet";
+import { useCareersPage } from "../hooks/useCareersPage";
+import { loc } from "../lib/locale";
 import { Loader2, CheckCircle, XCircle, ArrowRight, ArrowLeft, Briefcase, User, MapPin, IndianRupee, FileText } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ── DATA ──
-// Role titles are industry-standard English across all locales — resumes,
-// LinkedIn listings, and HR tooling use them as proper terms. Group labels
-// and step titles are translated via t() inside the component.
-const POSITION_GROUPS = [
-  { id: "management", roles: [
-    "Project Director (Min 25 yrs — Marine/Offshore/Oil & Gas)",
-    "Project Manager — Seawater Intake Outfall Pipeline Systems",
-    "Marine Operations Manager",
-    "Company Secretary",
-  ]},
-  { id: "engineering", roles: [
-    "Naval Architect / Marine Engineer",
-    "Planning Engineer",
-    "Dredging Engineer",
-    "Project Engineer",
-    "Environmental Engineer (Marine experience only)",
-  ]},
-  { id: "legal", roles: [
-    "Contracts Manager (Legal) — Administration & Claims",
-    "Contracts Manager (SCM) — Subcontracts & Procurement",
-    "Legal Manager (Real Estate)",
-    "Bid Specialist",
-  ]},
-  { id: "crew", roles: [
-    "Dredge Master (Large CSD experience)",
-    "Chief Engineer (Large CSD experience)",
-    "2nd Engineer (Large CSD experience)",
-    "3rd Engineer (Large CSD experience)",
-    "Watchkeeping Engineer — On Deck",
-    "Watchkeeping Engineer — Engine Room",
-    "Fitter / Mechanic — Deck",
-    "Fitter / Mechanic — Engine Room",
-  ]},
-  { id: "support", roles: [
-    "Ship Repair / Ship Building Manager",
-    "Hydrographic Surveyor",
-    "HSE Manager (Marine experience only)",
-    "Project Accountant (Dahej)",
-    "Event Assistant",
-    "IT System Admin",
-  ]},
-  { id: "other", roles: [
-    "Intern",
-    "Other",
-  ]},
+// Position groups + roles are now CMS-driven (see useCareersPage). Role titles
+// stay English (they're industry-standard terms used in resumes, LinkedIn, HR
+// tooling) — admins edit them as plain strings in Sanity.
+const SOURCES = [
+  { value: "LinkedIn",        key: "linkedin" },
+  { value: "Indeed",          key: "indeed" },
+  { value: "Apna",            key: "apna" },
+  { value: "Company Website", key: "companyWebsite" },
+  { value: "Referral",        key: "referral" },
+  { value: "Other",           key: "other" },
 ];
-
-const ALL_ROLES = POSITION_GROUPS.flatMap((g) => g.roles);
-const SOURCES = ["LinkedIn", "Indeed", "Apna", "Company Website", "Referral", "Other"];
+const AVAILABILITY = [
+  { value: "Immediately", key: "immediately" },
+  { value: "15 days",     key: "fifteenDays" },
+  { value: "One month",   key: "oneMonth" },
+];
+const AVAILABILITY_KEY = Object.fromEntries(AVAILABILITY.map((a) => [a.value, a.key]));
 const STEP_ICONS = [User, Briefcase, MapPin, IndianRupee, FileText];
 const STEP_KEYS = ["personal", "position", "location", "compensation", "resume"];
 
@@ -106,15 +75,18 @@ const PillButton = ({ selected, onClick, children }) => (
 export default function CareersPage() {
   const pageRef = useRef(null);
   const formRef = useRef(null);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.slice(0, 2) || "en";
+  const careersData = useCareersPage();
 
   const POSITIONS = useMemo(
     () =>
-      POSITION_GROUPS.map((g) => ({
-        ...g,
-        group: t(`careers.groups.${g.id}`),
+      careersData.positionGroups.map((g) => ({
+        id: g.id,
+        roles: g.roles || [],
+        group: loc(g.label, lang),
       })),
-    [t]
+    [careersData.positionGroups, lang]
   );
   const STEPS = useMemo(
     () =>
@@ -245,20 +217,20 @@ export default function CareersPage() {
       <section className="hero-section relative w-full pt-28 sm:pt-36 md:pt-48 pb-16 md:pb-20 px-6 md:px-16 overflow-hidden bg-[#f5f5f0] flex flex-col justify-end min-h-[60vh] md:min-h-[70vh]">
         <div className="relative z-10 w-full max-w-[1600px] mx-auto">
           <span className="hero-subtitle block text-[#0ea5a4] text-xs font-sans tracking-[0.4em] uppercase font-bold mb-8">
-            {t("careers.joinTheLegacy")}
+            {loc(careersData.heroEyebrow, lang)}
           </span>
           <h1 className="text-[16vw] lg:text-[11vw] 2xl:text-[10rem] font-serif uppercase tracking-tighter leading-[0.85] text-[#050505] mix-blend-multiply mb-10">
             <span className="block overflow-hidden py-5 -my-5">
-              <span className="hero-word block">{t("careers.build")}</span>
+              <span className="hero-word block">{loc(careersData.heroTitleWord1, lang)}</span>
             </span>
             <span className="block overflow-hidden py-5 -my-5 lg:ml-[8vw]">
-              <span className="hero-word block text-black/20">{t("careers.withUs")}</span>
+              <span className="hero-word block text-black/20">{loc(careersData.heroTitleWord2, lang)}</span>
             </span>
           </h1>
           <div className="w-full max-w-xl lg:ml-[8vw]">
             <div className="hero-line w-16 h-[2px] bg-[#0ea5a4] mb-8 origin-left" />
             <p className="hero-desc text-lg md:text-xl text-gray-600 font-sans leading-relaxed">
-              {t("careers.heroDesc")}
+              {loc(careersData.heroDescription, lang)}
             </p>
           </div>
         </div>
@@ -268,17 +240,13 @@ export default function CareersPage() {
       <section className="relative z-10 py-20 md:py-32 px-6 md:px-16 border-t border-black/[0.06]">
         <div className="max-w-[1600px] mx-auto">
           <span className="text-[#0ea5a4] text-[11px] font-sans tracking-[0.4em] uppercase font-bold mb-8 block">
-            {t("careers.whyMekaGroup")}
+            {loc(careersData.whyMekaEyebrow, lang)}
           </span>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
-            {[
-              { title: t("careers.legacyOfExcellence"), desc: t("careers.legacyDesc") },
-              { title: t("careers.diverseOpportunities"), desc: t("careers.diverseDesc") },
-              { title: t("careers.growthImpact"), desc: t("careers.growthDesc") },
-            ].map((item, i) => (
+            {careersData.whyMekaCards.map((item, i) => (
               <div key={i}>
-                <h3 className="text-2xl md:text-3xl font-serif uppercase tracking-tight text-[#050505] mb-4">{item.title}</h3>
-                <p className="text-sm md:text-base text-gray-600 font-sans leading-relaxed">{item.desc}</p>
+                <h3 className="text-2xl md:text-3xl font-serif uppercase tracking-tight text-[#050505] mb-4">{loc(item.title, lang)}</h3>
+                <p className="text-sm md:text-base text-gray-600 font-sans leading-relaxed">{loc(item.description, lang)}</p>
               </div>
             ))}
           </div>
@@ -291,12 +259,12 @@ export default function CareersPage() {
 
           {/* Header */}
           <div className="mb-10 md:mb-14">
-            <span className="text-[#0ea5a4] text-[11px] font-sans tracking-[0.4em] uppercase font-bold mb-4 block">{t("careers.jobApplication")}</span>
+            <span className="text-[#0ea5a4] text-[11px] font-sans tracking-[0.4em] uppercase font-bold mb-4 block">{loc(careersData.applyEyebrow, lang)}</span>
             <h2 className="text-4xl md:text-5xl font-serif uppercase tracking-tighter leading-[0.9] text-[#050505] mb-3">
-              Apply Now
+              {loc(careersData.applyTitle, lang)}
             </h2>
             <p className="text-gray-400 text-sm font-sans max-w-lg">
-              Diversified group with interests in Civil & Marine Construction, Dredging, Subsea Pipelines, and Port Development.
+              {loc(careersData.applyDescription, lang)}
             </p>
           </div>
 
@@ -370,18 +338,18 @@ export default function CareersPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="fullName" required>{t("careers.fields.fullName")}</Label>
-                      <InputField id="fullName" value={form.fullName} placeholder="John Doe" error={errors.fullName} onChange={(e) => set("fullName", e.target.value)} />
+                      <InputField id="fullName" value={form.fullName} placeholder={t("careers.fields.examples.name")} error={errors.fullName} onChange={(e) => set("fullName", e.target.value)} />
                     </div>
                     <div>
                       <Label htmlFor="email" required>{t("careers.fields.email")}</Label>
-                      <InputField id="email" type="email" value={form.email} placeholder="your@email.com" error={errors.email} onChange={(e) => set("email", e.target.value)} />
+                      <InputField id="email" type="email" value={form.email} placeholder={t("careers.fields.examples.email")} error={errors.email} onChange={(e) => set("email", e.target.value)} />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="phone" required>{t("careers.fields.phone")}</Label>
-                      <InputField id="phone" type="tel" value={form.phone} placeholder="+91 XXXXX XXXXX" error={errors.phone} onChange={(e) => set("phone", e.target.value)} />
+                      <InputField id="phone" type="tel" value={form.phone} placeholder={t("careers.fields.examples.phone")} error={errors.phone} onChange={(e) => set("phone", e.target.value)} />
                     </div>
                     <div>
                       <Label htmlFor="dob" required>{t("careers.fields.dob")}</Label>
@@ -393,7 +361,7 @@ export default function CareersPage() {
                     <Label>{t("careers.fields.foundOpening")}</Label>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {SOURCES.map((src) => (
-                        <PillButton key={src} selected={form.appliedFrom === src} onClick={() => set("appliedFrom", src)}>{src}</PillButton>
+                        <PillButton key={src.value} selected={form.appliedFrom === src.value} onClick={() => set("appliedFrom", src.value)}>{t(`careers.sources.${src.key}`)}</PillButton>
                       ))}
                     </div>
                     {form.appliedFrom === "Other" && (
@@ -460,13 +428,13 @@ export default function CareersPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="exp" required>{t("careers.fields.yearsExperience")}</Label>
-                      <InputField id="exp" value={form.yearsOfExperience} placeholder="e.g. 5" error={errors.yearsOfExperience} onChange={(e) => set("yearsOfExperience", e.target.value)} />
+                      <InputField id="exp" value={form.yearsOfExperience} placeholder={t("careers.fields.examples.years")} error={errors.yearsOfExperience} onChange={(e) => set("yearsOfExperience", e.target.value)} />
                     </div>
                     <div>
                       <Label required>{t("careers.fields.availability")}</Label>
                       <div className="flex flex-wrap gap-2 mt-1">
-                        {["Immediately", "15 days", "One month"].map((opt) => (
-                          <PillButton key={opt} selected={form.availability === opt} onClick={() => set("availability", opt)}>{opt}</PillButton>
+                        {AVAILABILITY.map((opt) => (
+                          <PillButton key={opt.value} selected={form.availability === opt.value} onClick={() => set("availability", opt.value)}>{t(`careers.availability.${opt.key}`)}</PillButton>
                         ))}
                       </div>
                       {errors.availability && <p className="text-red-400 text-[10px] mt-1">{t("careers.fields.required")}</p>}
@@ -486,11 +454,11 @@ export default function CareersPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="presentCity" required>{t("careers.fields.presentCity")}</Label>
-                      <InputField id="presentCity" value={form.presentCity} placeholder="e.g. Mumbai" error={errors.presentCity} onChange={(e) => set("presentCity", e.target.value)} />
+                      <InputField id="presentCity" value={form.presentCity} placeholder={t("careers.fields.examples.city")} error={errors.presentCity} onChange={(e) => set("presentCity", e.target.value)} />
                     </div>
                     <div>
                       <Label htmlFor="presentState">{t("careers.fields.presentState")}</Label>
-                      <InputField id="presentState" value={form.presentState} placeholder="e.g. Maharashtra" onChange={(e) => set("presentState", e.target.value)} />
+                      <InputField id="presentState" value={form.presentState} placeholder={t("careers.fields.examples.state")} onChange={(e) => set("presentState", e.target.value)} />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -506,7 +474,7 @@ export default function CareersPage() {
                   <div>
                     <Label htmlFor="distanceWorli">{t("careers.fields.distanceWorli")}</Label>
                     <p className="text-[10px] text-black/30 font-sans mb-2">{t("careers.fields.distanceDetail")}</p>
-                    <InputField id="distanceWorli" value={form.distanceFromWorli} placeholder="e.g. 15 km / 45 min" onChange={(e) => set("distanceFromWorli", e.target.value)} />
+                    <InputField id="distanceWorli" value={form.distanceFromWorli} placeholder={t("careers.fields.examples.distance")} onChange={(e) => set("distanceFromWorli", e.target.value)} />
                   </div>
                 </div>
               )}
@@ -522,18 +490,18 @@ export default function CareersPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="curSalary" required>{t("careers.fields.presentSalary")}</Label>
-                      <InputField id="curSalary" value={form.presentSalary} placeholder="e.g. 5" error={errors.presentSalary} onChange={(e) => set("presentSalary", e.target.value)} />
+                      <InputField id="curSalary" value={form.presentSalary} placeholder={t("careers.fields.examples.salaryLow")} error={errors.presentSalary} onChange={(e) => set("presentSalary", e.target.value)} />
                     </div>
                     <div>
                       <Label htmlFor="expSalary" required>{t("careers.fields.expectedSalary")}</Label>
                       <p className="text-[10px] text-black/30 font-sans mb-2">{t("careers.fields.salaryNote")}</p>
-                      <InputField id="expSalary" value={form.expectedSalary} placeholder="e.g. 8" error={errors.expectedSalary} onChange={(e) => set("expectedSalary", e.target.value)} />
+                      <InputField id="expSalary" value={form.expectedSalary} placeholder={t("careers.fields.examples.salaryHigh")} error={errors.expectedSalary} onChange={(e) => set("expectedSalary", e.target.value)} />
                     </div>
                   </div>
 
                   <div>
                     <Label htmlFor="currentCompany" required>{t("careers.fields.currentCompany")}</Label>
-                    <InputField id="currentCompany" value={form.currentCompany} placeholder="e.g. L&T, Mumbai — Project Engineer" error={errors.currentCompany} onChange={(e) => set("currentCompany", e.target.value)} />
+                    <InputField id="currentCompany" value={form.currentCompany} placeholder={t("careers.fields.examples.company")} error={errors.currentCompany} onChange={(e) => set("currentCompany", e.target.value)} />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -598,14 +566,14 @@ export default function CareersPage() {
 
                   {/* Summary */}
                   <div className="bg-[#fafaf8] border border-black/[0.06] rounded-sm p-4">
-                    <p className="text-[9px] font-sans font-bold tracking-[0.2em] uppercase text-black/30 mb-3">Application Summary</p>
+                    <p className="text-[9px] font-sans font-bold tracking-[0.2em] uppercase text-black/30 mb-3">{t("careers.summary.title")}</p>
                     <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs font-sans">
-                      <span className="text-black/40">Name</span><span className="text-[#050505] font-medium">{form.fullName || "—"}</span>
-                      <span className="text-black/40">Position</span><span className="text-[#050505] font-medium">{form.position === "Other" ? form.positionOther : form.position || "—"}</span>
-                      <span className="text-black/40">Experience</span><span className="text-[#050505] font-medium">{form.yearsOfExperience ? `${form.yearsOfExperience} years` : "—"}</span>
-                      <span className="text-black/40">City</span><span className="text-[#050505] font-medium">{form.presentCity || "—"}</span>
-                      <span className="text-black/40">Expected CTC</span><span className="text-[#050505] font-medium">{form.expectedSalary ? `₹${form.expectedSalary}L` : "—"}</span>
-                      <span className="text-black/40">Availability</span><span className="text-[#050505] font-medium">{form.availability || "—"}</span>
+                      <span className="text-black/40">{t("careers.summary.name")}</span><span className="text-[#050505] font-medium">{form.fullName || "—"}</span>
+                      <span className="text-black/40">{t("careers.summary.position")}</span><span className="text-[#050505] font-medium">{form.position === "Other" ? form.positionOther : form.position || "—"}</span>
+                      <span className="text-black/40">{t("careers.summary.experience")}</span><span className="text-[#050505] font-medium">{form.yearsOfExperience ? t("careers.summary.yearsValue", { n: form.yearsOfExperience }) : "—"}</span>
+                      <span className="text-black/40">{t("careers.summary.city")}</span><span className="text-[#050505] font-medium">{form.presentCity || "—"}</span>
+                      <span className="text-black/40">{t("careers.summary.expectedCTC")}</span><span className="text-[#050505] font-medium">{form.expectedSalary ? `₹${form.expectedSalary}L` : "—"}</span>
+                      <span className="text-black/40">{t("careers.summary.availability")}</span><span className="text-[#050505] font-medium">{form.availability ? t(`careers.availability.${AVAILABILITY_KEY[form.availability]}`) : "—"}</span>
                     </div>
                   </div>
                 </div>

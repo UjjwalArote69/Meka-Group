@@ -11,54 +11,31 @@ import { useGSAP } from "@gsap/react";
 import { useTranslation } from "react-i18next";
 import Companies from "../../../components/Companies";
 import useIsMobile from "../../../hooks/useIsMobile";
+import { useHero } from "../../../hooks/useHero";
+import { loc } from "../../../lib/locale";
 
 gsap.registerPlugin(ScrollTrigger);
-
-// ──────────────────────────────────────────────────────────────
-//  STRUCTURAL DATA
-// ──────────────────────────────────────────────────────────────
-const STAT_IDS = [
-  { value: 45, key: "stats.yearsExperience",     suffix: "+" },
-  { value: 50, key: "stats.marineProjects",       suffix: "+" },
-  { value: 25, key: "stats.specializedVessels",   suffix: "+" },
-  { value: 10, key: "stats.globalReach",          suffix: "" },
-];
-
-const CLIENTS = [
-  "Reliance Industries",
-  "L&T",
-  "ONGC",
-  "Hyundai Heavy",
-  "Mitsui & Co.",
-  "McDermott",
-  "Vatech Wabag",
-  "Indian Navy",
-];
-
-const DEPLOYMENT_IDS = [
-  { code: "QA-04", key: "nfxp" },
-  { code: "IN-12", key: "kochi" },
-  { code: "IN-07", key: "hazira" },
-  { code: "IN-03", key: "rewas" },
-];
 
 // ──────────────────────────────────────────────────────────────
 //  COMPONENT
 // ──────────────────────────────────────────────────────────────
 const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
-  const { t } = useTranslation();
+  const { i18n } = useTranslation();
+  const lang = i18n.language?.slice(0, 2) || "en";
+  const hero = useHero();
   const STATS = useMemo(
-    () => STAT_IDS.map((s) => ({ ...s, label: t(s.key) })),
-    [t]
+    () => hero.stats.map((s) => ({ ...s, label: loc(s.label, lang) })),
+    [lang, hero.stats]
   );
+  const CLIENTS = hero.clients;
   const DEPLOYMENTS = useMemo(
     () =>
-      DEPLOYMENT_IDS.map((d) => ({
+      hero.deployments.map((d) => ({
         code: d.code,
-        site: t(`hero.deployments.${d.key}.site`),
-        coord: t(`hero.deployments.${d.key}.coord`),
+        site: loc(d.site, lang),
+        coord: loc(d.coord, lang),
       })),
-    [t]
+    [lang, hero.deployments]
   );
   
   const containerRef      = useRef(null);
@@ -237,7 +214,7 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
               {isMobile ? (
                 <img
                   src="/new_hero_image.jpg"
-                  alt={t("hero.videoAlt")}
+                  alt={loc(hero.videoAlt, lang)}
                   className="hero-bg-media absolute inset-0 w-full h-full object-cover origin-center"
                 />
               ) : (
@@ -248,7 +225,7 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
                   loop
                   playsInline
                   preload="auto"
-                  fetchpriority="high"
+                  fetchPriority="high"
                   poster="/new_hero_image.jpg"
                   src="/videos/hero.mp4"
                   className="hero-bg-media absolute inset-0 w-full h-full object-cover origin-center scale-105"
@@ -282,19 +259,19 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
                     </span>
                     <span className="w-8 h-px bg-white/30" />
                     <span className="font-sans text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-[#0ea5a4] font-bold">
-                      {t("hero.live")} REEL
+                      {loc(hero.liveLabel, lang)} REEL
                     </span>
                   </div>
 
                   <h1 className="m-0 drop-shadow-2xl flex flex-col">
                     <div className="overflow-hidden pb-2">
                       <span className="reveal-text block font-sans font-medium text-[13vw] md:text-[7rem] lg:text-[7.5rem] 2xl:text-[9rem] leading-[0.85] tracking-[-0.03em] uppercase text-white">
-                        {t("hero.marine")}
+                        {loc(hero.titleLine1, lang)}
                       </span>
                     </div>
                     <div className="overflow-hidden flex items-center gap-4 md:gap-6 lg:gap-8 mt-1 lg:mt-3 pb-2">
                       <span className="reveal-text block font-serif italic text-[11.5vw] md:text-[6rem] lg:text-[6.5rem] 2xl:text-[8rem] leading-[0.85] tracking-tight lowercase text-[#0ea5a4]">
-                        {t("hero.engineering")}
+                        {loc(hero.titleLine2, lang)}
                       </span>
                       <span className="hidden lg:block w-16 xl:w-32 h-[2px] bg-[#0ea5a4] shrink-0 hero-fade-in rounded-full" />
                     </div>
@@ -308,11 +285,11 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0ea5a4]" />
                   </span>
                   <span className="font-sans text-[9px] uppercase tracking-[0.3em] text-white font-bold">
-                    {t("hero.live")}
+                    {loc(hero.liveLabel, lang)}
                   </span>
                   <span className="hidden md:inline-block w-px h-3 bg-white/20" />
                   <span className="hidden md:inline-block font-sans text-[9px] uppercase tracking-[0.2em] text-white/60 font-semibold tabular-nums">
-                    EST. 1980
+                    EST. {hero.establishedYear}
                   </span>
                 </div>
               </div>
@@ -334,7 +311,7 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
                         }}
                       >
                         <span className="font-sans text-[9px] uppercase tracking-[0.25em] text-white/50 font-bold mb-1.5 flex items-center gap-2">
-                          <span>{t("hero.activeDeployment")}</span>
+                          <span>{loc(hero.activeDeploymentLabel, lang)}</span>
                           <span className="text-white/30">// {d.coord}</span>
                         </span>
                         <p className="font-sans text-sm text-white font-medium tracking-wide">
@@ -348,7 +325,7 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
                 {/* BOTTOM RIGHT: Description */}
                 <div className="flex flex-col lg:items-end text-left lg:text-right max-w-sm lg:max-w-md">
                   <p className="hero-fade-in font-sans text-sm md:text-base leading-relaxed text-white/75 font-medium drop-shadow-md">
-                    {t("hero.description")}
+                    {loc(hero.description, lang)}
                   </p>
                 </div>
 
@@ -358,7 +335,7 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
             {/* SCROLL INDICATOR */}
             <div className="hero-fade-in pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 z-30 hidden md:flex flex-col items-center gap-2">
               <span className="font-sans text-[9px] uppercase tracking-[0.4em] text-white/50 font-bold">
-                {t("hero.scroll", "Scroll")}
+                {loc(hero.scrollLabel, lang)}
               </span>
               <span className="relative w-px h-10 bg-white/20 overflow-hidden">
                 <span className="absolute top-0 left-0 w-full h-1/2 bg-white/80 animate-[scrollCue_2s_ease-in-out_infinite]" />
@@ -394,7 +371,7 @@ const NewHero = ({ onLoadProgress = () => {}, onReady = () => {} }) => {
           ══════════════════════════════════════════════════════ */}
       <section aria-label="Trusted by" className="relative z-10 bg-[#f5f5f0] py-12 md:py-20 overflow-hidden border-t border-black/[0.05]">
         <p className="font-sans text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-black/40 text-center mb-12 font-bold">
-          {t("trustedGlobally")}
+          {loc(hero.trustedLabel, lang)}
         </p>
         <div className="flex overflow-hidden whitespace-nowrap relative">
           <div aria-hidden="true" className="absolute left-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-r from-[#f5f5f0] to-transparent z-10" />
